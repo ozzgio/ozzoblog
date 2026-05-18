@@ -15,7 +15,7 @@ export const Title = ({ children }) => {
       </span>
       <Heading
         display="inline-block"
-        as="h3"
+        as="h1"
         fontSize={["xl", 24]}
         mb={4}
         color="headingText.default"
