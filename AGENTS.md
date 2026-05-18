@@ -52,3 +52,26 @@ npm run build
 ```
 
 For content-related tasks, verify both articles and books pages because they depend on external JSON contracts.
+
+## Codex code review guidelines
+
+When reviewing pull requests, focus on high-signal issues that can break production, weaken quality, or create user-facing regressions. Avoid commenting on trivial style preferences unless they hide a real bug.
+
+Flag as high priority:
+
+- changes that can break `npm run build`, `npm run lint`, or Vercel deployment
+- runtime errors in Next.js pages, data fetching, routing, SEO metadata, or RSS generation
+- regressions in mobile responsiveness, dark mode, accessibility, or navigation
+- unsafe assumptions around external `portfolio-data` JSON shape, missing fields, failed fetches, or unavailable images
+- changes that move article/book authoring concerns into this presentation repo
+- project-card changes that make `libs/projectData.js` inconsistent with the UI
+- dependency changes that are unnecessary, risky, or incompatible with the current Next.js/React stack
+- secrets, tokens, private URLs, vault-private content, or personal data accidentally committed
+- missing tests or manual verification notes for behavior that affects public pages
+
+For comments:
+
+- explain the concrete risk
+- point to the affected file or behavior
+- suggest a practical fix when possible
+- keep feedback concise and actionable
