@@ -3,8 +3,9 @@ import {
   resolvePortfolioAssetUrl,
 } from "../libs/contentUtils";
 
+const siteUrl = "https://ozzo.blog";
+
 function generateRSSFeed(articles) {
-  const siteUrl = "https://ozzo.blog";
   const currentDate = new Date().toUTCString();
 
   const rssItems = articles

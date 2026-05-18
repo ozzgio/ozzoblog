@@ -175,7 +175,11 @@ const ArticlesPage = ({ articles, error }) => {
   };
 
   return (
-    <Layout title="Articles">
+    <Layout
+      title="Articles"
+      description="Architecture calls, decisions, and things that broke while building in public. Writing about Synergym, agentic systems, and the stack decisions behind both."
+      path="/articles"
+    >
       <MotionBox
         initial={{ opacity: 0, y: 18 }}
         animate={{ opacity: 1, y: 0 }}
