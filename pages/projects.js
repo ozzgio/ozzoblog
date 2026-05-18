@@ -103,7 +103,7 @@ const Projects = () => {
       >
         <Container maxW="container.lg" px={[2, 4, 8]}>
           <Heading
-            as="h2"
+            as="h1"
             fontSize={["2xl", "2xl", "3xl"]}
             mb={6}
             textAlign="center"

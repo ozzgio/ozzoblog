@@ -68,7 +68,7 @@ const NavBar = (props) => {
           gap={2}
         >
           <Flex align="center" flexShrink={0}>
-            <Heading as="h1" size="lg" letterSpacing={"tighter"}>
+            <Heading as="p" size="lg" letterSpacing={"tighter"}>
               <Logo />
             </Heading>
           </Flex>

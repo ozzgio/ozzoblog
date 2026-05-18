@@ -214,7 +214,11 @@ def get_articles() -> List[Dict[str, Any]]:
                 # Only include if status is published (or if url exists)
                 status = frontmatter.get('status', '').lower()
                 has_url = bool(frontmatter.get('url'))
-                
+
+                # Skip articles destined for Synergym only
+                if (frontmatter.get('blog') or '').strip().lower() == 'synergym':
+                    continue
+
                 if status == 'published' or has_url:
                     article = {
                         'title': frontmatter.get('title', '').strip(),
