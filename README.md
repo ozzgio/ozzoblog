@@ -13,6 +13,7 @@ Welcome to my portfolio website — a modern, responsive web app showcasing my b
 [![React](https://img.shields.io/badge/React-20232A?logo=react&logoColor=61DAFB)](https://reactjs.org/)
 [![Chakra UI](https://img.shields.io/badge/Chakra--UI-319795?logo=chakraui&logoColor=white)](https://chakra-ui.com/)
 [![Framer Motion](https://img.shields.io/badge/Framer--Motion-0055FF?logo=framer&logoColor=white)](https://www.framer.com/motion/)
+[![React Markdown](https://img.shields.io/badge/React--Markdown-000000?logo=markdown&logoColor=white)](https://github.com/remarkjs/react-markdown)
 [![GitHub](https://img.shields.io/badge/GitHub-181717?logo=github&logoColor=white)](https://github.com/)
 [![React Icons](https://img.shields.io/badge/React%20Icons-EFD81D?logo=react&logoColor=black)](https://react-icons.github.io/react-icons/)
 [![Vercel](https://img.shields.io/badge/Vercel-000000?logo=vercel&logoColor=white)](https://vercel.com/)
@@ -26,8 +27,12 @@ Welcome to my portfolio website — a modern, responsive web app showcasing my b
 - Fully responsive, mobile-first layout
 - Dark mode support
 - Dynamic content from Obsidian vault (via GitHub)
-- SEO-friendly metadata
+- SEO-friendly metadata with automated CI health checks
+- RSS feed (`/rss.xml`) with runtime error guardrails
 - Animated transitions
+- Book and article deep-dive detail pages with Markdown rendering
+- Individual project detail pages
+- Experience timeline page
 - Clean and consistent component structure
 - Easy-to-maintain codebase with Prettier & ESLint
 
@@ -38,13 +43,29 @@ Welcome to my portfolio website — a modern, responsive web app showcasing my b
 To run the project locally:
 
 ```bash
-git clone https://github.com/ozzgio/portfolio.git
-cd portfolio
+git clone https://github.com/ozzgio/ozzoblog.git
+cd ozzoblog
 npm install
 npm run dev
 ```
 
 Then open [http://localhost:3000](http://localhost:3000) in your browser.
+
+---
+
+## 🧪 Checks & Verification
+
+```bash
+npm run lint          # ESLint
+npm run build         # Next.js production build
+npm run verify:native # Verify native filesystem integration
+```
+
+The SEO health workflow (`.github/workflows/seo-health.yml`) runs on every PR and `main` push:
+- Builds the site and starts `next start`
+- Verifies `/rss.xml` returns 200 with a valid RSS envelope
+- Verifies every URL in `public/sitemap.xml` returns 200
+- Checks key pages carry all required SEO tags: `title`, `meta description`, `canonical`, `og:*`, `twitter:card`
 
 ---
 
@@ -68,7 +89,7 @@ See the [portfolio-data repository](https://github.com/ozzgio/portfolio-data) fo
 
 ## 🧭 Repository Boundaries
 
-- **Lives here**: UI, layout, page composition, project cards, animations, SEO pages
+- **Lives here**: UI, layout, page composition, project cards, animations, SEO pages, detail page rendering
 - **Does not live here**: article/book authoring workflow, vault-private notes, publishing automation state
 - **Local source of truth**: `libs/projectData.js` for project cards
 - **External source of truth**: `portfolio-data` for articles/books
