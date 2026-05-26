@@ -1,3 +1,4 @@
+import dynamic from "next/dynamic";
 import ReactMarkdown from "react-markdown";
 import {
   Box,
@@ -10,6 +11,8 @@ import {
   Code,
   useColorModeValue,
 } from "@chakra-ui/react";
+
+const MermaidDiagram = dynamic(() => import("./mermaid-diagram"), { ssr: false });
 
 export default function MarkdownProse({ children }) {
   const bodyColor = useColorModeValue("gray.700", "gray.300");
@@ -81,20 +84,26 @@ export default function MarkdownProse({ children }) {
       <ListItem lineHeight="1.75">{children}</ListItem>
     ),
     hr: () => <Divider my={6} />,
-    pre: ({ children }) => (
-      <Box
-        as="pre"
-        bg={codeBg}
-        p={4}
-        borderRadius="md"
-        overflowX="auto"
-        mb={4}
-        fontSize="xs"
-        lineHeight="1.6"
-      >
-        {children}
-      </Box>
-    ),
+    pre: ({ children }) => {
+      const child = Array.isArray(children) ? children[0] : children;
+      if (child?.props?.className === "language-mermaid") {
+        return <MermaidDiagram chart={String(child.props.children).trim()} />;
+      }
+      return (
+        <Box
+          as="pre"
+          bg={codeBg}
+          p={4}
+          borderRadius="md"
+          overflowX="auto"
+          mb={4}
+          fontSize="xs"
+          lineHeight="1.6"
+        >
+          {children}
+        </Box>
+      );
+    },
     code: ({ children }) => (
       <Code bg={codeBg} px={1} borderRadius="sm" fontSize="xs">
         {children}
