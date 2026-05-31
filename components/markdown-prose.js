@@ -11,6 +11,11 @@ import {
   Code,
   useColorModeValue,
 } from "@chakra-ui/react";
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import {
+  oneDark,
+  oneLight,
+} from "react-syntax-highlighter/dist/cjs/styles/prism";
 
 const MermaidDiagram = dynamic(() => import("./mermaid-diagram"), { ssr: false });
 
@@ -20,6 +25,8 @@ export default function MarkdownProse({ children }) {
   const quoteBorder = useColorModeValue("orange.300", "orange.600");
   const quoteBg = useColorModeValue("orange.50", "whiteAlpha.50");
   const codeBg = useColorModeValue("gray.100", "whiteAlpha.200");
+  const codeBorder = useColorModeValue("gray.200", "whiteAlpha.300");
+  const syntaxTheme = useColorModeValue(oneLight, oneDark);
 
   const components = {
     h1: ({ children }) => (
@@ -86,9 +93,47 @@ export default function MarkdownProse({ children }) {
     hr: () => <Divider my={6} />,
     pre: ({ children }) => {
       const child = Array.isArray(children) ? children[0] : children;
-      if (child?.props?.className === "language-mermaid") {
+      const className = child?.props?.className || "";
+      const match = className.match(/language-([\w-]+)/);
+      const language = match?.[1];
+
+      if (className === "language-mermaid") {
         return <MermaidDiagram chart={String(child.props.children).trim()} />;
       }
+
+      if (language) {
+        return (
+          <Box
+            mb={4}
+            borderWidth="1px"
+            borderColor={codeBorder}
+            borderRadius="md"
+            overflow="hidden"
+          >
+            <SyntaxHighlighter
+              language={language}
+              style={syntaxTheme}
+              PreTag="div"
+              customStyle={{
+                margin: 0,
+                padding: "1rem",
+                fontSize: "0.78rem",
+                lineHeight: 1.7,
+                background: "transparent",
+              }}
+              codeTagProps={{
+                style: {
+                  fontFamily:
+                    'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
+                },
+              }}
+            >
+              {String(child.props.children).replace(/\n$/, "")}
+            </SyntaxHighlighter>
+          </Box>
+        );
+      }
+
       return (
         <Box
           as="pre"

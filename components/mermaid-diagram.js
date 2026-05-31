@@ -7,6 +7,11 @@ export default function MermaidDiagram({ chart }) {
   const id = useId().replace(/:/g, "-");
   const containerRef = useRef(null);
   const isDark = useColorModeValue(false, true);
+  const surfaceBg = useColorModeValue("#f8fafc", "#111827");
+  const surfaceBorder = useColorModeValue("#e2e8f0", "#334155");
+  const textColor = isDark ? "#e5e7eb" : "#0f172a";
+  const edgeLabelBg = isDark ? "#1f2937" : "#ffffff";
+  const arrowColor = isDark ? "#cbd5e1" : "#475569";
 
   useEffect(() => {
     if (!chart || !containerRef.current) return;
@@ -22,10 +27,46 @@ export default function MermaidDiagram({ chart }) {
         theme: "base",
         themeVariables: {
           background: isDark ? "#1a1a1e" : "#ffffff",
-          primaryTextColor: isDark ? "#f7fafc" : "#1a202c",
-          lineColor: "#475569",
+          primaryColor: isDark ? "#1f2937" : "#f8fafc",
+          primaryBorderColor: isDark ? "#94a3b8" : "#475569",
+          primaryTextColor: textColor,
+          secondaryColor: isDark ? "#1e293b" : "#f1f5f9",
+          secondaryTextColor: textColor,
+          tertiaryColor: isDark ? "#0f172a" : "#f8fafc",
+          tertiaryTextColor: textColor,
+          textColor,
+          lineColor: arrowColor,
+          defaultLinkColor: arrowColor,
+          edgeLabelBackground: edgeLabelBg,
+          mainBkg: isDark ? "#1f2937" : "#f8fafc",
+          nodeBorder: isDark ? "#94a3b8" : "#475569",
+          nodeTextColor: textColor,
+          clusterBkg: isDark ? "#0f172a" : "#f8fafc",
+          clusterBorder: isDark ? "#475569" : "#cbd5e1",
           fontSize: "13px",
         },
+        themeCSS: `
+          .edgeLabel rect,
+          .labelBkg {
+            fill: ${edgeLabelBg} !important;
+            opacity: 1 !important;
+          }
+          .edgeLabel p,
+          .edgeLabel span,
+          .edgeLabel text {
+            color: ${textColor} !important;
+            fill: ${textColor} !important;
+            font-weight: 600 !important;
+          }
+          .edgePath .path,
+          .flowchart-link {
+            stroke-width: 2px !important;
+          }
+          marker path {
+            fill: ${arrowColor} !important;
+            stroke: ${arrowColor} !important;
+          }
+        `,
         flowchart: { useMaxWidth: true, htmlLabels: true },
         c4: {
           c4ShapeInRow: 3,
@@ -57,13 +98,17 @@ export default function MermaidDiagram({ chart }) {
     });
 
     return () => { cancelled = true; };
-  }, [chart, id, isDark]);
+  }, [arrowColor, chart, edgeLabelBg, id, isDark, textColor]);
 
   return (
     <Box
       ref={containerRef}
       my={6}
+      p={4}
       overflowX="auto"
+      borderWidth="1px"
+      borderColor={surfaceBorder}
+      bg={surfaceBg}
       borderRadius="md"
       display="flex"
       justifyContent="center"
