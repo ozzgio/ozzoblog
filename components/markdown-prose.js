@@ -9,6 +9,7 @@ import {
   ListItem,
   Divider,
   Code,
+  Link,
   useColorModeValue,
 } from "@chakra-ui/react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
@@ -64,6 +65,21 @@ export default function MarkdownProse({ children }) {
         {children}
       </Box>
     ),
+    a: ({ href, children }) => {
+      const isExternal = /^https?:\/\//.test(href || "");
+      return (
+        <Link
+          href={href}
+          isExternal={isExternal}
+          textDecoration="underline"
+          textUnderlineOffset="3px"
+          fontWeight="medium"
+          wordBreak="break-word"
+        >
+          {children}
+        </Link>
+      );
+    },
     blockquote: ({ children }) => (
       <Box
         borderLeftWidth="3px"
