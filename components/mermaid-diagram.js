@@ -24,9 +24,17 @@ export default function MermaidDiagram({ chart }) {
           background: isDark ? "#1a1a1e" : "#ffffff",
           primaryTextColor: isDark ? "#f7fafc" : "#1a202c",
           lineColor: "#475569",
-          fontSize: "14px",
+          fontSize: "13px",
         },
         flowchart: { useMaxWidth: true, htmlLabels: true },
+        c4: {
+          c4ShapeInRow: 3,
+          c4BoundaryInRow: 1,
+          c4ShapeMargin: 80,
+          c4ShapePadding: 24,
+          diagramMarginX: 80,
+          diagramMarginY: 60,
+        },
         securityLevel: "loose",
       });
 
