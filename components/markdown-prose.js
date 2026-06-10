@@ -1,4 +1,5 @@
 import dynamic from "next/dynamic";
+import NextLink from "next/link";
 import ReactMarkdown from "react-markdown";
 import {
   Box,
@@ -67,15 +68,17 @@ export default function MarkdownProse({ children }) {
     ),
     a: ({ href, children }) => {
       const isExternal = /^https?:\/\//.test(href || "");
+      const linkProps = {
+        textDecoration: "underline",
+        textUnderlineOffset: "3px",
+        fontWeight: "medium",
+        wordBreak: "break-word",
+      };
+      if (isExternal) {
+        return <Link href={href} isExternal {...linkProps}>{children}</Link>;
+      }
       return (
-        <Link
-          href={href}
-          isExternal={isExternal}
-          textDecoration="underline"
-          textUnderlineOffset="3px"
-          fontWeight="medium"
-          wordBreak="break-word"
-        >
+        <Link as={NextLink} href={href} {...linkProps}>
           {children}
         </Link>
       );

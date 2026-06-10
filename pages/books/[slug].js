@@ -183,30 +183,30 @@ export default function BookDetailPage({ book }) {
               <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4} w="100%">
                 {book.problem && (
                   <SectionBlock icon={IoBulbOutline} label="Why I picked this up" color="blue">
-                    <Text fontSize="sm" color={bodyColor} lineHeight="1.7">
-                      {book.problem}
-                    </Text>
+                    <Box sx={{ "& p": { mb: 0 } }}>
+                      <MarkdownProse>{book.problem}</MarkdownProse>
+                    </Box>
                   </SectionBlock>
                 )}
                 {book.concept && (
                   <SectionBlock icon={IoLayersOutline} label="What it teaches" color="purple">
-                    <Text fontSize="sm" color={bodyColor} lineHeight="1.7">
-                      {book.concept}
-                    </Text>
+                    <Box sx={{ "& p": { mb: 0 } }}>
+                      <MarkdownProse>{book.concept}</MarkdownProse>
+                    </Box>
                   </SectionBlock>
                 )}
                 {book.effect && (
                   <SectionBlock icon={IoCheckmarkCircleOutline} label="What changed" color="green">
-                    <Text fontSize="sm" color={bodyColor} lineHeight="1.7">
-                      {book.effect}
-                    </Text>
+                    <Box sx={{ "& p": { mb: 0 } }}>
+                      <MarkdownProse>{book.effect}</MarkdownProse>
+                    </Box>
                   </SectionBlock>
                 )}
                 {book.trade_off && (
                   <SectionBlock icon={IoSwapHorizontalOutline} label="Honest take" color="gray">
-                    <Text fontSize="sm" color={bodyColor} lineHeight="1.7">
-                      {book.trade_off}
-                    </Text>
+                    <Box sx={{ "& p": { mb: 0 } }}>
+                      <MarkdownProse>{book.trade_off}</MarkdownProse>
+                    </Box>
                   </SectionBlock>
                 )}
               </SimpleGrid>
@@ -227,13 +227,13 @@ export default function BookDetailPage({ book }) {
                       What I decided
                     </Text>
                   </HStack>
-                  <Text fontSize="sm" color={decisionText} lineHeight="1.7" fontWeight="medium">
-                    {book.decision}
-                  </Text>
+                  <Box sx={{ "& p": { mb: 0 }, "& a": { color: decisionText } }}>
+                    <MarkdownProse>{book.decision}</MarkdownProse>
+                  </Box>
                   {book.implementation && (
-                    <Text fontSize="sm" color={decisionText} lineHeight="1.7" mt={3} opacity={0.85}>
-                      {book.implementation}
-                    </Text>
+                    <Box sx={{ "& p": { mb: 0 }, "& a": { color: decisionText } }} mt={3} opacity={0.85}>
+                      <MarkdownProse>{book.implementation}</MarkdownProse>
+                    </Box>
                   )}
                 </Box>
               )}
