@@ -13,7 +13,7 @@ const ErrorPage = () => {
   return (
     <>
       <Head>
-        <title>404 — Page Not Found | Ozzo</title>
+        <title>404 - Page Not Found | Ozzo</title>
         <meta
           name="description"
           content="The page you are looking for does not exist on ozzo.blog."

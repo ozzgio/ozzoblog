@@ -9,7 +9,7 @@ const theme = extendTheme({
   styles: {
     global: (props) => ({
       body: {
-        bg: mode("#fafafa", "#1a1a1e")(props),
+        bg: mode("#f7f5f2", "#1a1a1e")(props),
         color: mode("gray.800", "gray.100")(props),
       },
       "*::placeholder": {
