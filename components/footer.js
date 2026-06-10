@@ -2,8 +2,8 @@ import { Box, HStack, Link, Text, VStack, useColorModeValue } from "@chakra-ui/r
 import packageJson from "../package.json";
 
 const Footer = ({ showBorder = true }) => {
-  const textColor = useColorModeValue("gray.600", "gray.400");
-  const linkColor = useColorModeValue("orange.600", "orange.400");
+  const textColor = useColorModeValue("gray.700", "gray.400");
+  const linkColor = useColorModeValue("orange.700", "orange.300");
   const borderColor = useColorModeValue("gray.200", "gray.700");
 
   return (
@@ -43,7 +43,7 @@ const Footer = ({ showBorder = true }) => {
             </Link>
           </Text>
         </HStack>
-        <Text fontSize="xs" color={textColor} opacity={0.7}>
+        <Text fontSize="xs" color={useColorModeValue("gray.700", "gray.500")}>
           Version: {packageJson.version}
         </Text>
       </VStack>

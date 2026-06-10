@@ -1,11 +1,9 @@
 import styled from "@emotion/styled";
 
 const Paragraph = styled.p`
-  text-align: justify;
-  text-indent: 0.5em;
-  hyphens: auto;
+  text-align: left;
   font-size: 1.125rem;
-  line-height: 1.5;
+  line-height: 1.7;
 `;
 
 export default Paragraph;
