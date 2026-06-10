@@ -13,12 +13,12 @@ const LogoBox = styled.span`
   line-height: 1;
   padding: 8px 10px;
 
-  > svg {
+  img {
     transition: 200ms ease;
     flex-shrink: 0;
   }
 
-  &:hover > svg {
+  &:hover img {
     transform: rotate(30deg);
   }
 `;
@@ -41,17 +41,7 @@ const Logo = () => {
           whiteSpace="nowrap"
         >
           <Text as="span" color={useColorModeValue("gray.900", "whiteAlpha.900")}>
-            Ozzo&apos;s
-          </Text>
-          <Text
-            as="span"
-            fontSize={{ base: "0.7em", md: "0.62em" }}
-            fontWeight="300"
-            letterSpacing="0.18em"
-            textTransform="uppercase"
-            color={useColorModeValue("orange.500", "orange.300")}
-          >
-            blog
+            Ozzo
           </Text>
         </Text>
       </LogoBox>
