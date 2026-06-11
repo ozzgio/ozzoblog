@@ -52,7 +52,13 @@ function SectionBlock({ icon, label, color, children, bg }) {
     >
       <HStack spacing={2} mb={3}>
         <Icon as={icon} color={`${color}.500`} boxSize={4} />
-        <Text fontSize="xs" fontWeight="bold" textTransform="uppercase" color={labelColor} letterSpacing="wider">
+        <Text
+          fontSize="xs"
+          fontWeight="bold"
+          textTransform="uppercase"
+          color={labelColor}
+          letterSpacing="wider"
+        >
           {label}
         </Text>
       </HStack>
@@ -77,7 +83,8 @@ export default function BookDetailPage({ book }) {
   if (!book) return null;
 
   const canonicalUrl = `https://ozzo.blog/books/${book.slug}`;
-  const hasPersonalSections = book.problem || book.decision || book.effect || book.trade_off;
+  const hasPersonalSections =
+    book.problem || book.decision || book.effect || book.trade_off;
   const hasQuotes = book.quotes?.length > 0;
 
   return (
@@ -92,16 +99,18 @@ export default function BookDetailPage({ book }) {
 
       <Container maxW="3xl" py={{ base: 6, md: 10 }}>
         <VStack align="start" spacing={8}>
-
-          {/* Back link */}
-          <Link as={NextLink} href="/books" color="orange.500" fontWeight="semibold">
+          <Link
+            as={NextLink}
+            href="/books"
+            color="orange.500"
+            fontWeight="semibold"
+          >
             <HStack spacing={1}>
               <Icon as={IoArrowBackOutline} />
               <Text>Back to books</Text>
             </HStack>
           </Link>
 
-          {/* Hero: cover + meta */}
           <Box w="100%">
             <HStack align="start" spacing={6} flexWrap="wrap">
               {book.cover && (
@@ -126,8 +135,13 @@ export default function BookDetailPage({ book }) {
                 </Box>
               )}
               <VStack align="start" spacing={3} flex={1} minW="200px">
-                <Heading as="h1" size="lg" lineHeight="1.15" color={headingColor}
-                  style={{ fontFamily: "'Merriweather', Georgia, serif" }}>
+                <Heading
+                  as="h1"
+                  size="lg"
+                  lineHeight="1.15"
+                  color={headingColor}
+                  style={{ fontFamily: "'Merriweather', Georgia, serif" }}
+                >
                   {book.title}
                 </Heading>
                 <HStack spacing={2} color={mutedText} fontSize="sm">
@@ -150,7 +164,12 @@ export default function BookDetailPage({ book }) {
                 )}
                 <HStack flexWrap="wrap" spacing={2}>
                   {book.tags?.map((tag) => (
-                    <Tag key={tag} colorScheme="orange" borderRadius="full" size="sm">
+                    <Tag
+                      key={tag}
+                      colorScheme="orange"
+                      borderRadius="full"
+                      size="sm"
+                    >
                       {tag}
                     </Tag>
                   ))}
@@ -159,7 +178,6 @@ export default function BookDetailPage({ book }) {
             </HStack>
           </Box>
 
-          {/* Key lesson - always shown if present */}
           {book.lesson && (
             <Box
               w="100%"
@@ -168,44 +186,70 @@ export default function BookDetailPage({ book }) {
               pl={4}
               py={1}
             >
-              <Text fontStyle="italic" color={bodyColor} fontSize="md" lineHeight="1.6"
-                style={{ fontFamily: "'Merriweather', Georgia, serif" }}>
+              <Text
+                fontStyle="italic"
+                color={bodyColor}
+                fontSize="md"
+                lineHeight="1.6"
+                style={{ fontFamily: "'Merriweather', Georgia, serif" }}
+              >
                 &ldquo;{book.lesson}&rdquo;
               </Text>
             </Box>
           )}
 
-          {/* Personal read sections */}
           {hasPersonalSections && (
             <VStack align="start" spacing={4} w="100%">
-              <Heading as="h2" size="sm" color={mutedText} textTransform="uppercase" letterSpacing="wider">
+              <Heading
+                as="h2"
+                size="sm"
+                color={mutedText}
+                textTransform="uppercase"
+                letterSpacing="wider"
+              >
                 My read
               </Heading>
 
               <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4} w="100%">
                 {book.problem && (
-                  <SectionBlock icon={IoBulbOutline} label="Why I picked this up" color="blue">
+                  <SectionBlock
+                    icon={IoBulbOutline}
+                    label="Why I picked this up"
+                    color="blue"
+                  >
                     <Box sx={{ "& p": { mb: 0 } }}>
                       <MarkdownProse>{book.problem}</MarkdownProse>
                     </Box>
                   </SectionBlock>
                 )}
                 {book.concept && (
-                  <SectionBlock icon={IoLayersOutline} label="What it teaches" color="purple">
+                  <SectionBlock
+                    icon={IoLayersOutline}
+                    label="What it teaches"
+                    color="purple"
+                  >
                     <Box sx={{ "& p": { mb: 0 } }}>
                       <MarkdownProse>{book.concept}</MarkdownProse>
                     </Box>
                   </SectionBlock>
                 )}
                 {book.effect && (
-                  <SectionBlock icon={IoCheckmarkCircleOutline} label="What changed" color="green">
+                  <SectionBlock
+                    icon={IoCheckmarkCircleOutline}
+                    label="What changed"
+                    color="green"
+                  >
                     <Box sx={{ "& p": { mb: 0 } }}>
                       <MarkdownProse>{book.effect}</MarkdownProse>
                     </Box>
                   </SectionBlock>
                 )}
                 {book.trade_off && (
-                  <SectionBlock icon={IoSwapHorizontalOutline} label="Honest take" color="gray">
+                  <SectionBlock
+                    icon={IoSwapHorizontalOutline}
+                    label="Critical reflection"
+                    color="gray"
+                  >
                     <Box sx={{ "& p": { mb: 0 } }}>
                       <MarkdownProse>{book.trade_off}</MarkdownProse>
                     </Box>
@@ -213,7 +257,6 @@ export default function BookDetailPage({ book }) {
                 )}
               </SimpleGrid>
 
-              {/* Decision — full width, highlighted */}
               {book.decision && (
                 <Box
                   w="100%"
@@ -225,15 +268,27 @@ export default function BookDetailPage({ book }) {
                 >
                   <HStack spacing={2} mb={3}>
                     <Icon as={IoFlashOutline} color="orange.500" boxSize={4} />
-                    <Text fontSize="xs" fontWeight="bold" textTransform="uppercase" color={decisionText} letterSpacing="wider">
+                    <Text
+                      fontSize="xs"
+                      fontWeight="bold"
+                      textTransform="uppercase"
+                      color={decisionText}
+                      letterSpacing="wider"
+                    >
                       What I decided
                     </Text>
                   </HStack>
-                  <Box sx={{ "& p": { mb: 0 }, "& a": { color: decisionText } }}>
+                  <Box
+                    sx={{ "& p": { mb: 0 }, "& a": { color: decisionText } }}
+                  >
                     <MarkdownProse>{book.decision}</MarkdownProse>
                   </Box>
                   {book.implementation && (
-                    <Box sx={{ "& p": { mb: 0 }, "& a": { color: decisionText } }} mt={3} opacity={0.85}>
+                    <Box
+                      sx={{ "& p": { mb: 0 }, "& a": { color: decisionText } }}
+                      mt={3}
+                      opacity={0.85}
+                    >
                       <MarkdownProse>{book.implementation}</MarkdownProse>
                     </Box>
                   )}
@@ -242,14 +297,19 @@ export default function BookDetailPage({ book }) {
             </VStack>
           )}
 
-          {/* Notable quotes */}
           {hasQuotes && (
             <>
               <Divider />
               <VStack align="start" spacing={4} w="100%">
                 <HStack spacing={2}>
                   <Icon as={IoChatbubbleOutline} color="orange.400" />
-                  <Heading as="h2" size="sm" color={mutedText} textTransform="uppercase" letterSpacing="wider">
+                  <Heading
+                    as="h2"
+                    size="sm"
+                    color={mutedText}
+                    textTransform="uppercase"
+                    letterSpacing="wider"
+                  >
                     Notable quotes
                   </Heading>
                 </HStack>
@@ -265,7 +325,12 @@ export default function BookDetailPage({ book }) {
                       bg={quoteBg}
                       borderRadius="sm"
                     >
-                      <Text fontSize="sm" fontStyle="italic" color={bodyColor} lineHeight="1.7">
+                      <Text
+                        fontSize="sm"
+                        fontStyle="italic"
+                        color={bodyColor}
+                        lineHeight="1.7"
+                      >
                         {quote}
                       </Text>
                     </Box>
@@ -275,7 +340,6 @@ export default function BookDetailPage({ book }) {
             </>
           )}
 
-          {/* Fallback: raw notes for books without structured sections */}
           {!hasPersonalSections && book.notes && (
             <Box
               w="100%"
@@ -289,7 +353,6 @@ export default function BookDetailPage({ book }) {
             </Box>
           )}
 
-          {/* Empty state */}
           {!hasPersonalSections && !book.notes && (
             <Box
               w="100%"
@@ -303,13 +366,20 @@ export default function BookDetailPage({ book }) {
                 Full reading notes for this book have not been published yet.
               </Text>
               {book.url && (
-                <Link href={book.url} color="orange.500" fontWeight="semibold" isExternal fontSize="sm" mt={2} display="block">
+                <Link
+                  href={book.url}
+                  color="orange.500"
+                  fontWeight="semibold"
+                  isExternal
+                  fontSize="sm"
+                  mt={2}
+                  display="block"
+                >
                   Open original link
                 </Link>
               )}
             </Box>
           )}
-
         </VStack>
       </Container>
     </Layout>
