@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 const ZIcon = (props) => (
   <span
     style={{
@@ -9,9 +11,8 @@ const ZIcon = (props) => (
       flexShrink: 0,
     }}
   >
-    {/* eslint-disable-next-line @next/next/no-img-element */}
-    <img
-      src="/images/zicon.png"
+    <Image
+      src="/favicon.svg"
       alt=""
       width={30}
       height={30}

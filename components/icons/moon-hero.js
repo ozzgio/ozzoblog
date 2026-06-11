@@ -309,19 +309,15 @@ const MoonHero = ({ size = 220 }) => {
     const animate = () => {
       frameId = requestAnimationFrame(animate);
       const delta = clock.getDelta();
-      if (!isInteracting) {
+      if (!isInteracting && !prefersReducedMotion) {
         elapsed += delta;
-        // Y rotation always on — ~18 s per orbit regardless of reduced-motion
         systemGroup.rotation.y += 0.35 * delta;
-        // X tilt only when motion is preferred: ±22° over ~10 s cycle
-        if (!prefersReducedMotion) {
-          systemGroup.rotation.x = Math.sin(elapsed * 0.32) * 0.38;
-        }
+        systemGroup.rotation.x = Math.sin(elapsed * 0.32) * 0.38;
+        planetData.forEach((p) => {
+          p.angle += p.speed * delta;
+          p.sprite.position.set(Math.cos(p.angle) * p.rad, 0, Math.sin(p.angle) * p.rad);
+        });
       }
-      planetData.forEach((p) => {
-        p.angle += p.speed * delta;
-        p.sprite.position.set(Math.cos(p.angle) * p.rad, 0, Math.sin(p.angle) * p.rad);
-      });
       controls.update();
       renderer.render(scene, camera);
     };
