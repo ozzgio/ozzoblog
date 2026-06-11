@@ -4,44 +4,35 @@ import {
   Button,
   Container,
   Heading,
-  HStack,
-  Icon,
-  Image,
   Link,
   SimpleGrid,
   Text,
   VStack,
-  chakra,
 } from "@chakra-ui/react";
 import { ChevronRightIcon, ExternalLinkIcon } from "@chakra-ui/icons";
 import NextLink from "next/link";
-import { IoBookOutline, IoDocumentText, IoLaptopOutline, IoRocketOutline } from "react-icons/io5";
-
+import Image from "next/image";
 import Section from "../components/section";
 import Paragraph from "../components/paragraph";
 import { BioSection, BioYear } from "../components/bio";
 import Layout from "../components/layouts/layout";
 import BaseCard from "../components/basecard";
+import MoonHero from "../components/icons/moon-hero";
 import {
   getArticleSummary,
   isInternalArticle,
   resolvePortfolioAssetUrl,
 } from "../libs/contentUtils";
 
-const ProfileImage = chakra(Image, {
-  shouldForwardProp: (prop) => ["width", "height", "src", "alt"].includes(prop),
-});
-
 const formatAbsoluteDate = (dateStr) => {
   if (!dateStr) return "";
-
   try {
     return new Intl.DateTimeFormat("en", {
       day: "2-digit",
       month: "short",
       year: "numeric",
     }).format(new Date(dateStr));
-  } catch (error) {
+  } catch {
     return dateStr;
   }
 };
@@ -49,9 +40,13 @@ const formatAbsoluteDate = (dateStr) => {
 const normalizeArticle = (article) => {
   const internal = isInternalArticle(article);
   const slug =
-    typeof article.slug === "string" && article.slug.trim() ? article.slug.trim() : "";
+    typeof article.slug === "string" && article.slug.trim()
+      ? article.slug.trim()
+      : "";
   const externalUrl =
-    typeof article.url === "string" && article.url.trim() ? article.url.trim() : "";
+    typeof article.url === "string" && article.url.trim()
+      ? article.url.trim()
+      : "";
   const url = internal ? `/articles/${slug}` : externalUrl;
 
   return {
@@ -62,11 +57,32 @@ const normalizeArticle = (article) => {
     date: String(article.date || ""),
     formattedDate: formatAbsoluteDate(article.date || ""),
     source: internal ? "internal" : "external",
-    thumbnail: article.thumbnail ? resolvePortfolioAssetUrl(article.thumbnail) : "",
+    thumbnail: article.thumbnail
+      ? resolvePortfolioAssetUrl(article.thumbnail)
+      : "",
   };
 };
 
-const Home = ({ latestArticles = [], articlesError = false, currentBook = null }) => {
+const SectionLabel = ({ children, mt = 10 }) => (
+  <Text
+    fontSize="xs"
+    fontWeight="bold"
+    textTransform="uppercase"
+    letterSpacing="0.12em"
+    color="gray.500"
+    _dark={{ color: "gray.400" }}
+    mb={6}
+    mt={mt}
+  >
+    {children}
+  </Text>
+);
+
+const Home = ({
+  latestArticles = [],
+  articlesError = false,
+  currentBook = null,
+}) => {
   const homepageSchema = {
     "@context": "https://schema.org",
     "@graph": [
@@ -80,9 +96,9 @@ const Home = ({ latestArticles = [], articlesError = false, currentBook = null }
           "https://github.com/ozzgio",
           "https://www.linkedin.com/in/ozzolagiorgio/",
         ],
-        jobTitle: "Solo Developer",
+        jobTitle: "Full-stack Developer",
         description:
-          "Italian solo developer building systems for autonomy with practical AI and human review.",
+          "Full-stack developer shipping Synergym and building systems for autonomy.",
       },
       {
         "@type": "WebSite",
@@ -91,9 +107,7 @@ const Home = ({ latestArticles = [], articlesError = false, currentBook = null }
         name: "Ozzo.blog",
         description:
           "Writing about Synergym, my personal operating system, and the stack decisions behind both.",
-        publisher: {
-          "@id": "https://ozzo.blog/#person",
-        },
+        publisher: { "@id": "https://ozzo.blog/#person" },
       },
     ],
   };
@@ -101,223 +115,203 @@ const Home = ({ latestArticles = [], articlesError = false, currentBook = null }
   return (
     <Layout
       title="Home"
-      metaTitle="Ozzo — solo developer building systems for autonomy"
-      description="Italian solo developer building systems for autonomy. Writing about Synergym, my personal operating system, and the stack decisions behind both."
+      metaTitle="Full-stack developer shipping Synergym and building systems for autonomy"
+      description="Solo developer building systems for autonomy. Writing about Synergym, practical AI, and the stack decisions behind both."
       keywords="solo developer, practical AI, systems for autonomy, Synergym, Italian developer, build in public"
       path="/"
       jsonLd={homepageSchema}
     >
-      <br />
+      {/* Hero */}
+      <Box textAlign="center" pt={4} mb={2}>
+        <MoonHero size={340} />
+      </Box>
+
       <Container>
-        <Box
-          borderRadius="xl"
-          bgGradient="linear(to-r, orange.50, orange.100)"
-          _dark={{
-            bgGradient: "linear(to-r, orange.900, orange.800)",
-            borderColor: "orange.700",
-          }}
-          mb={8}
-          p={6}
-          textAlign="center"
-          boxShadow="lg"
-          borderWidth="1px"
-          borderColor="orange.200"
-        >
-          <Text
-            fontSize="lg"
-            fontWeight="semibold"
-            color="orange.800"
-            _dark={{ color: "orange.100" }}
+        {/* Statement - large type, no box */}
+        <Box mb={12} mt={4}>
+          <Heading
+            as="p"
+            fontSize={{ base: "2xl", md: "4xl" }}
+            fontWeight="800"
+            lineHeight="1.15"
+            letterSpacing="-0.01em"
+            color="#1c1917"
+            _dark={{ color: "white" }}
+            style={{ fontFamily: "'Bricolage Grotesque', sans-serif" }}
           >
-            Italian solo developer building systems for autonomy.
-          </Text>
+            Full-stack developer shipping Synergym
+            <br />
+            and building systems for autonomy.
+          </Heading>
         </Box>
+
+        {/* Profile - no card chrome */}
         <Box
-          display={{ md: "flex" }}
-          mb={10}
-          p={6}
-          borderRadius="xl"
-          bgGradient="linear(to-br, whiteAlpha.50, whiteAlpha.100)"
-          _dark={{ bgGradient: "linear(to-br, whiteAlpha.50, whiteAlpha.100)" }}
-          boxShadow="md"
-          alignItems="center"
+          display="flex"
+          flexDirection={{ base: "column", md: "row" }}
+          alignItems={{ base: "flex-start", md: "center" }}
+          gap={5}
+          mb={14}
+          pb={10}
+          borderBottomWidth="1px"
+          borderBottomColor="gray.100"
+          _dark={{ borderBottomColor: "whiteAlpha.100" }}
         >
-          <Box flexGrow={1}>
+          <Box flexShrink={0} borderRadius="full" overflow="hidden">
+            <Image
+              src="/images/propic.jpg"
+              alt="Giorgio Ozzola"
+              width={72}
+              height={72}
+              style={{ display: "block", borderRadius: "50%" }}
+              priority
+            />
+          </Box>
+          <Box>
             <Heading
               as="h1"
-              variant="page-title"
-              fontSize={{ base: "3xl", md: "4xl" }}
-              mb={4}
+              fontSize={{ base: "xl", md: "2xl" }}
+              fontWeight="700"
               bgGradient="linear(to-r, orange.400, orange.600)"
               _dark={{ bgGradient: "linear(to-r, orange.300, orange.500)" }}
               bgClip="text"
+              mb={1}
             >
               Ozzo
             </Heading>
-            <Text fontSize="lg" fontWeight="medium">
-              Practical AI use with human review for peers, solo builders, and operators.
+            <Text
+              fontSize="sm"
+              color="gray.500"
+              _dark={{ color: "gray.400" }}
+            >
+              Building in public: Synergym, agentic systems, homelab.
             </Text>
           </Box>
-          <Box
-            flexShrink={0}
-            mt={{ base: 6, md: 0 }}
-            ml={{ md: 8 }}
-            textAlign="center"
-          >
-            <Box
-              borderColor="orange.300"
-              _dark={{ borderColor: "orange.600" }}
-              borderWidth={3}
-              borderStyle="solid"
-              w="120px"
-              h="120px"
-              display="inline-block"
-              borderRadius="full"
-              overflow="hidden"
-              boxShadow="xl"
-              _hover={{
-                transform: "scale(1.05)",
-                borderColor: "orange.400",
-                _dark: { borderColor: "orange.500" },
-              }}
-              transition="all 0.3s"
-            >
-              <ProfileImage
-                src="/images/propic.jpg"
-                alt="Profile image"
-                borderRadius="full"
-                width={120}
-                height={120}
-                objectFit="cover"
-                style={{ aspectRatio: "1 / 1" }}
-              />
-            </Box>
-          </Box>
         </Box>
+
+        {/* Currently building */}
         <Section delay={0.1}>
-          <Heading as="h2" variant="section-title">
-            Currently
-          </Heading>
-          <VStack spacing={4} align="stretch" mt={4}>
+          <SectionLabel mt={0}>Currently building</SectionLabel>
+          <VStack spacing={8} align="stretch">
             <Box
-              p={4}
-              borderRadius="lg"
-              borderWidth="1px"
-              borderColor="orange.200"
-              bg="orange.50"
-              _dark={{ borderColor: "orange.700", bg: "whiteAlpha.50" }}
+              borderLeftWidth="2px"
+              borderLeftColor="orange.400"
+              _dark={{ borderLeftColor: "orange.500" }}
+              pl={5}
             >
-              <HStack spacing={3} mb={2}>
-                <Icon as={IoRocketOutline} color="orange.500" boxSize={5} />
-                <Heading as="h3" fontSize="md" fontWeight="semibold">
-                  Synergym.fit
-                </Heading>
-              </HStack>
-              <Text fontSize="sm" color="gray.700" _dark={{ color: "gray.300" }}>
-                Gym management SaaS on Rails 8 — PostgreSQL, Redis, Sidekiq for background jobs,
-                Playwright for full E2E coverage. Trainer and athlete workflows, workout program
-                creation, progress tracking. Running in production.
+              <Heading as="h2" fontSize="md" fontWeight="semibold" mb={1.5}>
+                Synergym.fit
+              </Heading>
+              <Text
+                fontSize="sm"
+                color="gray.600"
+                _dark={{ color: "gray.400" }}
+                mb={2}
+              >
+                Gym management SaaS on Rails 8: PostgreSQL, Redis, Sidekiq for
+                background jobs, Playwright for full E2E coverage. Trainer and
+                athlete workflows, workout program creation, progress tracking.
+                Running in production.
               </Text>
               <Link
                 as={NextLink}
                 href="/projects/synergym"
-                color="orange.600"
-                _dark={{ color: "orange.400" }}
+                color="orange.700"
+                _dark={{ color: "orange.300" }}
                 fontSize="sm"
                 fontWeight="medium"
-                mt={2}
-                display="inline-block"
               >
                 View project page →
               </Link>
             </Box>
+
             <Box
-              p={4}
-              borderRadius="lg"
-              borderWidth="1px"
-              borderColor="orange.200"
-              bg="orange.50"
-              _dark={{ borderColor: "orange.700", bg: "whiteAlpha.50" }}
+              borderLeftWidth="2px"
+              borderLeftColor="gray.200"
+              _dark={{ borderLeftColor: "whiteAlpha.200" }}
+              pl={5}
             >
-              <HStack spacing={3} mb={2}>
-                <Icon as={IoDocumentText} color="orange.500" boxSize={5} />
-                <Heading as="h3" fontSize="md" fontWeight="semibold">
-                  Agentic system
-                </Heading>
-              </HStack>
-              <Text fontSize="sm" color="gray.700" _dark={{ color: "gray.300" }}>
-                A personal operating system built on AI agents. Vault is truth, Telegram is
-                transport, nvim is cockpit. Hermes is the routing agent at the centre of it.
+              <Heading as="h2" fontSize="md" fontWeight="semibold" mb={1.5}>
+                Agentic system
+              </Heading>
+              <Text
+                fontSize="sm"
+                color="gray.600"
+                _dark={{ color: "gray.400" }}
+              >
+                A personal operating system built on AI agents. Vault is truth,
+                Telegram is transport, nvim is cockpit. Hermes is the routing
+                agent at the centre of it.
               </Text>
             </Box>
+
             <Box
-              p={4}
-              borderRadius="lg"
-              borderWidth="1px"
-              borderColor="orange.200"
-              bg="orange.50"
-              _dark={{ borderColor: "orange.700", bg: "whiteAlpha.50" }}
+              borderLeftWidth="2px"
+              borderLeftColor="gray.200"
+              _dark={{ borderLeftColor: "whiteAlpha.200" }}
+              pl={5}
             >
-              <HStack spacing={3} mb={2}>
-                <Icon as={IoLaptopOutline} color="orange.500" boxSize={5} />
-                <Heading as="h3" fontSize="md" fontWeight="semibold">
-                  Self-hosted infrastructure
-                </Heading>
-              </HStack>
-              <Text fontSize="sm" color="gray.700" _dark={{ color: "gray.300" }}>
-                25+ Dockerized services on an Intel NUC14. Custom MCP server exposing the Obsidian
-                vault to AI agents. n8n in queue mode, Letta for agent memory, ChromaDB as vector
-                store, Ollama for local inference, Faster-Whisper for speech-to-text. Self-hosted
-                Gitea with act_runner CI/CD. The infrastructure layer behind everything else here.
+              <Heading as="h2" fontSize="md" fontWeight="semibold" mb={1.5}>
+                Self-hosted infrastructure
+              </Heading>
+              <Text
+                fontSize="sm"
+                color="gray.600"
+                _dark={{ color: "gray.400" }}
+                mb={2}
+              >
+                25+ Dockerized services on an Intel NUC14. Custom MCP server
+                exposing the Obsidian vault to AI agents. n8n, Letta, ChromaDB,
+                Ollama, Faster-Whisper, Gitea with act_runner CI/CD. The
+                infrastructure layer behind everything else here.
               </Text>
               <Link
                 as={NextLink}
                 href="/experience#homelab"
-                color="orange.600"
-                _dark={{ color: "orange.400" }}
+                color="orange.700"
+                _dark={{ color: "orange.300" }}
                 fontSize="sm"
                 fontWeight="medium"
-                mt={2}
-                display="inline-block"
               >
                 Full breakdown →
               </Link>
             </Box>
           </VStack>
         </Section>
+
+        {/* Why this exists */}
         <Section delay={0.2}>
-          <Heading as="h2" variant="section-title">
-            Why This Exists
-          </Heading>
+          <SectionLabel>Why this exists</SectionLabel>
           <Paragraph>
-            This isn&apos;t a portfolio. It&apos;s my space on the internet. LinkedIn makes you a
-            user ID. GitHub shows code. This shows the person behind the work.
+            This isn&apos;t a portfolio. It&apos;s my space on the internet.
+            LinkedIn makes you a user ID. GitHub shows code. This shows the
+            person behind the work.
           </Paragraph>
           <Paragraph>
-            I build systems that help me and other people operate with more clarity and less
-            friction. Some of that is product work, some of it is internal tooling, and some of it
-            is learning in public while the thing is still being built.
+            I build systems that help me and other people operate with more
+            clarity and less friction. Some of that is product work, some of it
+            is internal tooling, and some of it is learning in public while the
+            thing is still being built.
           </Paragraph>
           <Paragraph>
-            I work with AI, not against it. It increases leverage, but only when there&apos;s human
-            review, judgment, and enough taste to know what should not ship.
+            I work with AI, not against it. It increases leverage, but only when
+            there&apos;s human review, judgment, and enough taste to know what
+            should not ship.
           </Paragraph>
           <Paragraph>
-            I lift 4x a week, read constantly, and build software outside of work. That&apos;s the
-            whole personality section.
+            I lift 4x a week, read constantly, and build software outside of
+            work. That&apos;s the whole personality section.
           </Paragraph>
-          <Box display="flex" justifyContent="center" gap={4} my={6} flexWrap="wrap">
+          <Box display="flex" gap={3} mt={8} flexWrap="wrap">
             <Button
               as={NextLink}
               href="/articles"
               scroll={false}
               rightIcon={<ChevronRightIcon />}
               colorScheme="orange"
-              size="lg"
-              _hover={{ transform: "translateY(-2px)", boxShadow: "xl" }}
-              transition="all 0.2s"
+              size="md"
             >
-              Read The Writing
+              Read the writing
             </Button>
             <Button
               as={NextLink}
@@ -325,41 +319,51 @@ const Home = ({ latestArticles = [], articlesError = false, currentBook = null }
               scroll={false}
               rightIcon={<ChevronRightIcon />}
               colorScheme="orange"
-              variant="outline"
-              size="lg"
-              _hover={{ transform: "translateY(-2px)", boxShadow: "xl" }}
-              transition="all 0.2s"
+              variant="ghost"
+              size="md"
             >
-              My Background
+              My background
             </Button>
           </Box>
         </Section>
+
+        {/* Latest writing */}
         <Section delay={0.3}>
-          <Heading as="h2" variant="section-title">
-            Latest writing
-          </Heading>
+          <SectionLabel>Latest writing</SectionLabel>
           {articlesError ? (
-            <Text mt={4}>Latest writing is temporarily unavailable.</Text>
+            <Text color="gray.500">Latest writing is temporarily unavailable.</Text>
           ) : latestArticles.length === 0 ? (
-            <Text mt={4}>No articles yet. That gap is visible on purpose.</Text>
+            <Text color="gray.500">No articles yet. That gap is visible on purpose.</Text>
           ) : (
-            <SimpleGrid columns={{ base: 1, md: 2 }} spacing={6} mt={4}>
+            <SimpleGrid columns={{ base: 1, md: 2 }} spacing={6}>
               {latestArticles.map((article) => (
-                <BaseCard key={`${article.source}:${article.url}`} maxW="none" h="100%">
+                <BaseCard
+                  key={`${article.source}:${article.url}`}
+                  maxW="none"
+                  h="100%"
+                >
                   <VStack align="start" spacing={3} h="100%">
-                    <Badge colorScheme="orange">{article.formattedDate || "No date"}</Badge>
+                    <Badge colorScheme="orange">
+                      {article.formattedDate || "No date"}
+                    </Badge>
                     <Heading as="h3" fontSize="lg" lineHeight="1.2">
                       {article.title}
                     </Heading>
-                    <Text fontSize="sm" color="gray.600" _dark={{ color: "gray.300" }}>
-                      {article.description || article.summary || "No description provided."}
+                    <Text
+                      fontSize="sm"
+                      color="gray.600"
+                      _dark={{ color: "gray.300" }}
+                    >
+                      {article.description ||
+                        article.summary ||
+                        "No description provided."}
                     </Text>
                     <Link
                       as={article.source === "internal" ? NextLink : "a"}
                       href={article.url}
                       isExternal={article.source !== "internal"}
-                      color="orange.600"
-                      _dark={{ color: "orange.400" }}
+                      color="orange.700"
+                      _dark={{ color: "orange.300" }}
                       fontWeight="medium"
                       mt="auto"
                     >
@@ -377,40 +381,43 @@ const Home = ({ latestArticles = [], articlesError = false, currentBook = null }
             </SimpleGrid>
           )}
           {currentBook && (
-            <Link as={NextLink} href="/books" _hover={{ textDecoration: "none" }}>
-              <HStack
-                spacing={4}
-                p={4}
-                borderRadius="lg"
-                borderWidth="1px"
-                borderColor="orange.200"
-                bg="orange.50"
-                _dark={{ borderColor: "orange.700", bg: "whiteAlpha.50" }}
-                _hover={{ borderColor: "orange.400" }}
-                transition="border-color 0.2s"
-                mt={6}
+            <Box
+              borderLeftWidth="2px"
+              borderLeftColor="gray.200"
+              _dark={{ borderLeftColor: "whiteAlpha.200" }}
+              pl={5}
+              mt={8}
+            >
+              <Link
+                as={NextLink}
+                href="/books"
+                _hover={{ textDecoration: "none", color: "orange.600" }}
+                _dark={{ _hover: { color: "orange.300" } }}
               >
-                <Icon as={IoBookOutline} color="orange.500" boxSize={5} flexShrink={0} />
-                <Box flex={1} minW={0}>
-                  <Text fontSize="xs" fontWeight="bold" textTransform="uppercase" letterSpacing="wider" color="orange.500" mb={0.5}>
-                    Currently reading
-                  </Text>
-                  <Text fontSize="sm" fontWeight="semibold" noOfLines={1}>
-                    {currentBook.title}
-                  </Text>
-                  <Text fontSize="xs" color="gray.500" _dark={{ color: "gray.400" }}>
-                    {currentBook.author}
-                  </Text>
-                </Box>
-                <ChevronRightIcon color="orange.400" />
-              </HStack>
-            </Link>
+                <Text
+                  fontSize="xs"
+                  fontWeight="bold"
+                  textTransform="uppercase"
+                  letterSpacing="wider"
+                  color="gray.400"
+                  mb={1}
+                >
+                  Currently reading
+                </Text>
+                <Text fontSize="sm" fontWeight="medium">
+                  {currentBook.title}
+                </Text>
+                <Text fontSize="xs" color="gray.500" _dark={{ color: "gray.400" }}>
+                  {currentBook.author}
+                </Text>
+              </Link>
+            </Box>
           )}
         </Section>
+
+        {/* Bio */}
         <Section delay={0.4}>
-          <Heading as="h2" variant="section-title">
-            Bio
-          </Heading>
+          <SectionLabel>Bio</SectionLabel>
           <BioSection>
             <BioYear>2001</BioYear>
             Born in Piacenza, Italy.
@@ -422,12 +429,7 @@ const Home = ({ latestArticles = [], articlesError = false, currentBook = null }
           <BioSection>
             <BioYear>2021</BioYear>
             Worked @{" "}
-            <Link
-              as={NextLink}
-              href="https://www.getec-italia.com/it/"
-              target="_blank"
-              passHref
-            >
+            <Link as={NextLink} href="https://www.getec-italia.com/it/" target="_blank" passHref>
               Getec Italia
             </Link>
             .
@@ -451,12 +453,7 @@ const Home = ({ latestArticles = [], articlesError = false, currentBook = null }
           <BioSection>
             <BioYear>2023 to present</BioYear>
             Mentee of{" "}
-            <Link
-              as={NextLink}
-              href="https://linkedin.com/in/davidecovato"
-              target="_blank"
-              passHref
-            >
+            <Link as={NextLink} href="https://linkedin.com/in/davidecovato" target="_blank" passHref>
               Davide Covato
             </Link>
             .
@@ -469,8 +466,12 @@ const Home = ({ latestArticles = [], articlesError = false, currentBook = null }
 
 export async function getStaticProps() {
   const [articlesRes, booksRes] = await Promise.allSettled([
-    fetch("https://raw.githubusercontent.com/ozzgio/portfolio-data/main/articles.json"),
-    fetch("https://raw.githubusercontent.com/ozzgio/portfolio-data/main/books.json"),
+    fetch(
+      "https://raw.githubusercontent.com/ozzgio/portfolio-data/main/articles.json",
+    ),
+    fetch(
+      "https://raw.githubusercontent.com/ozzgio/portfolio-data/main/books.json",
+    ),
   ]);
 
   let latestArticles = [];
@@ -499,7 +500,9 @@ export async function getStaticProps() {
     if (booksRes.status === "fulfilled" && booksRes.value.ok) {
       const booksData = await booksRes.value.json();
       if (Array.isArray(booksData)) {
-        const reading = booksData.find((b) => b.status === "reading" && b.title && b.author);
+        const reading = booksData.find(
+          (b) => b.status === "reading" && b.title && b.author,
+        );
         if (reading) {
           currentBook = {
             title: String(reading.title),

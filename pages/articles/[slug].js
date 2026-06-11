@@ -48,7 +48,8 @@ export default function ArticleDetailPage({ article }) {
           </Link>
 
           <VStack align="start" spacing={3}>
-            <Heading as="h1" size="lg" lineHeight="1.2">
+            <Heading as="h1" size="lg" lineHeight="1.2"
+              style={{ fontFamily: "'Merriweather', Georgia, serif" }}>
               {article.title}
             </Heading>
             <HStack spacing={3} flexWrap="wrap" color={mutedText}>
@@ -72,6 +73,7 @@ export default function ArticleDetailPage({ article }) {
             borderColor={proseBorder}
             borderRadius="xl"
             bg={proseBg}
+            style={{ fontFamily: "'Merriweather', Georgia, serif" }}
           >
             <MarkdownProse>{article.content}</MarkdownProse>
           </Box>

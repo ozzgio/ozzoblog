@@ -4,10 +4,9 @@ import { Link } from "@chakra-ui/react";
 
 const LinkItem = ({ href, path, target, children, ...props }) => {
   const active = path === href;
-  const inactiveColor = useColorModeValue("gray.700", "whiteAlpha.800");
-  const activeBg = useColorModeValue("orange.50", "orange.900");
-  const hoverBg = useColorModeValue("orange.50", "orange.800");
-  
+  const inactiveColor = useColorModeValue("gray.500", "gray.400");
+  const activeColor = useColorModeValue("gray.900", "white");
+
   return (
     <Link
       as={NextLink}
@@ -16,18 +15,14 @@ const LinkItem = ({ href, path, target, children, ...props }) => {
       p={2}
       px={3}
       borderRadius="md"
-      fontWeight={active ? "semibold" : "medium"}
-      color={active ? "orange.500" : inactiveColor}
+      color={active ? activeColor : inactiveColor}
       target={target}
       position="relative"
-      transition="background-color 0.2s ease-in-out, color 0.2s ease-in-out, transform 0.2s ease-in-out"
       sx={{
-        // Explicitly set transition only for specific properties, excluding fontWeight
-        transition: "background-color 0.2s ease-in-out, color 0.2s ease-in-out, transform 0.2s ease-in-out",
         fontWeight: active ? "semibold" : "medium",
+        transition: "color 0.15s ease-in-out, transform 0.15s ease-in-out",
         ...(active
           ? {
-              bg: activeBg,
               _before: {
                 content: '""',
                 position: "absolute",
@@ -43,13 +38,11 @@ const LinkItem = ({ href, path, target, children, ...props }) => {
           : {}),
       }}
       _hover={{
-        bg: hoverBg,
-        color: "orange.500",
+        color: activeColor,
         textDecoration: "none",
         transform: "translateY(-1px)",
       }}
       _active={{
-        bg: activeBg,
         transform: "translateY(0)",
       }}
       {...props}

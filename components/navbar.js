@@ -26,13 +26,14 @@ const MenuLink = forwardRef((props, ref) => (
 const NavBar = (props) => {
   const { path } = props;
   const navBg = useColorModeValue(
-    "rgba(255, 255, 255, 0.9)",
-    "rgba(26, 26, 30, 0.9)"
+    "rgba(247, 245, 242, 0.75)",
+    "rgba(18, 18, 22, 0.65)"
   );
   const borderColor = useColorModeValue("gray.200", "gray.700");
   const menuBg = useColorModeValue("white", "gray.800");
-  const menuItemActiveBg = useColorModeValue("orange.50", "orange.900");
-  const menuItemHoverBg = useColorModeValue("orange.50", "orange.800");
+  const menuItemActiveColor = useColorModeValue("gray.900", "white");
+  const menuItemInactiveColor = useColorModeValue("gray.600", "gray.300");
+  const menuItemHoverBg = useColorModeValue("gray.50", "whiteAlpha.100");
   
   return (
     <Box
@@ -126,54 +127,45 @@ const NavBar = (props) => {
                 borderColor={borderColor}
                 boxShadow="lg"
               >
-                <MenuItem 
-                  as={MenuLink} 
+                <MenuItem
+                  as={MenuLink}
                   href="/articles"
-                  bg={path === "/articles" ? menuItemActiveBg : "transparent"}
-                  color={path === "/articles" ? "orange.500" : "inherit"}
+                  bg="transparent"
+                  color={path === "/articles" ? menuItemActiveColor : menuItemInactiveColor}
                   fontWeight={path === "/articles" ? "semibold" : "normal"}
-                  _hover={{
-                    bg: menuItemHoverBg,
-                    color: "orange.500",
-                  }}
+                  _hover={{ bg: menuItemHoverBg, color: menuItemActiveColor }}
                 >
                   Articles
                 </MenuItem>
-                <MenuItem 
-                  as={MenuLink} 
+                <MenuItem
+                  as={MenuLink}
                   href="/books"
-                  bg={path === "/books" ? menuItemActiveBg : "transparent"}
-                  color={path === "/books" ? "orange.500" : "inherit"}
+                  bg="transparent"
+                  color={path === "/books" ? menuItemActiveColor : menuItemInactiveColor}
                   fontWeight={path === "/books" ? "semibold" : "normal"}
-                  _hover={{
-                    bg: menuItemHoverBg,
-                    color: "orange.500",
-                  }}
+                  _hover={{ bg: menuItemHoverBg, color: menuItemActiveColor }}
                 >
                   Books
                 </MenuItem>
-                <MenuItem 
-                  as={MenuLink} 
+                <MenuItem
+                  as={MenuLink}
                   href="/projects"
-                  bg={path === "/projects" ? menuItemActiveBg : "transparent"}
-                  color={path === "/projects" ? "orange.500" : "inherit"}
+                  bg="transparent"
+                  color={path === "/projects" ? menuItemActiveColor : menuItemInactiveColor}
                   fontWeight={path === "/projects" ? "semibold" : "normal"}
-                  _hover={{
-                    bg: menuItemHoverBg,
-                    color: "orange.500",
-                  }}
+                  _hover={{ bg: menuItemHoverBg, color: menuItemActiveColor }}
                 >
                   Projects
                 </MenuItem>
-                <MenuItem 
-                  as={MenuLink} 
+                <MenuItem
+                  as={MenuLink}
                   href="/contacts"
-                  bg={path === "/contacts" ? menuItemActiveBg : "transparent"}
-                  color={path === "/contacts" ? "orange.500" : "inherit"}
+                  bg="transparent"
+                  color={path === "/contacts" ? menuItemActiveColor : menuItemInactiveColor}
                   fontWeight={path === "/contacts" ? "semibold" : "normal"}
                   _hover={{
                     bg: menuItemHoverBg,
-                    color: "orange.500",
+                    color: menuItemActiveColor,
                   }}
                 >
                   Contacts
@@ -181,10 +173,9 @@ const NavBar = (props) => {
                 <MenuItem
                   as={MenuLink}
                   href="https://github.com/ozzgio/portfolio/"
-                _hover={{
-                  bg: menuItemHoverBg,
-                  color: "orange.500",
-                }}
+                  bg="transparent"
+                  color={menuItemInactiveColor}
+                  _hover={{ bg: menuItemHoverBg, color: menuItemActiveColor }}
                 >
                   Source Code
                 </MenuItem>

@@ -25,7 +25,7 @@ import {
   IoSwapHorizontalOutline,
   IoCheckmarkCircleOutline,
   IoLayersOutline,
-  IoQuoteOutline,
+  IoChatbubbleOutline,
 } from "react-icons/io5";
 import RatingStar from "../../components/ratingstar";
 import Layout from "../../components/layouts/layout";
@@ -81,7 +81,7 @@ export default function BookDetailPage({ book }) {
   const hasQuotes = book.quotes?.length > 0;
 
   return (
-    <Layout title={`${book.title} — Reading Notes`}>
+    <Layout title={`${book.title}: Reading Notes`}>
       <Head>
         <meta
           name="description"
@@ -126,7 +126,8 @@ export default function BookDetailPage({ book }) {
                 </Box>
               )}
               <VStack align="start" spacing={3} flex={1} minW="200px">
-                <Heading as="h1" size="lg" lineHeight="1.15" color={headingColor}>
+                <Heading as="h1" size="lg" lineHeight="1.15" color={headingColor}
+                  style={{ fontFamily: "'Merriweather', Georgia, serif" }}>
                   {book.title}
                 </Heading>
                 <HStack spacing={2} color={mutedText} fontSize="sm">
@@ -158,7 +159,7 @@ export default function BookDetailPage({ book }) {
             </HStack>
           </Box>
 
-          {/* Key lesson — always shown if present */}
+          {/* Key lesson - always shown if present */}
           {book.lesson && (
             <Box
               w="100%"
@@ -167,7 +168,8 @@ export default function BookDetailPage({ book }) {
               pl={4}
               py={1}
             >
-              <Text fontStyle="italic" color={bodyColor} fontSize="md" lineHeight="1.6">
+              <Text fontStyle="italic" color={bodyColor} fontSize="md" lineHeight="1.6"
+                style={{ fontFamily: "'Merriweather', Georgia, serif" }}>
                 &ldquo;{book.lesson}&rdquo;
               </Text>
             </Box>
@@ -246,7 +248,7 @@ export default function BookDetailPage({ book }) {
               <Divider />
               <VStack align="start" spacing={4} w="100%">
                 <HStack spacing={2}>
-                  <Icon as={IoQuoteOutline} color="orange.400" />
+                  <Icon as={IoChatbubbleOutline} color="orange.400" />
                   <Heading as="h2" size="sm" color={mutedText} textTransform="uppercase" letterSpacing="wider">
                     Notable quotes
                   </Heading>

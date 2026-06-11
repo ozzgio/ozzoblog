@@ -85,7 +85,7 @@ const Experience = () => {
   return (
     <Layout
       title="Background"
-      description="Giorgio Ozzola — work history, projects, and stack. Full Stack Developer with 4+ years of professional experience."
+      description="Giorgio Ozzola: work history, projects, and stack. Full Stack Developer with 4+ years of professional experience."
       keywords="Giorgio Ozzola, full stack developer, .NET, Rails, experience, background"
       path="/experience"
     >
@@ -159,7 +159,7 @@ const Experience = () => {
             />
             <ProjectEntry
               id="homelab"
-              title="Home Lab — Agentic AI Platform"
+              title="Home Lab: Agentic AI Platform"
               period="Ongoing"
               description="25+ Dockerized services running on an Intel NUC14 (Ubuntu 24.04, 16GB RAM), fully self-managed. Mission control: custom Next.js dashboard for monitoring and managing running agents. Agentic stack: n8n in queue mode (worker + Redis + PostgreSQL), Ollama for local LLM inference, Letta for agent memory, ChromaDB as vector store, Faster-Whisper for speech-to-text. Dev side: self-hosted Gitea with act_runner CI/CD, custom MCP server that exposes an Obsidian vault to AI agents. Platform: Nginx Proxy Manager, AdGuard Home, Portainer."
               stack={["Docker", "n8n", "Ollama", "Letta", "ChromaDB", "Faster-Whisper", "Next.js", "Gitea", "MCP", "PostgreSQL", "Redis", "Nginx"]}

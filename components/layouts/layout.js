@@ -2,12 +2,12 @@ import Head from "next/head";
 import { Flex } from "@chakra-ui/react";
 
 const SITE_URL = "https://ozzo.blog";
-const DEFAULT_TITLE = "Ozzo — solo developer building systems for autonomy";
+const DEFAULT_TITLE = "Ozzo | Solo developer building systems for autonomy";
 const DEFAULT_DESCRIPTION =
-  "Italian solo developer building systems for autonomy. Writing about Synergym, my personal operating system, and the stack decisions behind both.";
+  "Solo developer building systems for autonomy. Writing about Synergym, practical AI, and the stack decisions behind both.";
 const DEFAULT_KEYWORDS =
   "solo developer, indie builder, Italian developer, practical AI, autonomy systems, Synergym, software engineering";
-const DEFAULT_OG_IMAGE = `${SITE_URL}/images/propic.jpg`;
+const DEFAULT_OG_IMAGE = `${SITE_URL}/images/zicon.png`;
 
 const Layout = ({
   children,
@@ -31,15 +31,17 @@ const Layout = ({
         <title key="title-tag">{pageTitle}</title>
         <meta
           name="viewport"
-          content="width=device-width, initial-scale=1, shrink-to-fit=no, user-scalable=no"
+          content="width=device-width, initial-scale=1"
         />
         <meta name="description" content={description} />
         <meta name="author" content="Ozzo" />
         <meta name="keywords" content={keywords} />
         <meta name="robots" content={robots} />
         {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        <link rel="icon" type="image/png" sizes="512x512" href="/images/zicon.png" />
         <link rel="icon" href="/favicon.ico" />
-        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        <link rel="apple-touch-icon" href="/images/zicon.png" />
         <link rel="manifest" href="/site.webmanifest" />
         <meta property="og:title" content={shareTitle} />
         <meta property="og:description" content={description} />
