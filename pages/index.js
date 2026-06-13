@@ -60,6 +60,8 @@ const normalizeArticle = (article) => {
     thumbnail: article.thumbnail
       ? resolvePortfolioAssetUrl(article.thumbnail)
       : "",
+    book: String(article.book || ""),
+    book_url: String(article.book_url || ""),
   };
 };
 

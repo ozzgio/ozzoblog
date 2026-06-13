@@ -52,6 +52,12 @@ export const createExcerpt = (value, maxLength = 220) => {
 export const getArticleBody = (article) =>
   getTextContent(article?.content || article?.body);
 
+export const getArticleBookReference = (article) =>
+  getTextContent(article?.book);
+
+export const getArticleBookUrl = (article) =>
+  getTextContent(article?.book_url || article?.bookUrl);
+
 export const isInternalArticle = (article) =>
   Boolean(getTextContent(article?.slug) && getArticleBody(article));
 

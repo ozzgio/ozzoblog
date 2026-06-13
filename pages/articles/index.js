@@ -109,6 +109,8 @@ const ArticlesPage = ({ articles, error }) => {
           formattedDate: formattedDate || article.date || "",
           absoluteDate: article.date ? formatAbsoluteDate(article.date) : "",
           year: article.date ? String(new Date(article.date).getFullYear()) : "",
+          book: String(article.book || ""),
+          book_url: String(article.book_url || ""),
         };
       });
   }, [articles, isMounted]);
@@ -150,7 +152,7 @@ const ArticlesPage = ({ articles, error }) => {
     return sortedArticles.filter((article) => {
       const matchesTag = selectedTag ? article.tags?.includes(selectedTag) : true;
       const matchesQuery = query
-        ? [article.title, article.description, article.content, ...(article.tags || [])]
+        ? [article.title, article.description, article.content, article.book, ...(article.tags || [])]
             .join(" ")
             .toLowerCase()
             .includes(query)

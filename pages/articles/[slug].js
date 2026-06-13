@@ -18,6 +18,8 @@ import Layout from "../../components/layouts/layout";
 import {
   formatAbsoluteDate,
   getArticleBody,
+  getArticleBookReference,
+  getArticleBookUrl,
   isInternalArticle,
   resolvePortfolioAssetUrl,
 } from "../../libs/contentUtils";
@@ -26,10 +28,13 @@ export default function ArticleDetailPage({ article }) {
   const mutedText = useColorModeValue("gray.600", "gray.400");
   const proseBg = useColorModeValue("white", "whiteAlpha.100");
   const proseBorder = useColorModeValue("blackAlpha.100", "whiteAlpha.200");
+  const bookBg = useColorModeValue("orange.50", "orange.900");
 
   if (!article) return null;
 
   const canonicalUrl = `https://ozzo.blog/articles/${article.slug}`;
+  const bookReference = getArticleBookReference(article);
+  const bookUrl = getArticleBookUrl(article);
 
   return (
     <Layout title={article.title}>
@@ -64,6 +69,34 @@ export default function ArticleDetailPage({ article }) {
               ))}
             </HStack>
             {article.description && <Text color={mutedText}>{article.description}</Text>}
+            {bookReference && (
+              <Box
+                w="100%"
+                p={4}
+                borderWidth="1px"
+                borderColor={proseBorder}
+                borderRadius="lg"
+                bg={bookBg}
+                _dark={{ bg: "orange.900" }}
+              >
+                <Text fontSize="xs" fontWeight="bold" textTransform="uppercase" letterSpacing="wider" color="orange.600" _dark={{ color: "orange.300" }} mb={1}>
+                  Referenced book
+                </Text>
+                {bookUrl ? (
+                  <Link
+                    as={bookUrl.startsWith("http") ? "a" : NextLink}
+                    href={bookUrl}
+                    color="orange.700"
+                    _dark={{ color: "orange.200" }}
+                    fontWeight="semibold"
+                  >
+                    {bookReference}
+                  </Link>
+                ) : (
+                  <Text fontWeight="semibold">{bookReference}</Text>
+                )}
+              </Box>
+            )}
           </VStack>
 
           <Box
@@ -134,6 +167,8 @@ export async function getStaticProps({ params }) {
           slug: String(article.slug || ""),
           content: getArticleBody(article),
           tags: Array.isArray(article.tags) ? article.tags.filter(Boolean) : [],
+          book: String(article.book || ""),
+          book_url: String(article.book_url || ""),
           thumbnail: article.thumbnail
             ? resolvePortfolioAssetUrl(article.thumbnail)
             : "",

@@ -10,8 +10,11 @@ import {
 } from "@chakra-ui/react";
 import NextLink from "next/link";
 import { ExternalLinkIcon } from "@chakra-ui/icons";
-import { IoCalendarOutline } from "react-icons/io5";
-import { formatAbsoluteDate } from "../../libs/contentUtils";
+import { IoBookOutline, IoCalendarOutline } from "react-icons/io5";
+import {
+  formatAbsoluteDate,
+  getArticleBookReference,
+} from "../../libs/contentUtils";
 
 const ArticleCard = ({
   title,
@@ -24,6 +27,7 @@ const ArticleCard = ({
   source = "external",
   tags,
   thumbnail,
+  book,
 }) => {
   const border = useColorModeValue("blackAlpha.100", "whiteAlpha.100");
   const bg = useColorModeValue("white", "whiteAlpha.50");
@@ -36,6 +40,7 @@ const ArticleCard = ({
   const href = isInternal ? `/articles/${slug}` : url;
   const displayDate = absoluteDate || formatAbsoluteDate(date);
   const leadText = description || summary || "";
+  const bookReference = getArticleBookReference({ book });
 
   const sourceLabel = (() => {
     if (isInternal) return "ozzo.blog";
@@ -102,6 +107,15 @@ const ArticleCard = ({
             <Text fontSize="xs" color={bodyColor} lineHeight="1.6" noOfLines={2}>
               {leadText}
             </Text>
+          )}
+
+          {bookReference && (
+            <HStack spacing={1} align="start" color={mutedColor} fontSize="xs" w="100%">
+              <Icon as={IoBookOutline} boxSize={3} mt="2px" />
+              <Text noOfLines={2} lineHeight="1.4">
+                Book reference: {bookReference}
+              </Text>
+            </HStack>
           )}
 
           {tags?.length > 0 && (
