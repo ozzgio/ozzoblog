@@ -49,8 +49,15 @@ export const createExcerpt = (value, maxLength = 220) => {
   ).trimEnd()}…`;
 };
 
+// Article bodies in portfolio-data open with their own "# Title" line by
+// authoring convention, duplicating the page's own styled H1. Strip a
+// leading H1 (and the blank line after it) so the title renders exactly
+// once.
+const stripLeadingHeading = (text) =>
+  text.replace(/^\s*#\s+.+\n+/, "");
+
 export const getArticleBody = (article) =>
-  getTextContent(article?.content || article?.body);
+  stripLeadingHeading(getTextContent(article?.content || article?.body));
 
 export const getArticleBookReference = (article) =>
   getTextContent(article?.book);
@@ -70,6 +77,29 @@ export const getArticleSummary = (article, maxLength = 220) => {
 
 export const getBookNotes = (book) =>
   getTextContent(book?.notes || book?.content);
+
+// Every book entry in portfolio-data writes notes as a sequence of
+// **Label** paragraphs ("The problem", "The concept", "The decision", ...).
+// Parse that convention into labeled sections so the UI can render a single
+// reading arc instead of one undifferentiated block of markdown.
+export const parseBookNotesSections = (notes) => {
+  const text = getTextContent(notes);
+  if (!text) return [];
+
+  const headingPattern = /\*\*([^*\n]+)\*\*\s*\n*/g;
+  const matches = [...text.matchAll(headingPattern)];
+  if (matches.length < 2) return [];
+
+  return matches
+    .map((match, index) => {
+      const label = match[1].trim();
+      const start = match.index + match[0].length;
+      const end = index + 1 < matches.length ? matches[index + 1].index : text.length;
+      const body = text.slice(start, end).trim();
+      return { label, body };
+    })
+    .filter((section) => section.body);
+};
 
 export const getBookSlug = (book) =>
   getTextContent(book?.slug) || slugify(book?.title || "");

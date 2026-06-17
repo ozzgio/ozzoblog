@@ -21,7 +21,20 @@ import {
 
 const MermaidDiagram = dynamic(() => import("./mermaid-diagram"), { ssr: false });
 
-export default function MarkdownProse({ children }) {
+const READING_FONT = "'Merriweather', Georgia, serif";
+
+// "article" is the full long-form reading size (article body, book notes
+// fallback). "compact" is for shorter blurbs inside a card or arc entry.
+// fontFamily is set explicitly on every text node here because Chakra's
+// Text/UnorderedList/OrderedList components set their own font-family from
+// the theme's body token, which wins over an inherited style from a parent
+// wrapper -- inheriting Merriweather from an ancestor silently does nothing.
+const SIZES = {
+  article: { fontSize: "17px", lineHeight: "1.8", listFontSize: "16px" },
+  compact: { fontSize: "15px", lineHeight: "1.75", listFontSize: "14px" },
+};
+
+export default function MarkdownProse({ children, size = "article" }) {
   const bodyColor = useColorModeValue("gray.700", "gray.300");
   const headingColor = useColorModeValue("gray.800", "gray.100");
   const quoteBorder = useColorModeValue("orange.300", "orange.600");
@@ -29,30 +42,31 @@ export default function MarkdownProse({ children }) {
   const codeBg = useColorModeValue("gray.100", "whiteAlpha.200");
   const codeBorder = useColorModeValue("gray.200", "whiteAlpha.300");
   const syntaxTheme = useColorModeValue(oneLight, oneDark);
+  const { fontSize, lineHeight, listFontSize } = SIZES[size] || SIZES.article;
 
   const components = {
     h1: ({ children }) => (
-      <Heading as="h1" size="lg" color={headingColor} mt={6} mb={3} lineHeight="1.3">
+      <Heading as="h1" size="lg" color={headingColor} mt={6} mb={3} lineHeight="1.3" fontFamily={READING_FONT}>
         {children}
       </Heading>
     ),
     h2: ({ children }) => (
-      <Heading as="h2" size="md" color={headingColor} mt={6} mb={3} lineHeight="1.3">
+      <Heading as="h2" size="md" color={headingColor} mt={6} mb={3} lineHeight="1.3" fontFamily={READING_FONT}>
         {children}
       </Heading>
     ),
     h3: ({ children }) => (
-      <Heading as="h3" size="sm" color={headingColor} mt={5} mb={2} lineHeight="1.4">
+      <Heading as="h3" size="sm" color={headingColor} mt={5} mb={2} lineHeight="1.4" fontFamily={READING_FONT}>
         {children}
       </Heading>
     ),
     h4: ({ children }) => (
-      <Heading as="h4" size="xs" color={headingColor} mt={4} mb={2} textTransform="uppercase" letterSpacing="wider">
+      <Heading as="h4" size="xs" color={headingColor} mt={4} mb={2} textTransform="uppercase" letterSpacing="wider" fontFamily={READING_FONT}>
         {children}
       </Heading>
     ),
     p: ({ children }) => (
-      <Text color={bodyColor} fontSize="sm" lineHeight="1.85" mb={4}>
+      <Text color={bodyColor} fontSize={fontSize} lineHeight={lineHeight} fontFamily={READING_FONT} mb={4}>
         {children}
       </Text>
     ),
@@ -92,22 +106,23 @@ export default function MarkdownProse({ children }) {
         py={2}
         my={4}
         borderRadius="sm"
+        fontFamily={READING_FONT}
       >
         {children}
       </Box>
     ),
     ul: ({ children }) => (
-      <UnorderedList spacing={1} mb={4} pl={2} color={bodyColor} fontSize="sm">
+      <UnorderedList spacing={1} mb={4} pl={2} color={bodyColor} fontSize={listFontSize} fontFamily={READING_FONT}>
         {children}
       </UnorderedList>
     ),
     ol: ({ children }) => (
-      <OrderedList spacing={1} mb={4} pl={2} color={bodyColor} fontSize="sm">
+      <OrderedList spacing={1} mb={4} pl={2} color={bodyColor} fontSize={listFontSize} fontFamily={READING_FONT}>
         {children}
       </OrderedList>
     ),
     li: ({ children }) => (
-      <ListItem lineHeight="1.75">{children}</ListItem>
+      <ListItem lineHeight={lineHeight}>{children}</ListItem>
     ),
     hr: () => <Divider my={6} />,
     pre: ({ children }) => {

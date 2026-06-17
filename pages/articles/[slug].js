@@ -24,11 +24,11 @@ import {
   resolvePortfolioAssetUrl,
 } from "../../libs/contentUtils";
 
+const READING_FONT = "'Merriweather', Georgia, serif";
+
 export default function ArticleDetailPage({ article }) {
   const mutedText = useColorModeValue("gray.600", "gray.400");
-  const proseBg = useColorModeValue("white", "whiteAlpha.100");
-  const proseBorder = useColorModeValue("blackAlpha.100", "whiteAlpha.200");
-  const bookBg = useColorModeValue("orange.50", "orange.900");
+  const ruleColor = useColorModeValue("orange.400", "orange.500");
 
   if (!article) return null;
 
@@ -43,7 +43,10 @@ export default function ArticleDetailPage({ article }) {
         <link rel="canonical" href={canonicalUrl} />
       </Head>
 
-      <Container maxW="4xl" py={{ base: 6, md: 10 }}>
+      {/* Measure tuned for long-form reading: ~70 characters per line at the
+          body font size, rather than stretching to the same width used by
+          card-grid pages. */}
+      <Container maxW="2xl" py={{ base: 6, md: 10 }}>
         <VStack align="start" spacing={6}>
           <Link as={NextLink} href="/articles" color="orange.500" fontWeight="semibold">
             <HStack spacing={2}>
@@ -52,42 +55,43 @@ export default function ArticleDetailPage({ article }) {
             </HStack>
           </Link>
 
-          <VStack align="start" spacing={3}>
-            <Heading as="h1" size="lg" lineHeight="1.2"
-              style={{ fontFamily: "'Merriweather', Georgia, serif" }}>
+          <VStack align="start" spacing={3} w="100%">
+            <Heading as="h1" size="lg" lineHeight="1.25" fontFamily={READING_FONT}>
               {article.title}
             </Heading>
-            <HStack spacing={3} flexWrap="wrap" color={mutedText}>
+            <HStack spacing={3} flexWrap="wrap" color={mutedText} fontSize="sm">
               <HStack spacing={1}>
                 <Icon as={IoCalendarOutline} />
                 <Text>{formatAbsoluteDate(article.date)}</Text>
               </HStack>
               {article.tags?.map((tag) => (
-                <Tag key={tag} colorScheme="orange" borderRadius="full">
+                <Tag key={tag} colorScheme="orange" borderRadius="full" size="sm">
                   {tag}
                 </Tag>
               ))}
             </HStack>
-            {article.description && <Text color={mutedText}>{article.description}</Text>}
+            {article.description && (
+              <Text color={mutedText} fontSize="md" lineHeight="1.6">
+                {article.description}
+              </Text>
+            )}
             {bookReference && (
-              <Box
+              <HStack
                 w="100%"
-                p={4}
-                borderWidth="1px"
-                borderColor={proseBorder}
-                borderRadius="lg"
-                bg={bookBg}
-                _dark={{ bg: "orange.900" }}
+                borderLeftWidth="3px"
+                borderLeftColor={ruleColor}
+                pl={3}
+                py={0.5}
+                spacing={2}
+                fontSize="sm"
               >
-                <Text fontSize="xs" fontWeight="bold" textTransform="uppercase" letterSpacing="wider" color="orange.600" _dark={{ color: "orange.300" }} mb={1}>
-                  Referenced book
-                </Text>
+                <Text color={mutedText}>Referenced book:</Text>
                 {bookUrl ? (
                   <Link
                     as={bookUrl.startsWith("http") ? "a" : NextLink}
                     href={bookUrl}
-                    color="orange.700"
-                    _dark={{ color: "orange.200" }}
+                    color="orange.600"
+                    _dark={{ color: "orange.300" }}
                     fontWeight="semibold"
                   >
                     {bookReference}
@@ -95,19 +99,13 @@ export default function ArticleDetailPage({ article }) {
                 ) : (
                   <Text fontWeight="semibold">{bookReference}</Text>
                 )}
-              </Box>
+              </HStack>
             )}
           </VStack>
 
-          <Box
-            w="100%"
-            p={{ base: 4, md: 6 }}
-            borderWidth="1px"
-            borderColor={proseBorder}
-            borderRadius="xl"
-            bg={proseBg}
-            style={{ fontFamily: "'Merriweather', Georgia, serif" }}
-          >
+          <Box w="100%" h="2px" bg={ruleColor} opacity={0.6} borderRadius="full" />
+
+          <Box w="100%">
             <MarkdownProse>{article.content}</MarkdownProse>
           </Box>
         </VStack>
