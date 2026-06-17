@@ -29,9 +29,28 @@ const READING_FONT = "'Merriweather', Georgia, serif";
 // Text/UnorderedList/OrderedList components set their own font-family from
 // the theme's body token, which wins over an inherited style from a parent
 // wrapper -- inheriting Merriweather from an ancestor silently does nothing.
+// paragraphMb/listSpacing/headingMt control vertical rhythm. "article" gets
+// real breathing room between paragraphs, list items, and section breaks --
+// a full-length essay packed at the same tight rhythm as a short card blurb
+// reads as a wall of text. "compact" (arc entries, decision callouts) stays
+// tighter since each block is already visually separated by the rail/label.
 const SIZES = {
-  article: { fontSize: "17px", lineHeight: "1.8", listFontSize: "16px" },
-  compact: { fontSize: "15px", lineHeight: "1.75", listFontSize: "14px" },
+  article: {
+    fontSize: "17px",
+    lineHeight: "1.8",
+    listFontSize: "16px",
+    paragraphMb: 6,
+    listSpacing: 3,
+    headingMt: { h1: 8, h2: 10, h3: 8, h4: 6 },
+  },
+  compact: {
+    fontSize: "15px",
+    lineHeight: "1.75",
+    listFontSize: "14px",
+    paragraphMb: 4,
+    listSpacing: 2,
+    headingMt: { h1: 6, h2: 6, h3: 5, h4: 4 },
+  },
 };
 
 export default function MarkdownProse({ children, size = "article" }) {
@@ -42,31 +61,31 @@ export default function MarkdownProse({ children, size = "article" }) {
   const codeBg = useColorModeValue("gray.100", "whiteAlpha.200");
   const codeBorder = useColorModeValue("gray.200", "whiteAlpha.300");
   const syntaxTheme = useColorModeValue(oneLight, oneDark);
-  const { fontSize, lineHeight, listFontSize } = SIZES[size] || SIZES.article;
+  const { fontSize, lineHeight, listFontSize, paragraphMb, listSpacing, headingMt } = SIZES[size] || SIZES.article;
 
   const components = {
     h1: ({ children }) => (
-      <Heading as="h1" size="lg" color={headingColor} mt={6} mb={3} lineHeight="1.3" fontFamily={READING_FONT}>
+      <Heading as="h1" size="lg" color={headingColor} mt={headingMt.h1} mb={4} lineHeight="1.3" fontFamily={READING_FONT}>
         {children}
       </Heading>
     ),
     h2: ({ children }) => (
-      <Heading as="h2" size="md" color={headingColor} mt={6} mb={3} lineHeight="1.3" fontFamily={READING_FONT}>
+      <Heading as="h2" size="md" color={headingColor} mt={headingMt.h2} mb={4} lineHeight="1.3" fontFamily={READING_FONT}>
         {children}
       </Heading>
     ),
     h3: ({ children }) => (
-      <Heading as="h3" size="sm" color={headingColor} mt={5} mb={2} lineHeight="1.4" fontFamily={READING_FONT}>
+      <Heading as="h3" size="sm" color={headingColor} mt={headingMt.h3} mb={3} lineHeight="1.4" fontFamily={READING_FONT}>
         {children}
       </Heading>
     ),
     h4: ({ children }) => (
-      <Heading as="h4" size="xs" color={headingColor} mt={4} mb={2} textTransform="uppercase" letterSpacing="wider" fontFamily={READING_FONT}>
+      <Heading as="h4" size="xs" color={headingColor} mt={headingMt.h4} mb={2} textTransform="uppercase" letterSpacing="wider" fontFamily={READING_FONT}>
         {children}
       </Heading>
     ),
     p: ({ children }) => (
-      <Text color={bodyColor} fontSize={fontSize} lineHeight={lineHeight} fontFamily={READING_FONT} mb={4}>
+      <Text color={bodyColor} fontSize={fontSize} lineHeight={lineHeight} fontFamily={READING_FONT} mb={paragraphMb}>
         {children}
       </Text>
     ),
@@ -104,7 +123,7 @@ export default function MarkdownProse({ children, size = "article" }) {
         bg={quoteBg}
         pl={4}
         py={2}
-        my={4}
+        my={paragraphMb}
         borderRadius="sm"
         fontFamily={READING_FONT}
       >
@@ -112,12 +131,12 @@ export default function MarkdownProse({ children, size = "article" }) {
       </Box>
     ),
     ul: ({ children }) => (
-      <UnorderedList spacing={1} mb={4} pl={2} color={bodyColor} fontSize={listFontSize} fontFamily={READING_FONT}>
+      <UnorderedList spacing={listSpacing} mb={paragraphMb} pl={2} color={bodyColor} fontSize={listFontSize} fontFamily={READING_FONT}>
         {children}
       </UnorderedList>
     ),
     ol: ({ children }) => (
-      <OrderedList spacing={1} mb={4} pl={2} color={bodyColor} fontSize={listFontSize} fontFamily={READING_FONT}>
+      <OrderedList spacing={listSpacing} mb={paragraphMb} pl={2} color={bodyColor} fontSize={listFontSize} fontFamily={READING_FONT}>
         {children}
       </OrderedList>
     ),
@@ -138,7 +157,7 @@ export default function MarkdownProse({ children, size = "article" }) {
       if (language) {
         return (
           <Box
-            mb={4}
+            mb={paragraphMb}
             borderWidth="1px"
             borderColor={codeBorder}
             borderRadius="md"
@@ -175,7 +194,7 @@ export default function MarkdownProse({ children, size = "article" }) {
           p={4}
           borderRadius="md"
           overflowX="auto"
-          mb={4}
+          mb={paragraphMb}
           fontSize="xs"
           lineHeight="1.6"
         >

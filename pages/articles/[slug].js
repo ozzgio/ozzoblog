@@ -47,7 +47,7 @@ export default function ArticleDetailPage({ article }) {
           body font size, rather than stretching to the same width used by
           card-grid pages. */}
       <Container maxW="2xl" py={{ base: 6, md: 10 }}>
-        <VStack align="start" spacing={6}>
+        <VStack align="start" spacing={8}>
           <Link as={NextLink} href="/articles" color="orange.500" fontWeight="semibold">
             <HStack spacing={2}>
               <Icon as={IoArrowBackOutline} />
@@ -55,7 +55,7 @@ export default function ArticleDetailPage({ article }) {
             </HStack>
           </Link>
 
-          <VStack align="start" spacing={3} w="100%">
+          <VStack align="start" spacing={4} w="100%">
             <Heading as="h1" size="lg" lineHeight="1.25" fontFamily={READING_FONT}>
               {article.title}
             </Heading>
@@ -71,7 +71,7 @@ export default function ArticleDetailPage({ article }) {
               ))}
             </HStack>
             {article.description && (
-              <Text color={mutedText} fontSize="md" lineHeight="1.6">
+              <Text color={mutedText} fontSize="md" lineHeight="1.7">
                 {article.description}
               </Text>
             )}
@@ -81,7 +81,7 @@ export default function ArticleDetailPage({ article }) {
                 borderLeftWidth="3px"
                 borderLeftColor={ruleColor}
                 pl={3}
-                py={0.5}
+                py={1}
                 spacing={2}
                 fontSize="sm"
               >
