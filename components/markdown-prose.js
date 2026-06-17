@@ -23,6 +23,13 @@ const MermaidDiagram = dynamic(() => import("./mermaid-diagram"), { ssr: false }
 
 const READING_FONT = "'Merriweather', Georgia, serif";
 
+// Both bundled Prism themes ship a "comment" color that fails WCAG AA
+// against their own background (oneDark: 2.3:1, oneLight: 2.5:1 -- verified
+// with axe-core, not assumed). Same hue/saturation, lightness nudged to
+// clear 4.5:1 with a small margin.
+const accessibleOneDark = { ...oneDark, comment: { ...oneDark.comment, color: "hsl(220, 10%, 62%)" } };
+const accessibleOneLight = { ...oneLight, comment: { ...oneLight.comment, color: "hsl(230, 4%, 44%)" } };
+
 // "article" is the full long-form reading size (article body, book notes
 // fallback). "compact" is for shorter blurbs inside a card or arc entry.
 // fontFamily is set explicitly on every text node here because Chakra's
@@ -60,7 +67,7 @@ export default function MarkdownProse({ children, size = "article" }) {
   const quoteBg = useColorModeValue("orange.50", "whiteAlpha.50");
   const codeBg = useColorModeValue("gray.100", "whiteAlpha.200");
   const codeBorder = useColorModeValue("gray.200", "whiteAlpha.300");
-  const syntaxTheme = useColorModeValue(oneLight, oneDark);
+  const syntaxTheme = useColorModeValue(accessibleOneLight, accessibleOneDark);
   const { fontSize, lineHeight, listFontSize, paragraphMb, listSpacing, headingMt } = SIZES[size] || SIZES.article;
 
   const components = {
@@ -172,7 +179,6 @@ export default function MarkdownProse({ children, size = "article" }) {
                 padding: "1rem",
                 fontSize: "0.78rem",
                 lineHeight: 1.7,
-                background: "transparent",
               }}
               codeTagProps={{
                 style: {
