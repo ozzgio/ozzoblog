@@ -29,6 +29,10 @@ const READING_FONT = "'Merriweather', Georgia, serif";
 export default function ArticleDetailPage({ article }) {
   const mutedText = useColorModeValue("gray.600", "gray.400");
   const ruleColor = useColorModeValue("orange.400", "orange.500");
+  // orange.500 is 3.11:1 against the light page background -- fails AA.
+  // orange.700 clears it (6.0:1) while orange.500 already clears the dark
+  // background (5.12:1), so this needs to vary by mode, not be a single token.
+  const linkOrange = useColorModeValue("orange.700", "orange.500");
 
   if (!article) return null;
 
@@ -48,7 +52,7 @@ export default function ArticleDetailPage({ article }) {
           card-grid pages. */}
       <Container maxW="2xl" py={{ base: 6, md: 10 }}>
         <VStack align="start" spacing={8}>
-          <Link as={NextLink} href="/articles" color="orange.500" fontWeight="semibold">
+          <Link as={NextLink} href="/articles" color={linkOrange} fontWeight="semibold">
             <HStack spacing={2}>
               <Icon as={IoArrowBackOutline} />
               <Text>Back to articles</Text>
@@ -90,7 +94,7 @@ export default function ArticleDetailPage({ article }) {
                   <Link
                     as={bookUrl.startsWith("http") ? "a" : NextLink}
                     href={bookUrl}
-                    color="orange.600"
+                    color="orange.700"
                     _dark={{ color: "orange.300" }}
                     fontWeight="semibold"
                   >

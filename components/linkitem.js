@@ -4,7 +4,7 @@ import { Link } from "@chakra-ui/react";
 
 const LinkItem = ({ href, path, target, children, ...props }) => {
   const active = path === href;
-  const inactiveColor = useColorModeValue("gray.500", "gray.400");
+  const inactiveColor = useColorModeValue("gray.600", "gray.400");
   const activeColor = useColorModeValue("gray.900", "white");
 
   return (

@@ -23,12 +23,34 @@ const MermaidDiagram = dynamic(() => import("./mermaid-diagram"), { ssr: false }
 
 const READING_FONT = "'Merriweather', Georgia, serif";
 
-// Both bundled Prism themes ship a "comment" color that fails WCAG AA
-// against their own background (oneDark: 2.3:1, oneLight: 2.5:1 -- verified
-// with axe-core, not assumed). Same hue/saturation, lightness nudged to
-// clear 4.5:1 with a small margin.
-const accessibleOneDark = { ...oneDark, comment: { ...oneDark.comment, color: "hsl(220, 10%, 62%)" } };
-const accessibleOneLight = { ...oneLight, comment: { ...oneLight.comment, color: "hsl(230, 4%, 44%)" } };
+// Several token colors in both bundled Prism themes fail WCAG AA against
+// their own theme background -- verified per-token with a direct contrast
+// calculation, then re-confirmed with axe-core, not assumed from the look
+// of the color. Same hue/saturation kept for each, only lightness nudged
+// enough to clear 4.5:1 with a small margin.
+const accessibleOneDark = {
+  ...oneDark,
+  comment: { ...oneDark.comment, color: "hsl(220, 10%, 62%)" }, // was 2.86:1
+  tag: { ...oneDark.tag, color: "hsl(355, 65%, 71%)" }, // was 4.38:1
+  property: { ...oneDark.property, color: "hsl(355, 65%, 71%)" },
+  symbol: { ...oneDark.symbol, color: "hsl(355, 65%, 71%)" },
+};
+const accessibleOneLight = {
+  ...oneLight,
+  comment: { ...oneLight.comment, color: "hsl(230, 4%, 44%)" },
+  function: { ...oneLight.function, color: "hsl(221, 87%, 54%)" }, // was 3.87:1
+  operator: { ...oneLight.operator, color: "hsl(221, 87%, 54%)" }, // same hue as function, same fix
+  variable: { ...oneLight.variable, color: "hsl(221, 87%, 54%)" },
+  "class-name": { ...oneLight["class-name"], color: "hsl(35, 99%, 32%)" }, // was 3.93:1
+  "attr-name": { ...oneLight["attr-name"], color: "hsl(35, 99%, 32%)" },
+  number: { ...oneLight.number, color: "hsl(35, 99%, 32%)" },
+  boolean: { ...oneLight.boolean, color: "hsl(35, 99%, 32%)" },
+  constant: { ...oneLight.constant, color: "hsl(35, 99%, 32%)" },
+  atrule: { ...oneLight.atrule, color: "hsl(35, 99%, 32%)" },
+  tag: { ...oneLight.tag, color: "hsl(5, 74%, 47%)" }, // was 3.51:1
+  property: { ...oneLight.property, color: "hsl(5, 74%, 47%)" },
+  symbol: { ...oneLight.symbol, color: "hsl(5, 74%, 47%)" },
+};
 
 // "article" is the full long-form reading size (article body, book notes
 // fallback). "compact" is for shorter blurbs inside a card or arc entry.

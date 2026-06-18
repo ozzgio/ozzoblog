@@ -134,6 +134,10 @@ export default function BookDetailPage({ book }) {
   const headingColor = useColorModeValue("gray.800", "gray.100");
   const bodyColor = useColorModeValue("gray.700", "gray.300");
   const proseBorder = useColorModeValue("blackAlpha.100", "whiteAlpha.200");
+  // orange.500 is 3.11:1 against the light page background -- fails AA.
+  // orange.700 clears it (6.0:1) while orange.500 already clears the dark
+  // background (5.12:1), so this needs to vary by mode, not be a single token.
+  const linkOrange = useColorModeValue("orange.700", "orange.500");
   const quoteBg = useColorModeValue("orange.50", "whiteAlpha.50");
   const quoteBorder = useColorModeValue("orange.300", "orange.600");
 
@@ -177,7 +181,7 @@ export default function BookDetailPage({ book }) {
           <Link
             as={NextLink}
             href="/books"
-            color="orange.500"
+            color={linkOrange}
             fontWeight="semibold"
           >
             <HStack spacing={1}>
@@ -222,7 +226,7 @@ export default function BookDetailPage({ book }) {
               {book.rating > 0 && (
                 <HStack spacing={2}>
                   <RatingStar rating={book.rating} />
-                  <Text color="orange.500" fontWeight="bold" fontSize="sm">
+                  <Text color={linkOrange} fontWeight="bold" fontSize="sm">
                     {book.rating}/5
                   </Text>
                 </HStack>
@@ -307,7 +311,7 @@ export default function BookDetailPage({ book }) {
               {book.url && (
                 <Link
                   href={book.url}
-                  color="orange.500"
+                  color={linkOrange}
                   fontWeight="semibold"
                   isExternal
                   fontSize="sm"
