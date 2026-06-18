@@ -43,7 +43,7 @@ const Footer = ({ showBorder = true }) => {
             </Link>
           </Text>
         </HStack>
-        <Text fontSize="xs" color={useColorModeValue("gray.700", "gray.500")}>
+        <Text fontSize="xs" color={useColorModeValue("gray.700", "gray.400")}>
           Version: {packageJson.version}
         </Text>
       </VStack>

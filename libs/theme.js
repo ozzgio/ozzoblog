@@ -42,7 +42,7 @@ const theme = extendTheme({
     },
     Link: {
       baseStyle: (props) => ({
-        color: mode("#0066ff", "#d24dff")(props),
+        color: mode("#0052cc", "#d24dff")(props),
         textUnderlineOffset: 3,
         _hover: {
           textDecoration: "underline",
@@ -77,7 +77,7 @@ const theme = extendTheme({
       _dark: "#744210",
     },
     tagText: {
-      default: "#dd6b20",
+      default: "#a8460a",
       _dark: "#f7fafc",
     },
   },

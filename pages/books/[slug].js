@@ -11,7 +11,6 @@ import {
   VStack,
   useColorModeValue,
   Divider,
-  SimpleGrid,
 } from "@chakra-ui/react";
 import Head from "next/head";
 import NextLink from "next/link";
@@ -26,6 +25,7 @@ import {
   IoCheckmarkCircleOutline,
   IoLayersOutline,
   IoChatbubbleOutline,
+  IoHammerOutline,
 } from "react-icons/io5";
 import RatingStar from "../../components/ratingstar";
 import Layout from "../../components/layouts/layout";
@@ -34,35 +34,97 @@ import {
   getBookSlug,
   getBookNotes,
   hasBookNotes,
+  parseBookNotesSections,
   resolvePortfolioAssetUrl,
 } from "../../libs/contentUtils";
 
-function SectionBlock({ icon, label, color, children, bg }) {
-  const defaultBg = useColorModeValue("gray.50", "whiteAlpha.50");
-  const border = useColorModeValue("blackAlpha.100", "whiteAlpha.100");
-  const labelColor = useColorModeValue(`${color}.700`, `${color}.300`);
+const READING_FONT = "'Merriweather', Georgia, serif";
+
+// Every book's notes follow the same reflection arc: why I picked it up,
+// what it teaches, what I decided, what changed, what I'd push back on.
+// One icon per recognized step, one accent color throughout -- the steps
+// are a real sequence, the rainbow-card-per-topic treatment they used to
+// get was decorative, not informative.
+const STEP_ICON_RULES = [
+  [/decision|decided/i, IoFlashOutline],
+  [/implementation/i, IoHammerOutline],
+  [/problem|why/i, IoBulbOutline],
+  [/concept|teach/i, IoLayersOutline],
+  [/effect|changed/i, IoCheckmarkCircleOutline],
+  [/trade.?off|reflection/i, IoSwapHorizontalOutline],
+];
+
+function iconForLabel(label) {
+  const match = STEP_ICON_RULES.find(([pattern]) => pattern.test(label));
+  return match ? match[1] : IoChatbubbleOutline;
+}
+
+function ReadingArc({ sections }) {
+  const railColor = useColorModeValue("orange.300", "orange.600");
+  const markerBg = useColorModeValue("white", "#1a1a1e");
+  const labelColor = useColorModeValue("orange.700", "orange.300");
+  const decisionBg = useColorModeValue("orange.50", "orange.900");
+  const decisionBorder = useColorModeValue("orange.300", "orange.600");
 
   return (
     <Box
-      borderWidth="1px"
-      borderColor={border}
-      borderRadius="xl"
-      p={{ base: 4, md: 5 }}
-      bg={bg || defaultBg}
+      borderLeftWidth="2px"
+      borderLeftColor={railColor}
+      ml={{ base: 2, md: 3 }}
+      pl={{ base: 6, md: 8 }}
     >
-      <HStack spacing={2} mb={3}>
-        <Icon as={icon} color={`${color}.500`} boxSize={4} />
-        <Text
-          fontSize="xs"
-          fontWeight="bold"
-          textTransform="uppercase"
-          color={labelColor}
-          letterSpacing="wider"
-        >
-          {label}
-        </Text>
-      </HStack>
-      {children}
+      {sections.map((section, index) => {
+        const isDecision = /decision|decided/i.test(section.label);
+        const isLast = index === sections.length - 1;
+
+        return (
+          <Box key={section.label} position="relative" pb={isLast ? 0 : 7}>
+            <Box
+              position="absolute"
+              left={{ base: "-37px", md: "-49px" }}
+              top="0"
+              boxSize={{ base: "26px", md: "30px" }}
+              borderRadius="full"
+              bg={markerBg}
+              borderWidth="2px"
+              borderColor={railColor}
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+            >
+              <Icon as={iconForLabel(section.label)} boxSize={{ base: 3, md: 3.5 }} color={railColor} />
+            </Box>
+
+            <Text
+              fontSize="xs"
+              fontWeight="bold"
+              textTransform="uppercase"
+              letterSpacing="wider"
+              color={labelColor}
+              mb={2}
+            >
+              {section.label}
+            </Text>
+
+            {isDecision ? (
+              <Box
+                bg={decisionBg}
+                borderWidth="1px"
+                borderColor={decisionBorder}
+                borderRadius="lg"
+                p={{ base: 4, md: 5 }}
+                sx={{ "& p:last-of-type": { mb: 0 } }}
+              >
+                <MarkdownProse size="compact">{section.body}</MarkdownProse>
+              </Box>
+            ) : (
+              <Box sx={{ "& p:last-of-type": { mb: 0 } }}>
+                <MarkdownProse size="compact">{section.body}</MarkdownProse>
+              </Box>
+            )}
+          </Box>
+        );
+      })}
     </Box>
   );
 }
@@ -71,20 +133,37 @@ export default function BookDetailPage({ book }) {
   const mutedText = useColorModeValue("gray.600", "gray.400");
   const headingColor = useColorModeValue("gray.800", "gray.100");
   const bodyColor = useColorModeValue("gray.700", "gray.300");
-  const proseBg = useColorModeValue("white", "whiteAlpha.50");
   const proseBorder = useColorModeValue("blackAlpha.100", "whiteAlpha.200");
-  const decisionBg = useColorModeValue("orange.50", "orange.900");
-  const decisionBorder = useColorModeValue("orange.300", "orange.600");
-  const decisionText = useColorModeValue("orange.800", "orange.100");
-  const quoteBg = useColorModeValue("gray.50", "whiteAlpha.50");
+  // orange.500 is 3.11:1 against the light page background -- fails AA.
+  // orange.700 clears it (6.0:1) while orange.500 already clears the dark
+  // background (5.12:1), so this needs to vary by mode, not be a single token.
+  const linkOrange = useColorModeValue("orange.700", "orange.500");
+  const quoteBg = useColorModeValue("orange.50", "whiteAlpha.50");
   const quoteBorder = useColorModeValue("orange.300", "orange.600");
-  const coverBg = useColorModeValue("gray.50", "blackAlpha.400");
 
   if (!book) return null;
 
   const canonicalUrl = `https://ozzo.blog/books/${book.slug}`;
-  const hasPersonalSections =
-    book.problem || book.decision || book.effect || book.trade_off;
+
+  // Two ways "my read" content can arrive: the structured JSON fields
+  // (currently unused by any book in portfolio-data, kept for forward
+  // compatibility), or the **Label** convention every book actually uses
+  // inside `notes`. Normalize both into the same {label, body} shape so
+  // there is exactly one rendering path.
+  const structuredSections = [
+    book.problem && { label: "Why I picked this up", body: book.problem },
+    book.concept && { label: "What it teaches", body: book.concept },
+    book.decision && { label: "What I decided", body: book.decision },
+    book.implementation && { label: "Implementation", body: book.implementation },
+    book.effect && { label: "What changed", body: book.effect },
+    book.trade_off && { label: "Critical reflection", body: book.trade_off },
+  ].filter(Boolean);
+
+  const sections = structuredSections.length > 0
+    ? structuredSections
+    : parseBookNotesSections(book.notes);
+
+  const hasArc = sections.length > 0;
   const hasQuotes = book.quotes?.length > 0;
 
   return (
@@ -97,12 +176,12 @@ export default function BookDetailPage({ book }) {
         <link rel="canonical" href={canonicalUrl} />
       </Head>
 
-      <Container maxW="3xl" py={{ base: 6, md: 10 }}>
+      <Container maxW="2xl" py={{ base: 6, md: 10 }}>
         <VStack align="start" spacing={8}>
           <Link
             as={NextLink}
             href="/books"
-            color="orange.500"
+            color={linkOrange}
             fontWeight="semibold"
           >
             <HStack spacing={1}>
@@ -111,189 +190,77 @@ export default function BookDetailPage({ book }) {
             </HStack>
           </Link>
 
-          <Box w="100%">
-            <HStack align="start" spacing={6} flexWrap="wrap">
-              {book.cover && (
-                <Box
-                  flexShrink={0}
-                  w={{ base: "100px", md: "130px" }}
-                  bg={coverBg}
-                  borderRadius="lg"
-                  overflow="hidden"
-                  boxShadow="lg"
-                  display="flex"
-                  alignItems="center"
-                  justifyContent="center"
-                  p={2}
-                >
-                  <Image
-                    src={book.cover}
-                    alt={book.title}
-                    maxH={{ base: "150px", md: "190px" }}
-                    objectFit="contain"
-                  />
-                </Box>
-              )}
-              <VStack align="start" spacing={3} flex={1} minW="200px">
-                <Heading
-                  as="h1"
-                  size="lg"
-                  lineHeight="1.15"
-                  color={headingColor}
-                  style={{ fontFamily: "'Merriweather', Georgia, serif" }}
-                >
-                  {book.title}
-                </Heading>
-                <HStack spacing={2} color={mutedText} fontSize="sm">
-                  <Icon as={IoBookOutline} />
-                  <Text fontWeight="medium">{book.author}</Text>
-                </HStack>
+          <HStack align="start" spacing={{ base: 4, md: 6 }} w="100%" flexWrap="wrap">
+            {book.cover && (
+              <Image
+                src={book.cover}
+                alt={book.title}
+                flexShrink={0}
+                w={{ base: "92px", md: "120px" }}
+                borderRadius="md"
+                boxShadow="lg"
+                objectFit="cover"
+              />
+            )}
+            <VStack align="start" spacing={3} flex={1} minW="200px">
+              <Heading
+                as="h1"
+                size="lg"
+                lineHeight="1.2"
+                color={headingColor}
+                fontFamily={READING_FONT}
+              >
+                {book.title}
+              </Heading>
+              <HStack spacing={2} color={mutedText} fontSize="sm">
+                <Icon as={IoBookOutline} />
+                <Text fontWeight="medium">{book.author}</Text>
                 {book.date && (
-                  <HStack spacing={2} color={mutedText} fontSize="sm">
+                  <>
+                    <Text aria-hidden="true">&middot;</Text>
                     <Icon as={IoCalendarOutline} />
                     <Text>Read {formatAbsoluteDate(book.date)}</Text>
-                  </HStack>
+                  </>
                 )}
-                {book.rating > 0 && (
-                  <HStack spacing={2}>
-                    <RatingStar rating={book.rating} />
-                    <Text color="orange.500" fontWeight="bold" fontSize="sm">
-                      {book.rating}/5
-                    </Text>
-                  </HStack>
-                )}
-                <HStack flexWrap="wrap" spacing={2}>
-                  {book.tags?.map((tag) => (
-                    <Tag
-                      key={tag}
-                      colorScheme="orange"
-                      borderRadius="full"
-                      size="sm"
-                    >
-                      {tag}
-                    </Tag>
-                  ))}
+              </HStack>
+              {book.rating > 0 && (
+                <HStack spacing={2}>
+                  <RatingStar rating={book.rating} />
+                  <Text color={linkOrange} fontWeight="bold" fontSize="sm">
+                    {book.rating}/5
+                  </Text>
                 </HStack>
-              </VStack>
-            </HStack>
-          </Box>
+              )}
+              <HStack flexWrap="wrap" spacing={2}>
+                {book.tags?.map((tag) => (
+                  <Tag key={tag} colorScheme="orange" borderRadius="full" size="sm">
+                    {tag}
+                  </Tag>
+                ))}
+              </HStack>
+            </VStack>
+          </HStack>
 
           {book.lesson && (
-            <Box
-              w="100%"
-              borderLeftWidth="3px"
-              borderLeftColor="orange.400"
-              pl={4}
-              py={1}
-            >
+            <Box w="100%" borderLeftWidth="3px" borderLeftColor="orange.400" pl={4} py={1}>
               <Text
                 fontStyle="italic"
                 color={bodyColor}
-                fontSize="md"
+                fontSize="lg"
                 lineHeight="1.6"
-                style={{ fontFamily: "'Merriweather', Georgia, serif" }}
+                fontFamily={READING_FONT}
               >
                 &ldquo;{book.lesson}&rdquo;
               </Text>
             </Box>
           )}
 
-          {hasPersonalSections && (
+          {hasArc && (
             <VStack align="start" spacing={4} w="100%">
-              <Heading
-                as="h2"
-                size="sm"
-                color={mutedText}
-                textTransform="uppercase"
-                letterSpacing="wider"
-              >
+              <Heading as="h2" size="sm" color={mutedText} textTransform="uppercase" letterSpacing="wider">
                 My read
               </Heading>
-
-              <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4} w="100%">
-                {book.problem && (
-                  <SectionBlock
-                    icon={IoBulbOutline}
-                    label="Why I picked this up"
-                    color="blue"
-                  >
-                    <Box sx={{ "& p": { mb: 0 } }}>
-                      <MarkdownProse>{book.problem}</MarkdownProse>
-                    </Box>
-                  </SectionBlock>
-                )}
-                {book.concept && (
-                  <SectionBlock
-                    icon={IoLayersOutline}
-                    label="What it teaches"
-                    color="purple"
-                  >
-                    <Box sx={{ "& p": { mb: 0 } }}>
-                      <MarkdownProse>{book.concept}</MarkdownProse>
-                    </Box>
-                  </SectionBlock>
-                )}
-                {book.effect && (
-                  <SectionBlock
-                    icon={IoCheckmarkCircleOutline}
-                    label="What changed"
-                    color="green"
-                  >
-                    <Box sx={{ "& p": { mb: 0 } }}>
-                      <MarkdownProse>{book.effect}</MarkdownProse>
-                    </Box>
-                  </SectionBlock>
-                )}
-                {book.trade_off && (
-                  <SectionBlock
-                    icon={IoSwapHorizontalOutline}
-                    label="Critical reflection"
-                    color="gray"
-                  >
-                    <Box sx={{ "& p": { mb: 0 } }}>
-                      <MarkdownProse>{book.trade_off}</MarkdownProse>
-                    </Box>
-                  </SectionBlock>
-                )}
-              </SimpleGrid>
-
-              {book.decision && (
-                <Box
-                  w="100%"
-                  bg={decisionBg}
-                  borderWidth="1px"
-                  borderColor={decisionBorder}
-                  borderRadius="xl"
-                  p={{ base: 4, md: 5 }}
-                >
-                  <HStack spacing={2} mb={3}>
-                    <Icon as={IoFlashOutline} color="orange.500" boxSize={4} />
-                    <Text
-                      fontSize="xs"
-                      fontWeight="bold"
-                      textTransform="uppercase"
-                      color={decisionText}
-                      letterSpacing="wider"
-                    >
-                      What I decided
-                    </Text>
-                  </HStack>
-                  <Box
-                    sx={{ "& p": { mb: 0 }, "& a": { color: decisionText } }}
-                  >
-                    <MarkdownProse>{book.decision}</MarkdownProse>
-                  </Box>
-                  {book.implementation && (
-                    <Box
-                      sx={{ "& p": { mb: 0 }, "& a": { color: decisionText } }}
-                      mt={3}
-                      opacity={0.85}
-                    >
-                      <MarkdownProse>{book.implementation}</MarkdownProse>
-                    </Box>
-                  )}
-                </Box>
-              )}
+              <ReadingArc sections={sections} />
             </VStack>
           )}
 
@@ -303,13 +270,7 @@ export default function BookDetailPage({ book }) {
               <VStack align="start" spacing={4} w="100%">
                 <HStack spacing={2}>
                   <Icon as={IoChatbubbleOutline} color="orange.400" />
-                  <Heading
-                    as="h2"
-                    size="sm"
-                    color={mutedText}
-                    textTransform="uppercase"
-                    letterSpacing="wider"
-                  >
+                  <Heading as="h2" size="sm" color={mutedText} textTransform="uppercase" letterSpacing="wider">
                     Notable quotes
                   </Heading>
                 </HStack>
@@ -325,12 +286,7 @@ export default function BookDetailPage({ book }) {
                       bg={quoteBg}
                       borderRadius="sm"
                     >
-                      <Text
-                        fontSize="sm"
-                        fontStyle="italic"
-                        color={bodyColor}
-                        lineHeight="1.7"
-                      >
+                      <Text fontSize="sm" fontStyle="italic" color={bodyColor} lineHeight="1.7">
                         {quote}
                       </Text>
                     </Box>
@@ -340,20 +296,7 @@ export default function BookDetailPage({ book }) {
             </>
           )}
 
-          {!hasPersonalSections && book.notes && (
-            <Box
-              w="100%"
-              p={{ base: 4, md: 6 }}
-              borderWidth="1px"
-              borderColor={proseBorder}
-              borderRadius="xl"
-              bg={proseBg}
-            >
-              <MarkdownProse>{book.notes}</MarkdownProse>
-            </Box>
-          )}
-
-          {!hasPersonalSections && !book.notes && (
+          {!hasArc && !hasQuotes && (
             <Box
               w="100%"
               p={{ base: 4, md: 6 }}
@@ -368,7 +311,7 @@ export default function BookDetailPage({ book }) {
               {book.url && (
                 <Link
                   href={book.url}
-                  color="orange.500"
+                  color={linkOrange}
                   fontWeight="semibold"
                   isExternal
                   fontSize="sm"
