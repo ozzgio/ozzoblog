@@ -1,4 +1,4 @@
-import { extendTheme } from "@chakra-ui/react";
+import { extendTheme, theme as baseTheme } from "@chakra-ui/react";
 import { mode } from "@chakra-ui/theme-tools";
 
 const theme = extendTheme({
@@ -49,6 +49,30 @@ const theme = extendTheme({
         },
       }),
     },
+    // Chakra's default light-mode solid "orange" is white-on-orange.500
+    // (3.39:1) and ghost text is orange.600 (4.2:1) -- both fail WCAG AA.
+    // Dark mode already uses its own orange.200-bg/gray.800-text combo for
+    // solid (11.5:1) -- leave that alone, only light mode needs shifting.
+    // Every other colorScheme keeps Chakra's own formula untouched.
+    Button: {
+      variants: {
+        solid: (props) => {
+          const base = baseTheme.components.Button.variants.solid(props);
+          if (props.colorScheme !== "orange" || props.colorMode === "dark") return base;
+          return {
+            ...base,
+            bg: "orange.700",
+            _hover: { ...base._hover, bg: "orange.800" },
+            _active: { ...base._active, bg: "orange.900" },
+          };
+        },
+        ghost: (props) => {
+          const base = baseTheme.components.Button.variants.ghost(props);
+          if (props.colorScheme !== "orange") return base;
+          return { ...base, color: mode("orange.700", "orange.200")(props) };
+        },
+      },
+    },
   },
   fonts: {
     heading: "'M PLUS Rounded 1c'",
@@ -69,7 +93,7 @@ const theme = extendTheme({
       _dark: "#ffffff", // Dark mode heading
     },
     bodyText: {
-      default: "#718096", // Light mode text
+      default: "#4a5568", // Light mode text -- #718096 was 3.68-4.01:1 against card/page bg, fails AA
       _dark: "#a0aec0", // Dark mode text
     },
     tagBg: {

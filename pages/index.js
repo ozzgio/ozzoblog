@@ -71,7 +71,7 @@ const SectionLabel = ({ children, mt = 10 }) => (
     fontWeight="bold"
     textTransform="uppercase"
     letterSpacing="0.12em"
-    color="gray.500"
+    color="gray.600"
     _dark={{ color: "gray.400" }}
     mb={6}
     mt={mt}
@@ -183,7 +183,7 @@ const Home = ({
             </Heading>
             <Text
               fontSize="sm"
-              color="gray.500"
+              color="gray.600"
               _dark={{ color: "gray.400" }}
             >
               Building in public: Synergym, agentic systems, homelab.
@@ -333,9 +333,9 @@ const Home = ({
         <Section delay={0.3}>
           <SectionLabel>Latest writing</SectionLabel>
           {articlesError ? (
-            <Text color="gray.500">Latest writing is temporarily unavailable.</Text>
+            <Text color="gray.600" _dark={{ color: "gray.400" }}>Latest writing is temporarily unavailable.</Text>
           ) : latestArticles.length === 0 ? (
-            <Text color="gray.500">No articles yet. That gap is visible on purpose.</Text>
+            <Text color="gray.600" _dark={{ color: "gray.400" }}>No articles yet. That gap is visible on purpose.</Text>
           ) : (
             <SimpleGrid columns={{ base: 1, md: 2 }} spacing={6}>
               {latestArticles.map((article) => (
@@ -401,7 +401,8 @@ const Home = ({
                   fontWeight="bold"
                   textTransform="uppercase"
                   letterSpacing="wider"
-                  color="gray.400"
+                  color="gray.600"
+                  _dark={{ color: "gray.400" }}
                   mb={1}
                 >
                   Currently reading
@@ -409,7 +410,7 @@ const Home = ({
                 <Text fontSize="sm" fontWeight="medium">
                   {currentBook.title}
                 </Text>
-                <Text fontSize="xs" color="gray.500" _dark={{ color: "gray.400" }}>
+                <Text fontSize="xs" color="gray.600" _dark={{ color: "gray.400" }}>
                   {currentBook.author}
                 </Text>
               </Link>

@@ -54,7 +54,7 @@ const BookCard = ({
   );
   const tagBgColor = useColorModeValue(colors.tagBg.default, colors.tagBg._dark);
   const tagTextColor = useColorModeValue(colors.tagText.default, colors.tagText._dark);
-  const metaText = useColorModeValue("gray.500", "gray.300");
+  const metaText = useColorModeValue("gray.600", "gray.300");
   const featuredGlow = useColorModeValue("orange.50", "orange.900");
   const coverPanelBg = useColorModeValue("gray.50", "blackAlpha.400");
 
