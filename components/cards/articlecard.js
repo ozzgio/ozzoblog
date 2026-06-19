@@ -34,7 +34,7 @@ const ArticleCard = ({
   const hoverBorder = useColorModeValue("orange.300", "orange.600");
   const headingColor = useColorModeValue("gray.800", "gray.100");
   const bodyColor = useColorModeValue("gray.600", "gray.400");
-  const mutedColor = useColorModeValue("gray.500", "gray.500");
+  const mutedColor = useColorModeValue("gray.600", "gray.400");
 
   const isInternal = source === "internal";
   const href = isInternal ? `/articles/${slug}` : url;
