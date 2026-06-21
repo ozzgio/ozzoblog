@@ -1,3 +1,5 @@
+// Trigger a fresh production build/deploy: the article-detail Lambda was
+// frozen on the 2026-06-19 build, predating recent portfolio-data content.
 const nextConfig = {
   reactStrictMode: true,
   webpack: (config, { dev, isServer }) => {
