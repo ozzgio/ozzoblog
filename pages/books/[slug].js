@@ -38,7 +38,7 @@ import {
   resolvePortfolioAssetUrl,
 } from "../../libs/contentUtils";
 
-const READING_FONT = "'Merriweather', Georgia, serif";
+const READING_FONT = "var(--font-merriweather), Georgia, serif";
 
 // Every book's notes follow the same reflection arc: why I picked it up,
 // what it teaches, what I decided, what changed, what I'd push back on.

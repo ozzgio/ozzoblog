@@ -30,7 +30,7 @@ const Logo = () => {
         <ZIcon />
         <Text
           color={useColorModeValue("gray.800", "whiteAlpha.900")}
-          fontFamily="'Raleway', sans-serif"
+          fontFamily="var(--font-raleway), sans-serif"
           fontWeight="700"
           as="span"
           display="inline-flex"

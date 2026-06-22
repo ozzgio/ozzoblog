@@ -24,7 +24,7 @@ import {
   resolvePortfolioAssetUrl,
 } from "../../libs/contentUtils";
 
-const READING_FONT = "'Merriweather', Georgia, serif";
+const READING_FONT = "var(--font-merriweather), Georgia, serif";
 
 export default function ArticleDetailPage({ article }) {
   const mutedText = useColorModeValue("gray.600", "gray.400");
