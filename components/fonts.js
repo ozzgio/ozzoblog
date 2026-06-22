@@ -1,6 +1,6 @@
 import {
   Raleway,
-  Space_Grotesk,
+  M_PLUS_Rounded_1c,
   Bricolage_Grotesque,
   Merriweather,
 } from "next/font/google";
@@ -15,10 +15,12 @@ export const raleway = Raleway({
   display: "swap",
 });
 
-export const spaceGrotesk = Space_Grotesk({
+// Chakra theme's heading font (libs/theme.js) — was never actually loaded
+// anywhere, so headings silently fell back to the system sans-serif.
+export const mPlusRounded1c = M_PLUS_Rounded_1c({
   subsets: ["latin"],
-  weight: ["700"],
-  variable: "--font-space-grotesk",
+  weight: ["400", "700", "800"],
+  variable: "--font-m-plus-rounded-1c",
   display: "swap",
 });
 
@@ -39,7 +41,7 @@ export const merriweather = Merriweather({
 
 export const fontVariables = [
   raleway.variable,
-  spaceGrotesk.variable,
+  mPlusRounded1c.variable,
   bricolageGrotesque.variable,
   merriweather.variable,
 ].join(" ");

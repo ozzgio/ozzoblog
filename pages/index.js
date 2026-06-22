@@ -26,8 +26,13 @@ import {
 
 // three.js + OrbitControls (~600KB+) only needed for this decorative canvas —
 // keep it out of the homepage's initial bundle, same pattern already used
-// for MermaidDiagram in markdown-prose.js.
-const MoonHero = dynamic(() => import("../components/icons/moon-hero"), { ssr: false });
+// for MermaidDiagram in markdown-prose.js. A same-size loading placeholder
+// reserves the 340x340 hero's layout space so hydration doesn't shift the
+// statement/profile content below it (CLS).
+const MoonHero = dynamic(() => import("../components/icons/moon-hero"), {
+  ssr: false,
+  loading: () => <Box width={340} height={340} display="inline-block" />,
+});
 
 const formatAbsoluteDate = (dateStr) => {
   if (!dateStr) return "";
