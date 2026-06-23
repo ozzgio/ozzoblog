@@ -19,7 +19,7 @@ function drawBadgeBase(ctx, S, innerColor, outerColor = "#111827") {
 }
 
 function drawDumbbell(ctx, S) {
-  const { cx, cy, r } = drawBadgeBase(ctx, S, "#374151");
+  const { cx, cy, r } = drawBadgeBase(ctx, S, "#b91c1c");
   const plateW = r * 0.24, plateH = r * 0.68, barW = r * 0.58, barH = r * 0.2;
   ctx.fillStyle = "#e5e7eb";
   ctx.fillRect(cx - barW / 2, cy - barH / 2, barW, barH);
@@ -60,29 +60,17 @@ function drawBook(ctx, S) {
 }
 
 function drawBMW(ctx, S) {
-  const cx = S / 2, cy = S / 2, R = S * 0.45, r = R * 0.76;
-  ctx.fillStyle = "#111827";
-  ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.fill();
-  const quarters = [
-    ["#1c69d4", -Math.PI / 2, 0],
-    ["#f8f8f8", 0, Math.PI / 2],
-    ["#1c69d4", Math.PI / 2, Math.PI],
-    ["#f8f8f8", Math.PI, 3 * Math.PI / 2],
-  ];
-  quarters.forEach(([color, a1, a2]) => {
-    ctx.fillStyle = color;
-    ctx.beginPath(); ctx.moveTo(cx, cy); ctx.arc(cx, cy, r, a1, a2); ctx.closePath(); ctx.fill();
-  });
-  ctx.strokeStyle = "#111827";
+  const { cx, cy, r } = drawBadgeBase(ctx, S, "#1c69d4");
+  ctx.strokeStyle = "#f8f8f8";
   ctx.lineWidth = S * 0.046;
-  ctx.beginPath(); ctx.moveTo(cx, cy - r); ctx.lineTo(cx, cy + r); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(cx - r, cy); ctx.lineTo(cx + r, cy); ctx.stroke();
-  ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(cx, cy - r * 0.85); ctx.lineTo(cx, cy + r * 0.85); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(cx - r * 0.85, cy); ctx.lineTo(cx + r * 0.85, cy); ctx.stroke();
+  ctx.beginPath(); ctx.arc(cx, cy, r * 0.6, 0, Math.PI * 2); ctx.stroke();
 }
 
 function drawTerminal(ctx, S) {
-  const { cx, cy, r } = drawBadgeBase(ctx, S, "#0d1117");
-  ctx.strokeStyle = "#22c55e";
+  const { cx, cy, r } = drawBadgeBase(ctx, S, "#14532d");
+  ctx.strokeStyle = "#4ade80";
   ctx.lineWidth = r * 0.22;
   ctx.lineCap = "round";
   ctx.lineJoin = "round";
@@ -98,7 +86,7 @@ function drawTerminal(ctx, S) {
 }
 
 function drawPencil(ctx, S) {
-  const { cx, cy, r } = drawBadgeBase(ctx, S, "#1f2937");
+  const { cx, cy, r } = drawBadgeBase(ctx, S, "#581c87");
   ctx.save();
   ctx.translate(cx, cy);
   ctx.rotate(-Math.PI * 0.25);
@@ -119,8 +107,8 @@ function drawPencil(ctx, S) {
 }
 
 function drawHeart(ctx, S) {
-  const { cx, cy, r } = drawBadgeBase(ctx, S, "#1f2937");
-  ctx.fillStyle = "#ef4444";
+  const { cx, cy, r } = drawBadgeBase(ctx, S, "#831843");
+  ctx.fillStyle = "#fb7185";
   const s = r * 0.92, topY = cy - s * 0.32, top = s * 0.3;
   ctx.beginPath();
   ctx.moveTo(cx, topY + top);
