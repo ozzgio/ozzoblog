@@ -68,16 +68,23 @@ export async function getServerSideProps({ res }) {
 
     const articles = articlesData
       .filter((article) => article && article.title && article.date)
-      .map((article) => ({
-        source: isInternalArticle(article) ? "internal" : "external",
-        slug: String(article.slug || ""),
-        title: String(article.title || ""),
-        description: String(article.description || ""),
-        content: getArticleBody(article),
-        url: String(article.url || ""),
-        date: article.date || "",
-        thumbnail: resolvePortfolioAssetUrl(article.thumbnail),
-      }))
+      .map((article) => {
+        const source = isInternalArticle(article) ? "internal" : "external";
+        return {
+          source,
+          slug: String(article.slug || ""),
+          title: String(article.title || ""),
+          description: String(article.description || ""),
+          // Gated on source, not just whether a body happens to be present --
+          // external rows link out to wherever they're actually published,
+          // so they must never get a full-content field even if the JSON
+          // carries a stray content/body value.
+          content: source === "internal" ? getArticleBody(article) : "",
+          url: String(article.url || ""),
+          date: article.date || "",
+          thumbnail: resolvePortfolioAssetUrl(article.thumbnail),
+        };
+      })
       .map((article) => ({
         ...article,
         link:
