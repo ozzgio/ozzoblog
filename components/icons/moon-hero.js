@@ -3,47 +3,60 @@ import { useColorMode } from "@chakra-ui/react";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 
-// --- Canvas helper ---
-function rRect(ctx, x, y, w, h, r) {
-  ctx.beginPath();
-  ctx.moveTo(x + r, y);
-  ctx.arcTo(x + w, y, x + w, y + h, r);
-  ctx.arcTo(x + w, y + h, x, y + h, r);
-  ctx.arcTo(x, y + h, x, y, r);
-  ctx.arcTo(x, y, x + w, y, r);
-  ctx.closePath();
+// --- Planet icon draw functions (64×64 canvas, transparent bg) ---
+//
+// Every icon shares BMW's recipe (the one icon in this set that already
+// read clearly at the ~0.38-scale sprite size): a thick dark ring, one flat
+// interior color, and a bold glyph with no gradients/highlights/fine
+// linework. Realistic shading just turns to mush at this render size.
+function drawBadgeBase(ctx, S, innerColor, outerColor = "#111827") {
+  const cx = S / 2, cy = S / 2, R = S * 0.45, r = R * 0.82;
+  ctx.fillStyle = outerColor;
+  ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = innerColor;
+  ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fill();
+  return { cx, cy, r };
 }
 
-// --- Planet icon draw functions (64×64 canvas, transparent bg) ---
-
 function drawDumbbell(ctx, S) {
-  const cx = S / 2, cy = S / 2, wR = S * 0.16, bH = S * 0.12, bW = S * 0.48;
-  ctx.fillStyle = "#6b7280";
-  ctx.fillRect(cx - bW / 2, cy - bH / 2, bW, bH);
-  ctx.fillStyle = "#9ca3af";
-  ctx.fillRect(cx - bW / 2 + 2, cy - bH / 2 + 2, bW - 4, bH * 0.38);
-  [cx - bW / 2, cx + bW / 2].forEach((wx) => {
-    ctx.fillStyle = "#374151";
-    ctx.beginPath(); ctx.arc(wx, cy, wR, 0, Math.PI * 2); ctx.fill();
-    ctx.fillStyle = "rgba(255,255,255,0.28)";
-    ctx.beginPath(); ctx.arc(wx - wR * 0.32, cy - wR * 0.32, wR * 0.44, 0, Math.PI * 2); ctx.fill();
+  const { cx, cy, r } = drawBadgeBase(ctx, S, "#374151");
+  const plateW = r * 0.24, plateH = r * 0.68, barW = r * 0.58, barH = r * 0.2;
+  ctx.fillStyle = "#e5e7eb";
+  ctx.fillRect(cx - barW / 2, cy - barH / 2, barW, barH);
+  [cx - barW / 2 - plateW / 2, cx + barW / 2 + plateW / 2].forEach((px) => {
+    const x = px - plateW / 2, y = cy - plateH / 2, w = plateW, h = plateH, rad = plateW / 2;
+    ctx.beginPath();
+    ctx.moveTo(x + rad, y);
+    ctx.arcTo(x + w, y, x + w, y + h, rad);
+    ctx.arcTo(x + w, y + h, x, y + h, rad);
+    ctx.arcTo(x, y + h, x, y, rad);
+    ctx.arcTo(x, y, x + w, y, rad);
+    ctx.closePath();
+    ctx.fill();
   });
 }
 
 function drawBook(ctx, S) {
-  const p = S * 0.1;
-  ctx.fillStyle = "#f0ebe0";
-  ctx.fillRect(S * 0.56, p, S * 0.34, S - p * 2);
-  ctx.fillStyle = "#c05a1f";
-  ctx.fillRect(p, p, S * 0.52, S - p * 2);
-  ctx.fillStyle = "#8b3610";
-  ctx.fillRect(p, p, S * 0.1, S - p * 2);
-  ctx.fillStyle = "#e0763a";
-  ctx.fillRect(p + S * 0.1, S * 0.23, S * 0.42, S * 0.11);
-  ctx.fillStyle = "#b0a898";
-  [0, 1, 2, 3, 4].forEach((i) => {
-    ctx.fillRect(S * 0.61, S * (0.27 + i * 0.1), i % 2 ? S * 0.14 : S * 0.18, S * 0.04);
-  });
+  const { cx, cy, r } = drawBadgeBase(ctx, S, "#92400e");
+  const w = r * 0.82, h = r * 0.66;
+  ctx.fillStyle = "#fef3e2";
+  ctx.beginPath();
+  ctx.moveTo(cx, cy - h / 2);
+  ctx.lineTo(cx - w / 2, cy - h / 2 + h * 0.14);
+  ctx.lineTo(cx - w / 2, cy + h / 2);
+  ctx.lineTo(cx, cy + h / 2 - h * 0.14);
+  ctx.closePath(); ctx.fill();
+  ctx.beginPath();
+  ctx.moveTo(cx, cy - h / 2);
+  ctx.lineTo(cx + w / 2, cy - h / 2 + h * 0.14);
+  ctx.lineTo(cx + w / 2, cy + h / 2);
+  ctx.lineTo(cx, cy + h / 2 - h * 0.14);
+  ctx.closePath(); ctx.fill();
+  ctx.strokeStyle = "#92400e";
+  ctx.lineWidth = r * 0.09;
+  ctx.beginPath();
+  ctx.moveTo(cx, cy - h / 2); ctx.lineTo(cx, cy + h / 2 - h * 0.14);
+  ctx.stroke();
 }
 
 function drawBMW(ctx, S) {
@@ -68,97 +81,73 @@ function drawBMW(ctx, S) {
 }
 
 function drawTerminal(ctx, S) {
-  const p = S * 0.08, rad = S * 0.1;
-  ctx.fillStyle = "#0d1117";
-  rRect(ctx, p, p, S - p * 2, S - p * 2, rad); ctx.fill();
-  ctx.fillStyle = "#161b22";
-  rRect(ctx, p, p, S - p * 2, S * 0.24, rad); ctx.fill();
-  // Overwrite bottom corners of title bar so it connects to window body
-  ctx.fillStyle = "#161b22";
-  ctx.fillRect(p, p + S * 0.14, S - p * 2, S * 0.1);
-  const dotY = p + S * 0.12, dotR = S * 0.044;
-  [["#ff5f56", p + S * 0.13], ["#ffbd2e", p + S * 0.24], ["#27c93f", p + S * 0.35]].forEach(([c, x]) => {
-    ctx.fillStyle = c; ctx.beginPath(); ctx.arc(x, dotY, dotR, 0, Math.PI * 2); ctx.fill();
-  });
-  ctx.fillStyle = "#00dd44";
-  const cX = p + S * 0.1, cY = p + S * 0.32;
-  [S * 0.52, S * 0.36, S * 0.54, S * 0.28].forEach((w, i) => {
-    ctx.fillRect(cX, cY + i * S * 0.13, w, S * 0.055);
-  });
+  const { cx, cy, r } = drawBadgeBase(ctx, S, "#0d1117");
+  ctx.strokeStyle = "#22c55e";
+  ctx.lineWidth = r * 0.22;
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+  ctx.beginPath();
+  ctx.moveTo(cx - r * 0.42, cy - r * 0.38);
+  ctx.lineTo(cx + r * 0.05, cy);
+  ctx.lineTo(cx - r * 0.42, cy + r * 0.38);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(cx + r * 0.15, cy + r * 0.42);
+  ctx.lineTo(cx + r * 0.55, cy + r * 0.42);
+  ctx.stroke();
 }
 
 function drawPencil(ctx, S) {
+  const { cx, cy, r } = drawBadgeBase(ctx, S, "#1f2937");
   ctx.save();
-  ctx.translate(S * 0.5, S * 0.5);
-  ctx.rotate(-Math.PI * 0.3);
-  const bw = S * 0.18, bh = S * 0.52;
-  // eraser (pink top)
+  ctx.translate(cx, cy);
+  ctx.rotate(-Math.PI * 0.25);
+  const bw = r * 0.32, bh = r * 1.15;
   ctx.fillStyle = "#f4a0a0";
-  ctx.fillRect(-bw / 2, -bh * 0.5, bw, bh * 0.1);
-  // metal ferrule band
-  ctx.fillStyle = "#c0c0c0";
-  ctx.fillRect(-bw / 2, -bh * 0.4, bw, bh * 0.06);
-  // yellow body
-  ctx.fillStyle = "#f5c518";
-  ctx.fillRect(-bw / 2, -bh * 0.34, bw, bh * 0.6);
-  // highlight stripe
-  ctx.fillStyle = "rgba(255,255,255,0.3)";
-  ctx.fillRect(-bw * 0.35, -bh * 0.34, bw * 0.18, bh * 0.6);
-  // wood tip (short cone)
+  ctx.fillRect(-bw / 2, -bh / 2, bw, bh * 0.14);
+  ctx.fillStyle = "#facc15";
+  ctx.fillRect(-bw / 2, -bh / 2 + bh * 0.14, bw, bh * 0.62);
   ctx.fillStyle = "#d4a96a";
   ctx.beginPath();
   ctx.moveTo(-bw / 2, bh * 0.26); ctx.lineTo(bw / 2, bh * 0.26); ctx.lineTo(0, bh * 0.42);
   ctx.closePath(); ctx.fill();
-  // graphite point
-  ctx.fillStyle = "#333";
+  ctx.fillStyle = "#1f2937";
   ctx.beginPath();
-  ctx.moveTo(-bw * 0.18, bh * 0.38); ctx.lineTo(bw * 0.18, bh * 0.38); ctx.lineTo(0, bh * 0.5);
+  ctx.moveTo(-bw * 0.18, bh * 0.36); ctx.lineTo(bw * 0.18, bh * 0.36); ctx.lineTo(0, bh * 0.46);
   ctx.closePath(); ctx.fill();
   ctx.restore();
 }
 
 function drawHeart(ctx, S) {
-  // ♥ (U+2665, BLACK HEART SUIT) — plain text glyph, respects fillStyle
-  ctx.fillStyle = "#e04060";
-  ctx.font = `bold ${Math.round(S * 0.72)}px Georgia, "Times New Roman", serif`;
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
-  ctx.fillText("♥", S * 0.5, S * 0.54);
+  const { cx, cy, r } = drawBadgeBase(ctx, S, "#1f2937");
+  ctx.fillStyle = "#ef4444";
+  const s = r * 0.92, topY = cy - s * 0.32, top = s * 0.3;
+  ctx.beginPath();
+  ctx.moveTo(cx, topY + top);
+  ctx.bezierCurveTo(cx, topY, cx - s / 2, topY, cx - s / 2, topY + top);
+  ctx.bezierCurveTo(cx - s / 2, topY + (s + top) / 2, cx, topY + (s + top) / 2, cx, topY + s);
+  ctx.bezierCurveTo(cx, topY + (s + top) / 2, cx + s / 2, topY + (s + top) / 2, cx + s / 2, topY + top);
+  ctx.bezierCurveTo(cx + s / 2, topY, cx, topY, cx, topY + top);
+  ctx.closePath();
+  ctx.fill();
 }
 
 function drawCoffee(ctx, S) {
-  const cx = S * 0.47;
-  ctx.fillStyle = "#e8d8c4";
-  ctx.beginPath();
-  ctx.ellipse(cx, S * 0.82, S * 0.29, S * 0.065, 0, 0, Math.PI * 2);
-  ctx.fill();
+  const { cx, cy, r } = drawBadgeBase(ctx, S, "#5c3d2e");
+  const w = r * 0.7, h = r * 0.62;
   ctx.fillStyle = "#f0e4d0";
   ctx.beginPath();
-  ctx.moveTo(cx - S * 0.22, S * 0.34);
-  ctx.lineTo(cx + S * 0.22, S * 0.34);
-  ctx.lineTo(cx + S * 0.17, S * 0.76);
-  ctx.lineTo(cx - S * 0.17, S * 0.76);
+  ctx.moveTo(cx - w / 2, cy - h / 2);
+  ctx.lineTo(cx + w / 2, cy - h / 2);
+  ctx.lineTo(cx + w * 0.4, cy + h / 2);
+  ctx.lineTo(cx - w * 0.4, cy + h / 2);
   ctx.closePath();
   ctx.fill();
-  ctx.fillStyle = "#5c3d2e";
+  ctx.strokeStyle = "#f0e4d0";
+  ctx.lineWidth = r * 0.14;
   ctx.beginPath();
-  ctx.ellipse(cx, S * 0.35, S * 0.21, S * 0.062, 0, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.strokeStyle = "#e0d0b8";
-  ctx.lineWidth = S * 0.07;
-  ctx.lineCap = "round";
-  ctx.beginPath();
-  ctx.arc(cx + S * 0.27, S * 0.55, S * 0.11, -Math.PI * 0.5, Math.PI * 0.5);
+  ctx.arc(cx + w * 0.5, cy - h * 0.05, r * 0.22, -Math.PI * 0.5, Math.PI * 0.5);
   ctx.stroke();
-  ctx.strokeStyle = "rgba(220,220,220,0.5)";
-  ctx.lineWidth = S * 0.038;
-  for (let i = 0; i < 3; i++) {
-    const sx = cx - S * 0.09 + i * S * 0.09;
-    ctx.beginPath();
-    ctx.moveTo(sx, S * 0.24);
-    ctx.bezierCurveTo(sx - S * 0.04, S * 0.17, sx + S * 0.04, S * 0.11, sx, S * 0.05);
-    ctx.stroke();
-  }
 }
 
 // --- Emissive map: "ozzo's blog" two-line text with glow ---
