@@ -1,7 +1,9 @@
 import {
+  getArticleBody,
   isInternalArticle,
   resolvePortfolioAssetUrl,
 } from "../libs/contentUtils";
+import { buildContentEncoded } from "../libs/rssContent";
 
 const siteUrl = "https://ozzo.blog";
 
@@ -17,6 +19,9 @@ function generateRSSFeed(articles) {
       const thumbnail = article.thumbnail
         ? `<media:thumbnail url="${article.thumbnail}" />`
         : "";
+      // Only internal articles have a full body to render here -- external
+      // entries just link out to wherever they're actually published.
+      const contentEncoded = buildContentEncoded(article.content);
 
       return `
     <item>
@@ -26,12 +31,13 @@ function generateRSSFeed(articles) {
       <pubDate>${pubDate}</pubDate>
       ${description}
       ${thumbnail}
+      ${contentEncoded}
       </item>`;
     })
     .join("");
 
   return `<?xml version="1.0" encoding="UTF-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/">
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
     <title>Ozzo's Articles</title>
     <link>${siteUrl}</link>
@@ -67,6 +73,7 @@ export async function getServerSideProps({ res }) {
         slug: String(article.slug || ""),
         title: String(article.title || ""),
         description: String(article.description || ""),
+        content: getArticleBody(article),
         url: String(article.url || ""),
         date: article.date || "",
         thumbnail: resolvePortfolioAssetUrl(article.thumbnail),
