@@ -59,13 +59,20 @@ function drawBook(ctx, S) {
   ctx.stroke();
 }
 
-function drawBMW(ctx, S) {
+function drawSteeringWheel(ctx, S) {
   const { cx, cy, r } = drawBadgeBase(ctx, S, "#1c69d4");
   ctx.strokeStyle = "#f8f8f8";
-  ctx.lineWidth = S * 0.046;
-  ctx.beginPath(); ctx.moveTo(cx, cy - r * 0.85); ctx.lineTo(cx, cy + r * 0.85); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(cx - r * 0.85, cy); ctx.lineTo(cx + r * 0.85, cy); ctx.stroke();
-  ctx.beginPath(); ctx.arc(cx, cy, r * 0.6, 0, Math.PI * 2); ctx.stroke();
+  ctx.lineWidth = r * 0.16;
+  ctx.beginPath(); ctx.arc(cx, cy, r * 0.78, 0, Math.PI * 2); ctx.stroke();
+  [-90, 30, 150].forEach((deg) => {
+    const a = (deg * Math.PI) / 180;
+    ctx.beginPath();
+    ctx.moveTo(cx + Math.cos(a) * r * 0.22, cy + Math.sin(a) * r * 0.22);
+    ctx.lineTo(cx + Math.cos(a) * r * 0.78, cy + Math.sin(a) * r * 0.78);
+    ctx.stroke();
+  });
+  ctx.fillStyle = "#f8f8f8";
+  ctx.beginPath(); ctx.arc(cx, cy, r * 0.22, 0, Math.PI * 2); ctx.fill();
 }
 
 function drawTerminal(ctx, S) {
@@ -253,7 +260,7 @@ const MoonHero = ({ size = 220 }) => {
       [drawBook,     1.72, 0.5,               0.55],
       [drawPencil,   1.72, 0.5 + PI * 2 / 3, 0.68],
       [drawHeart,    1.72, 0.5 + PI * 4 / 3, 0.46],
-      [drawBMW,      2.02, 1.1,               0.32],
+      [drawSteeringWheel, 2.02, 1.1,          0.32],
       [drawCoffee,   2.02, 1.1 + PI,          0.40],
     ];
 
