@@ -6,7 +6,19 @@ import ReactMarkdown from "react-markdown";
 // email clients get this text note instead.
 const MERMAID_PLACEHOLDER = "[Diagram available on ozzo.blog]";
 
+const SITE_URL = "https://ozzo.blog";
+
+// On the site, a root-relative path like "/articles/other-post" resolves
+// against ozzo.blog automatically. In an emailed/exported copy of this HTML
+// (Buttondown's RSS-to-Email importer) there's no implicit origin, so it
+// would silently 404. Absolutize it here only -- the live article page
+// renders this same markdown through markdown-prose.js untouched.
+const absolutize = (url) =>
+  typeof url === "string" && url.startsWith("/") ? `${SITE_URL}${url}` : url;
+
 const components = {
+  a: ({ href, children }) => <a href={absolutize(href)}>{children}</a>,
+  img: ({ src, alt }) => <img src={absolutize(src)} alt={alt} />,
   pre: ({ children }) => {
     const child = Array.isArray(children) ? children[0] : children;
     const className = child?.props?.className || "";
