@@ -59,20 +59,32 @@ function drawBook(ctx, S) {
   ctx.stroke();
 }
 
-function drawSteeringWheel(ctx, S) {
-  const { cx, cy, r } = drawBadgeBase(ctx, S, "#1c69d4");
-  ctx.strokeStyle = "#f8f8f8";
-  ctx.lineWidth = r * 0.16;
-  ctx.beginPath(); ctx.arc(cx, cy, r * 0.78, 0, Math.PI * 2); ctx.stroke();
-  [-90, 30, 150].forEach((deg) => {
-    const a = (deg * Math.PI) / 180;
-    ctx.beginPath();
-    ctx.moveTo(cx + Math.cos(a) * r * 0.22, cy + Math.sin(a) * r * 0.22);
-    ctx.lineTo(cx + Math.cos(a) * r * 0.78, cy + Math.sin(a) * r * 0.78);
-    ctx.stroke();
-  });
+function drawSoccerBall(ctx, S) {
+  const { cx, cy, r } = drawBadgeBase(ctx, S, "#15803d");
+  const ballR = r * 0.78, pentR = ballR * 0.42;
   ctx.fillStyle = "#f8f8f8";
-  ctx.beginPath(); ctx.arc(cx, cy, r * 0.22, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.arc(cx, cy, ballR, 0, Math.PI * 2); ctx.fill();
+
+  ctx.fillStyle = "#111827";
+  ctx.beginPath();
+  for (let i = 0; i < 5; i++) {
+    const a = -Math.PI / 2 + (i * 2 * Math.PI) / 5;
+    const px = cx + Math.cos(a) * pentR, py = cy + Math.sin(a) * pentR;
+    if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+  }
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.strokeStyle = "#111827";
+  ctx.lineWidth = ballR * 0.09;
+  ctx.lineCap = "round";
+  for (let i = 0; i < 5; i++) {
+    const a = -Math.PI / 2 + (i * 2 * Math.PI) / 5;
+    ctx.beginPath();
+    ctx.moveTo(cx + Math.cos(a) * pentR, cy + Math.sin(a) * pentR);
+    ctx.lineTo(cx + Math.cos(a) * ballR * 0.92, cy + Math.sin(a) * ballR * 0.92);
+    ctx.stroke();
+  }
 }
 
 function drawTerminal(ctx, S) {
@@ -260,7 +272,7 @@ const MoonHero = ({ size = 220 }) => {
       [drawBook,     1.72, 0.5,               0.55],
       [drawPencil,   1.72, 0.5 + PI * 2 / 3, 0.68],
       [drawHeart,    1.72, 0.5 + PI * 4 / 3, 0.46],
-      [drawSteeringWheel, 2.02, 1.1,          0.32],
+      [drawSoccerBall, 2.02, 1.1,             0.32],
       [drawCoffee,   2.02, 1.1 + PI,          0.40],
     ];
 
