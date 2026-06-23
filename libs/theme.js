@@ -75,7 +75,7 @@ const theme = extendTheme({
     },
   },
   fonts: {
-    heading: "'M PLUS Rounded 1c'",
+    heading: "var(--font-m-plus-rounded-1c), sans-serif",
   },
   colors: {
     grassTeal: "#ff9933",

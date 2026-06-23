@@ -12,17 +12,28 @@ import {
 import { ChevronRightIcon, ExternalLinkIcon } from "@chakra-ui/icons";
 import NextLink from "next/link";
 import Image from "next/image";
+import dynamic from "next/dynamic";
 import Section from "../components/section";
 import Paragraph from "../components/paragraph";
 import { BioSection, BioYear } from "../components/bio";
 import Layout from "../components/layouts/layout";
 import BaseCard from "../components/basecard";
-import MoonHero from "../components/icons/moon-hero";
+import NewsletterSubscribe from "../components/NewsletterSubscribe";
 import {
   getArticleSummary,
   isInternalArticle,
   resolvePortfolioAssetUrl,
 } from "../libs/contentUtils";
+
+// three.js + OrbitControls (~600KB+) only needed for this decorative canvas —
+// keep it out of the homepage's initial bundle, same pattern already used
+// for MermaidDiagram in markdown-prose.js. A same-size loading placeholder
+// reserves the 340x340 hero's layout space so hydration doesn't shift the
+// statement/profile content below it (CLS).
+const MoonHero = dynamic(() => import("../components/icons/moon-hero"), {
+  ssr: false,
+  loading: () => <Box width={340} height={340} display="inline-block" />,
+});
 
 const formatAbsoluteDate = (dateStr) => {
   if (!dateStr) return "";
@@ -139,7 +150,7 @@ const Home = ({
             letterSpacing="-0.01em"
             color="#1c1917"
             _dark={{ color: "white" }}
-            style={{ fontFamily: "'Bricolage Grotesque', sans-serif" }}
+            style={{ fontFamily: "var(--font-bricolage-grotesque), sans-serif" }}
           >
             Full-stack developer shipping Synergym
             <br />
@@ -190,6 +201,8 @@ const Home = ({
             </Text>
           </Box>
         </Box>
+
+        <NewsletterSubscribe borderTopWidth="0" mt={0} pt={0} mb={14} />
 
         {/* Currently building */}
         <Section delay={0.1}>

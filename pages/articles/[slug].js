@@ -13,6 +13,7 @@ import {
 import Head from "next/head";
 import NextLink from "next/link";
 import MarkdownProse from "../../components/markdown-prose";
+import NewsletterSubscribe from "../../components/NewsletterSubscribe";
 import { IoArrowBackOutline, IoCalendarOutline } from "react-icons/io5";
 import Layout from "../../components/layouts/layout";
 import {
@@ -24,7 +25,7 @@ import {
   resolvePortfolioAssetUrl,
 } from "../../libs/contentUtils";
 
-const READING_FONT = "'Merriweather', Georgia, serif";
+const READING_FONT = "var(--font-merriweather), Georgia, serif";
 
 export default function ArticleDetailPage({ article }) {
   const mutedText = useColorModeValue("gray.600", "gray.400");
@@ -112,6 +113,8 @@ export default function ArticleDetailPage({ article }) {
           <Box w="100%">
             <MarkdownProse>{article.content}</MarkdownProse>
           </Box>
+
+          <NewsletterSubscribe w="100%" />
         </VStack>
       </Container>
     </Layout>

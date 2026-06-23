@@ -21,7 +21,7 @@ import {
 
 const MermaidDiagram = dynamic(() => import("./mermaid-diagram"), { ssr: false });
 
-const READING_FONT = "'Merriweather', Georgia, serif";
+const READING_FONT = "var(--font-merriweather), Georgia, serif";
 
 // Several token colors in both bundled Prism themes fail WCAG AA against
 // their own theme background -- verified per-token with a direct contrast
