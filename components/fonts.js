@@ -3,6 +3,7 @@ import {
   M_PLUS_Rounded_1c,
   Bricolage_Grotesque,
   Merriweather,
+  Playfair_Display,
 } from "next/font/google";
 
 // Self-hosted via next/font instead of a render-blocking @import to
@@ -39,9 +40,17 @@ export const merriweather = Merriweather({
   display: "swap",
 });
 
+export const playfairDisplay = Playfair_Display({
+  subsets: ["latin"],
+  weight: ["700", "900"],
+  variable: "--font-playfair-display",
+  display: "swap",
+});
+
 export const fontVariables = [
   raleway.variable,
   mPlusRounded1c.variable,
   bricolageGrotesque.variable,
   merriweather.variable,
+  playfairDisplay.variable,
 ].join(" ");

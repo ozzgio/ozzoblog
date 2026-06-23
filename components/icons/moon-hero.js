@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { useColorMode } from "@chakra-ui/react";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+import { playfairDisplay } from "../fonts";
 
 // --- Planet icon draw functions (64×64 canvas, transparent bg) ---
 //
@@ -59,32 +60,27 @@ function drawBook(ctx, S) {
   ctx.stroke();
 }
 
-function drawSoccerBall(ctx, S) {
-  const { cx, cy, r } = drawBadgeBase(ctx, S, "#15803d");
-  const ballR = r * 0.78, pentR = ballR * 0.42;
-  ctx.fillStyle = "#f8f8f8";
-  ctx.beginPath(); ctx.arc(cx, cy, ballR, 0, Math.PI * 2); ctx.fill();
-
-  ctx.fillStyle = "#111827";
-  ctx.beginPath();
-  for (let i = 0; i < 5; i++) {
-    const a = -Math.PI / 2 + (i * 2 * Math.PI) / 5;
-    const px = cx + Math.cos(a) * pentR, py = cy + Math.sin(a) * pentR;
-    if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
-  }
-  ctx.closePath();
-  ctx.fill();
-
+function drawRoundel(ctx, S) {
+  // Saturated BMW-blue planet disc — matches the other planets' recipe
+  // (dark ring + colored disc + a centered mark).
+  const { cx, cy, r } = drawBadgeBase(ctx, S, "#1c69d4");
+  // BMW roundel as a centered mark on the disc: white disc with two blue
+  // diagonal quarters, ringed dark so the quartered pattern stays crisp on
+  // the blue planet instead of bleeding into it. The plain quartered disc
+  // (white background, no ring) read as a crosshair once every icon shared
+  // the badge style — the dark ring is what keeps it a recognizable mark.
+  const m = r * 0.72;
+  ctx.save();
+  ctx.beginPath(); ctx.arc(cx, cy, m, 0, Math.PI * 2); ctx.clip();
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(cx - m, cy - m, m * 2, m * 2);
+  ctx.fillStyle = "#1c69d4";
+  ctx.fillRect(cx - m, cy - m, m, m);
+  ctx.fillRect(cx, cy, m, m);
+  ctx.restore();
   ctx.strokeStyle = "#111827";
-  ctx.lineWidth = ballR * 0.09;
-  ctx.lineCap = "round";
-  for (let i = 0; i < 5; i++) {
-    const a = -Math.PI / 2 + (i * 2 * Math.PI) / 5;
-    ctx.beginPath();
-    ctx.moveTo(cx + Math.cos(a) * pentR, cy + Math.sin(a) * pentR);
-    ctx.lineTo(cx + Math.cos(a) * ballR * 0.92, cy + Math.sin(a) * ballR * 0.92);
-    ctx.stroke();
-  }
+  ctx.lineWidth = r * 0.12;
+  ctx.beginPath(); ctx.arc(cx, cy, m, 0, Math.PI * 2); ctx.stroke();
 }
 
 function drawTerminal(ctx, S) {
@@ -158,19 +154,26 @@ function drawCoffee(ctx, S) {
 }
 
 // --- Emissive map: "ozzo's blog" two-line text with glow ---
-function buildSphereEmissiveMap() {
-  const W = 512, H = 512;
-  const c = document.createElement("canvas");
-  c.width = W; c.height = H;
-  const ctx = c.getContext("2d");
+// Painted in Playfair Display (a high-contrast display serif) for an elegant
+// wordmark that contrasts with the sans body. next/font exposes the
+// self-hosted family name via .style.fontFamily — the only handle canvas
+// text can use (CSS variables don't resolve on a canvas). Webfonts load
+// async, so the text layer is repainted from the effect once the weight is
+// actually available.
+const MOON_FONT_FAMILY = playfairDisplay.style.fontFamily;
+const MOON_FONT_SIZE = 60;
+const MOON_FONT = `900 ${MOON_FONT_SIZE}px ${MOON_FONT_FAMILY}, serif`;
+const MOON_FONT_LOAD = `900 ${MOON_FONT_SIZE}px ${MOON_FONT_FAMILY}`;
+
+function paintEmissiveMap(ctx, W, H) {
   ctx.fillStyle = "#000";
   ctx.fillRect(0, 0, W, H);
   const cx = W / 2, cy = H / 2;
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
-  ctx.font = "bold 58px Georgia, 'Times New Roman', serif";
-  const lines = [{ text: "ozzo's", y: cy - 42 }, { text: "blog", y: cy + 42 }];
-  // subtle glow — keep blur small so serif details stay sharp
+  ctx.font = MOON_FONT;
+  const lines = [{ text: "ozzo's", y: cy - 44 }, { text: "blog", y: cy + 44 }];
+  // subtle glow — keep blur small so glyph edges stay crisp
   ctx.shadowColor = "rgba(130,190,255,0.9)";
   ctx.shadowBlur = 6;
   ctx.fillStyle = "rgba(255,255,255,0.5)";
@@ -179,6 +182,98 @@ function buildSphereEmissiveMap() {
   ctx.shadowBlur = 0;
   ctx.fillStyle = "#ffffff";
   lines.forEach(({ text, y }) => ctx.fillText(text, cx, y));
+}
+
+function buildSphereEmissiveMap() {
+  const W = 512, H = 512;
+  const c = document.createElement("canvas");
+  c.width = W; c.height = H;
+  paintEmissiveMap(c.getContext("2d"), W, H);
+  return c;
+}
+
+// --- Moon surface texture (procedural grayscale lunar map) ---
+// One canvas is used twice — as the sphere's albedo (map) and as its bumpMap —
+// so crater rims catch the directional sunlight and the surface gets real
+// relief shading as the moon turns. Features are drawn wrapped horizontally
+// so the equirectangular seam (where u=0 meets u=1) doesn't cut them in half.
+// Seeded so the moon looks identical on every load.
+function mulberry32(seed) {
+  return function () {
+    seed |= 0; seed = (seed + 0x6d2b79f5) | 0;
+    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+const clampByte = (v) => (v < 0 ? 0 : v > 255 ? 255 : v);
+
+function drawMaria(ctx, x, y, r) {
+  const g = ctx.createRadialGradient(x, y, r * 0.1, x, y, r);
+  g.addColorStop(0, "rgba(38,36,38,0.85)");
+  g.addColorStop(0.6, "rgba(54,51,51,0.5)");
+  g.addColorStop(1, "rgba(70,66,64,0)");
+  ctx.fillStyle = g;
+  ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
+}
+
+function drawCrater(ctx, x, y, r) {
+  // Dark floor → depression in the bump.
+  const g = ctx.createRadialGradient(x, y, 0, x, y, r);
+  g.addColorStop(0, "rgba(24,22,22,0.55)");
+  g.addColorStop(0.75, "rgba(24,22,22,0.16)");
+  g.addColorStop(1, "rgba(24,22,22,0)");
+  ctx.fillStyle = g;
+  ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
+  // Bright rim → raised in the bump, catches the sun.
+  ctx.strokeStyle = "rgba(240,240,240,0.32)";
+  ctx.lineWidth = Math.max(0.5, r * 0.14);
+  ctx.beginPath(); ctx.arc(x, y, r * 0.9, 0, Math.PI * 2); ctx.stroke();
+}
+
+function buildMoonTexture() {
+  const W = 1024, H = 512;
+  const c = document.createElement("canvas");
+  c.width = W; c.height = H;
+  const ctx = c.getContext("2d");
+  const rng = mulberry32(20260623);
+
+  // Highland base — light gray regolith.
+  ctx.fillStyle = "#a8a8a8";
+  ctx.fillRect(0, 0, W, H);
+
+  // Maria (the dark lunar "seas"), wrapped across the seam.
+  const maria = [
+    [260, 205, 155], [470, 185, 110], [365, 300, 100],
+    [760, 225, 135], [905, 305, 82], [150, 320, 72],
+    [625, 335, 78], [840, 175, 64],
+  ];
+  maria.forEach(([x, y, r]) => {
+    for (let k = -1; k <= 1; k++) drawMaria(ctx, x + k * W, y, r);
+  });
+
+  // Medium + small craters, wrapped across the seam.
+  for (let i = 0; i < 80; i++) {
+    const x = rng() * W, y = 36 + rng() * (H - 72), r = 6 + rng() * 24;
+    for (let k = -1; k <= 1; k++) drawCrater(ctx, x + k * W, y, r);
+  }
+  for (let i = 0; i < 280; i++) {
+    const x = rng() * W, y = 18 + rng() * (H - 36), r = 1.5 + rng() * 4.5;
+    for (let k = -1; k <= 1; k++) drawCrater(ctx, x + k * W, y, r);
+  }
+
+  // Fine regolith grain.
+  const img = ctx.getImageData(0, 0, W, H);
+  const d = img.data;
+  for (let i = 0; i < d.length; i += 4) {
+    const n = (rng() - 0.5) * 16;
+    d[i] = clampByte(d[i] + n);
+    d[i + 1] = clampByte(d[i + 1] + n);
+    d[i + 2] = clampByte(d[i + 2] + n);
+  }
+  ctx.putImageData(img, 0, 0);
+
   return c;
 }
 
@@ -214,6 +309,7 @@ const MoonHero = ({ size = 220 }) => {
   useEffect(() => {
     const mount = mountRef.current;
     if (!mount) return;
+    let disposed = false;
 
     const prefersReducedMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)"
@@ -231,29 +327,52 @@ const MoonHero = ({ size = 220 }) => {
     const camera = new THREE.OrthographicCamera(-s, s, s, -s, 0.01, 50);
     camera.position.set(0, 3.5, 8.5);
 
-    scene.add(new THREE.AmbientLight(0xffffff, 0.4));
-    const key = new THREE.DirectionalLight(0xc8d8f0, 2.0);
-    key.position.set(2, 1.5, 3);
+    // Sunlight from the upper-right-front; ambient + a faint cool fill are
+    // kept low so the moon gets a real day/night terminator. Lights only
+    // affect the sphere — rings and planet sprites are unlit materials.
+    scene.add(new THREE.AmbientLight(0x6b7280, 0.12));
+    const key = new THREE.DirectionalLight(0xfff3e6, 1.9);
+    key.position.set(3.5, 2.2, 4);
     scene.add(key);
-    const fill = new THREE.DirectionalLight(0x303858, 0.5);
-    fill.position.set(-2, -1, 1);
+    const fill = new THREE.DirectionalLight(0x2a3a66, 0.18);
+    fill.position.set(-3, -1.5, -2);
     scene.add(fill);
 
     // Group wrapping the whole solar system — used for X-axis tilt animation
     const systemGroup = new THREE.Group();
     scene.add(systemGroup);
 
-    // Central sphere — dark base color + self-lit "ozzo" via emissiveMap
+    // Central moon — procedural lunar surface (albedo + bump) self-lit with
+    // "ozzo's blog" via the emissiveMap, so the brand glows on both the lit
+    // highlands and the dark limb.
     const sphereGeo = new THREE.SphereGeometry(1, 64, 64);
+    const moonTex = new THREE.CanvasTexture(buildMoonTexture());
+    moonTex.colorSpace = THREE.SRGBColorSpace;
+    moonTex.anisotropy = renderer.capabilities.getMaxAnisotropy();
     const zEmissiveTex = new THREE.CanvasTexture(buildSphereEmissiveMap());
     zEmissiveTex.colorSpace = THREE.SRGBColorSpace;
+    // Webfonts load async; if Playfair wasn't ready when the text canvas was
+    // first painted, repaint it now that it is.
+    if (document.fonts && document.fonts.load) {
+      document.fonts
+        .load(MOON_FONT_LOAD, "ozzo's blog")
+        .then(() => {
+          if (disposed) return;
+          paintEmissiveMap(zEmissiveTex.image.getContext("2d"), 512, 512);
+          zEmissiveTex.needsUpdate = true;
+        })
+        .catch(() => {});
+    }
     const sphereMat = new THREE.MeshStandardMaterial({
-      color: new THREE.Color("#3a4252"),
+      color: 0xffffff,
+      map: moonTex,
+      bumpMap: moonTex,
+      bumpScale: 0.04,
       emissiveMap: zEmissiveTex,
       emissive: new THREE.Color(1, 1, 1),
-      emissiveIntensity: 0.82,
-      roughness: 0.82,
-      metalness: 0.06,
+      emissiveIntensity: 1.0,
+      roughness: 0.97,
+      metalness: 0.0,
     });
     systemGroup.add(new THREE.Mesh(sphereGeo, sphereMat));
 
@@ -272,7 +391,7 @@ const MoonHero = ({ size = 220 }) => {
       [drawBook,     1.72, 0.5,               0.55],
       [drawPencil,   1.72, 0.5 + PI * 2 / 3, 0.68],
       [drawHeart,    1.72, 0.5 + PI * 4 / 3, 0.46],
-      [drawSoccerBall, 2.02, 1.1,             0.32],
+      [drawRoundel, 2.02, 1.1,                0.32],
       [drawCoffee,   2.02, 1.1 + PI,          0.40],
     ];
 
@@ -320,12 +439,14 @@ const MoonHero = ({ size = 220 }) => {
     animate();
 
     return () => {
+      disposed = true;
       cancelAnimationFrame(frameId);
       controls.removeEventListener("start", onStart);
       controls.removeEventListener("end", onEnd);
       controls.dispose();
       sphereGeo.dispose();
       sphereMat.dispose();
+      moonTex.dispose();
       zEmissiveTex.dispose();
       rings.forEach((r) => { r.geometry.dispose(); r.material.dispose(); });
       planetData.forEach(({ tex, mat }) => { tex.dispose(); mat.dispose(); });
