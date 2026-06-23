@@ -21,6 +21,10 @@ const NewsletterSubscribe = (props) => {
 
   const mutedText = useColorModeValue("gray.600", "gray.400");
   const borderColor = useColorModeValue("gray.200", "whiteAlpha.200");
+  // red.500 is 3.79:1 against the light page bg and 4.21:1 against the dark
+  // bg -- both fail WCAG AA (4.5:1). Same fix pattern already used for
+  // orange.500 in pages/articles/[slug].js.
+  const errorColor = useColorModeValue("red.600", "red.300");
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -99,7 +103,7 @@ const NewsletterSubscribe = (props) => {
         </Button>
       </Stack>
       {status === STATUS.ERROR && (
-        <Text fontSize="sm" color="red.500" mt={2}>
+        <Text fontSize="sm" color={errorColor} mt={2}>
           Something went wrong. Try again.
         </Text>
       )}
