@@ -170,13 +170,19 @@ const Home = ({
           borderBottomColor="gray.100"
           _dark={{ borderBottomColor: "whiteAlpha.100" }}
         >
-          <Box flexShrink={0} borderRadius="full" overflow="hidden">
+          <Box
+            flexShrink={0}
+            position="relative"
+            borderRadius="full"
+            overflow="hidden"
+            boxSize={{ base: "64px", md: "72px" }}
+          >
             <Image
               src="/images/propic.jpg"
               alt="Giorgio Ozzola"
-              width={72}
-              height={72}
-              style={{ display: "block", borderRadius: "50%" }}
+              fill
+              sizes="72px"
+              style={{ objectFit: "cover", objectPosition: "center" }}
               priority
             />
           </Box>
