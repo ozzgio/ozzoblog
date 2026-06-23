@@ -18,6 +18,7 @@ import Paragraph from "../components/paragraph";
 import { BioSection, BioYear } from "../components/bio";
 import Layout from "../components/layouts/layout";
 import BaseCard from "../components/basecard";
+import NewsletterSubscribe from "../components/NewsletterSubscribe";
 import {
   getArticleSummary,
   isInternalArticle,
@@ -200,6 +201,8 @@ const Home = ({
             </Text>
           </Box>
         </Box>
+
+        <NewsletterSubscribe borderTopWidth="0" mt={0} pt={0} mb={14} />
 
         {/* Currently building */}
         <Section delay={0.1}>
