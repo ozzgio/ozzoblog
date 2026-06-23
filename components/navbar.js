@@ -95,7 +95,7 @@ const NavBar = (props) => {
             </LinkItem>
             <LinkItem
               target="_blank"
-              href="https://github.com/ozzgio/portfolio"
+              href="https://github.com/ozzgio/ozzoblog"
               path={path}
               display="inline-flex"
               alignItems="center"
@@ -172,7 +172,7 @@ const NavBar = (props) => {
                 </MenuItem>
                 <MenuItem
                   as={MenuLink}
-                  href="https://github.com/ozzgio/portfolio/"
+                  href="https://github.com/ozzgio/ozzoblog/"
                   bg="transparent"
                   color={menuItemInactiveColor}
                   _hover={{ bg: menuItemHoverBg, color: menuItemActiveColor }}

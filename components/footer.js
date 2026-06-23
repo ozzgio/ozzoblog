@@ -1,5 +1,4 @@
 import { Box, HStack, Link, Text, VStack, useColorModeValue } from "@chakra-ui/react";
-import packageJson from "../package.json";
 
 const Footer = ({ showBorder = true }) => {
   const textColor = useColorModeValue("gray.700", "gray.400");
@@ -43,9 +42,6 @@ const Footer = ({ showBorder = true }) => {
             </Link>
           </Text>
         </HStack>
-        <Text fontSize="xs" color={useColorModeValue("gray.700", "gray.400")}>
-          Version: {packageJson.version}
-        </Text>
       </VStack>
     </Box>
   );

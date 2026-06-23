@@ -2,179 +2,178 @@ import { useEffect, useRef } from "react";
 import { useColorMode } from "@chakra-ui/react";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
-
-// --- Canvas helper ---
-function rRect(ctx, x, y, w, h, r) {
-  ctx.beginPath();
-  ctx.moveTo(x + r, y);
-  ctx.arcTo(x + w, y, x + w, y + h, r);
-  ctx.arcTo(x + w, y + h, x, y + h, r);
-  ctx.arcTo(x, y + h, x, y, r);
-  ctx.arcTo(x, y, x + w, y, r);
-  ctx.closePath();
-}
+import { playfairDisplay } from "../fonts";
 
 // --- Planet icon draw functions (64×64 canvas, transparent bg) ---
+//
+// Every icon shares BMW's recipe (the one icon in this set that already
+// read clearly at the ~0.38-scale sprite size): a thick dark ring, one flat
+// interior color, and a bold glyph with no gradients/highlights/fine
+// linework. Realistic shading just turns to mush at this render size.
+function drawBadgeBase(ctx, S, innerColor, outerColor = "#111827") {
+  const cx = S / 2, cy = S / 2, R = S * 0.45, r = R * 0.82;
+  ctx.fillStyle = outerColor;
+  ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = innerColor;
+  ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fill();
+  return { cx, cy, r };
+}
 
 function drawDumbbell(ctx, S) {
-  const cx = S / 2, cy = S / 2, wR = S * 0.16, bH = S * 0.12, bW = S * 0.48;
-  ctx.fillStyle = "#6b7280";
-  ctx.fillRect(cx - bW / 2, cy - bH / 2, bW, bH);
-  ctx.fillStyle = "#9ca3af";
-  ctx.fillRect(cx - bW / 2 + 2, cy - bH / 2 + 2, bW - 4, bH * 0.38);
-  [cx - bW / 2, cx + bW / 2].forEach((wx) => {
-    ctx.fillStyle = "#374151";
-    ctx.beginPath(); ctx.arc(wx, cy, wR, 0, Math.PI * 2); ctx.fill();
-    ctx.fillStyle = "rgba(255,255,255,0.28)";
-    ctx.beginPath(); ctx.arc(wx - wR * 0.32, cy - wR * 0.32, wR * 0.44, 0, Math.PI * 2); ctx.fill();
+  const { cx, cy, r } = drawBadgeBase(ctx, S, "#b91c1c");
+  const plateW = r * 0.24, plateH = r * 0.68, barW = r * 0.58, barH = r * 0.2;
+  ctx.fillStyle = "#e5e7eb";
+  ctx.fillRect(cx - barW / 2, cy - barH / 2, barW, barH);
+  [cx - barW / 2 - plateW / 2, cx + barW / 2 + plateW / 2].forEach((px) => {
+    const x = px - plateW / 2, y = cy - plateH / 2, w = plateW, h = plateH, rad = plateW / 2;
+    ctx.beginPath();
+    ctx.moveTo(x + rad, y);
+    ctx.arcTo(x + w, y, x + w, y + h, rad);
+    ctx.arcTo(x + w, y + h, x, y + h, rad);
+    ctx.arcTo(x, y + h, x, y, rad);
+    ctx.arcTo(x, y, x + w, y, rad);
+    ctx.closePath();
+    ctx.fill();
   });
 }
 
 function drawBook(ctx, S) {
-  const p = S * 0.1;
-  ctx.fillStyle = "#f0ebe0";
-  ctx.fillRect(S * 0.56, p, S * 0.34, S - p * 2);
-  ctx.fillStyle = "#c05a1f";
-  ctx.fillRect(p, p, S * 0.52, S - p * 2);
-  ctx.fillStyle = "#8b3610";
-  ctx.fillRect(p, p, S * 0.1, S - p * 2);
-  ctx.fillStyle = "#e0763a";
-  ctx.fillRect(p + S * 0.1, S * 0.23, S * 0.42, S * 0.11);
-  ctx.fillStyle = "#b0a898";
-  [0, 1, 2, 3, 4].forEach((i) => {
-    ctx.fillRect(S * 0.61, S * (0.27 + i * 0.1), i % 2 ? S * 0.14 : S * 0.18, S * 0.04);
-  });
+  const { cx, cy, r } = drawBadgeBase(ctx, S, "#92400e");
+  const w = r * 0.82, h = r * 0.66;
+  ctx.fillStyle = "#fef3e2";
+  ctx.beginPath();
+  ctx.moveTo(cx, cy - h / 2);
+  ctx.lineTo(cx - w / 2, cy - h / 2 + h * 0.14);
+  ctx.lineTo(cx - w / 2, cy + h / 2);
+  ctx.lineTo(cx, cy + h / 2 - h * 0.14);
+  ctx.closePath(); ctx.fill();
+  ctx.beginPath();
+  ctx.moveTo(cx, cy - h / 2);
+  ctx.lineTo(cx + w / 2, cy - h / 2 + h * 0.14);
+  ctx.lineTo(cx + w / 2, cy + h / 2);
+  ctx.lineTo(cx, cy + h / 2 - h * 0.14);
+  ctx.closePath(); ctx.fill();
+  ctx.strokeStyle = "#92400e";
+  ctx.lineWidth = r * 0.09;
+  ctx.beginPath();
+  ctx.moveTo(cx, cy - h / 2); ctx.lineTo(cx, cy + h / 2 - h * 0.14);
+  ctx.stroke();
 }
 
-function drawBMW(ctx, S) {
-  const cx = S / 2, cy = S / 2, R = S * 0.45, r = R * 0.76;
-  ctx.fillStyle = "#111827";
-  ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.fill();
-  const quarters = [
-    ["#1c69d4", -Math.PI / 2, 0],
-    ["#f8f8f8", 0, Math.PI / 2],
-    ["#1c69d4", Math.PI / 2, Math.PI],
-    ["#f8f8f8", Math.PI, 3 * Math.PI / 2],
-  ];
-  quarters.forEach(([color, a1, a2]) => {
-    ctx.fillStyle = color;
-    ctx.beginPath(); ctx.moveTo(cx, cy); ctx.arc(cx, cy, r, a1, a2); ctx.closePath(); ctx.fill();
-  });
+function drawRoundel(ctx, S) {
+  // Saturated BMW-blue planet disc — matches the other planets' recipe
+  // (dark ring + colored disc + a centered mark).
+  const { cx, cy, r } = drawBadgeBase(ctx, S, "#1c69d4");
+  // BMW roundel as a centered mark on the disc: white disc with two blue
+  // diagonal quarters, ringed dark so the quartered pattern stays crisp on
+  // the blue planet instead of bleeding into it. The plain quartered disc
+  // (white background, no ring) read as a crosshair once every icon shared
+  // the badge style — the dark ring is what keeps it a recognizable mark.
+  const m = r * 0.72;
+  ctx.save();
+  ctx.beginPath(); ctx.arc(cx, cy, m, 0, Math.PI * 2); ctx.clip();
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(cx - m, cy - m, m * 2, m * 2);
+  ctx.fillStyle = "#1c69d4";
+  ctx.fillRect(cx - m, cy - m, m, m);
+  ctx.fillRect(cx, cy, m, m);
+  ctx.restore();
   ctx.strokeStyle = "#111827";
-  ctx.lineWidth = S * 0.046;
-  ctx.beginPath(); ctx.moveTo(cx, cy - r); ctx.lineTo(cx, cy + r); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(cx - r, cy); ctx.lineTo(cx + r, cy); ctx.stroke();
-  ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.stroke();
+  ctx.lineWidth = r * 0.12;
+  ctx.beginPath(); ctx.arc(cx, cy, m, 0, Math.PI * 2); ctx.stroke();
 }
 
 function drawTerminal(ctx, S) {
-  const p = S * 0.08, rad = S * 0.1;
-  ctx.fillStyle = "#0d1117";
-  rRect(ctx, p, p, S - p * 2, S - p * 2, rad); ctx.fill();
-  ctx.fillStyle = "#161b22";
-  rRect(ctx, p, p, S - p * 2, S * 0.24, rad); ctx.fill();
-  // Overwrite bottom corners of title bar so it connects to window body
-  ctx.fillStyle = "#161b22";
-  ctx.fillRect(p, p + S * 0.14, S - p * 2, S * 0.1);
-  const dotY = p + S * 0.12, dotR = S * 0.044;
-  [["#ff5f56", p + S * 0.13], ["#ffbd2e", p + S * 0.24], ["#27c93f", p + S * 0.35]].forEach(([c, x]) => {
-    ctx.fillStyle = c; ctx.beginPath(); ctx.arc(x, dotY, dotR, 0, Math.PI * 2); ctx.fill();
-  });
-  ctx.fillStyle = "#00dd44";
-  const cX = p + S * 0.1, cY = p + S * 0.32;
-  [S * 0.52, S * 0.36, S * 0.54, S * 0.28].forEach((w, i) => {
-    ctx.fillRect(cX, cY + i * S * 0.13, w, S * 0.055);
-  });
+  const { cx, cy, r } = drawBadgeBase(ctx, S, "#14532d");
+  ctx.strokeStyle = "#4ade80";
+  ctx.lineWidth = r * 0.22;
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+  ctx.beginPath();
+  ctx.moveTo(cx - r * 0.42, cy - r * 0.38);
+  ctx.lineTo(cx + r * 0.05, cy);
+  ctx.lineTo(cx - r * 0.42, cy + r * 0.38);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(cx + r * 0.15, cy + r * 0.42);
+  ctx.lineTo(cx + r * 0.55, cy + r * 0.42);
+  ctx.stroke();
 }
 
 function drawPencil(ctx, S) {
+  const { cx, cy, r } = drawBadgeBase(ctx, S, "#581c87");
   ctx.save();
-  ctx.translate(S * 0.5, S * 0.5);
-  ctx.rotate(-Math.PI * 0.3);
-  const bw = S * 0.18, bh = S * 0.52;
-  // eraser (pink top)
+  ctx.translate(cx, cy);
+  ctx.rotate(-Math.PI * 0.25);
+  const bw = r * 0.32, bh = r * 1.15;
   ctx.fillStyle = "#f4a0a0";
-  ctx.fillRect(-bw / 2, -bh * 0.5, bw, bh * 0.1);
-  // metal ferrule band
-  ctx.fillStyle = "#c0c0c0";
-  ctx.fillRect(-bw / 2, -bh * 0.4, bw, bh * 0.06);
-  // yellow body
-  ctx.fillStyle = "#f5c518";
-  ctx.fillRect(-bw / 2, -bh * 0.34, bw, bh * 0.6);
-  // highlight stripe
-  ctx.fillStyle = "rgba(255,255,255,0.3)";
-  ctx.fillRect(-bw * 0.35, -bh * 0.34, bw * 0.18, bh * 0.6);
-  // wood tip (short cone)
+  ctx.fillRect(-bw / 2, -bh / 2, bw, bh * 0.14);
+  ctx.fillStyle = "#facc15";
+  ctx.fillRect(-bw / 2, -bh / 2 + bh * 0.14, bw, bh * 0.62);
   ctx.fillStyle = "#d4a96a";
   ctx.beginPath();
   ctx.moveTo(-bw / 2, bh * 0.26); ctx.lineTo(bw / 2, bh * 0.26); ctx.lineTo(0, bh * 0.42);
   ctx.closePath(); ctx.fill();
-  // graphite point
-  ctx.fillStyle = "#333";
+  ctx.fillStyle = "#1f2937";
   ctx.beginPath();
-  ctx.moveTo(-bw * 0.18, bh * 0.38); ctx.lineTo(bw * 0.18, bh * 0.38); ctx.lineTo(0, bh * 0.5);
+  ctx.moveTo(-bw * 0.18, bh * 0.36); ctx.lineTo(bw * 0.18, bh * 0.36); ctx.lineTo(0, bh * 0.46);
   ctx.closePath(); ctx.fill();
   ctx.restore();
 }
 
 function drawHeart(ctx, S) {
-  // ♥ (U+2665, BLACK HEART SUIT) — plain text glyph, respects fillStyle
-  ctx.fillStyle = "#e04060";
-  ctx.font = `bold ${Math.round(S * 0.72)}px Georgia, "Times New Roman", serif`;
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
-  ctx.fillText("♥", S * 0.5, S * 0.54);
+  const { cx, cy, r } = drawBadgeBase(ctx, S, "#831843");
+  ctx.fillStyle = "#fb7185";
+  const s = r * 0.92, topY = cy - s * 0.32, top = s * 0.3;
+  ctx.beginPath();
+  ctx.moveTo(cx, topY + top);
+  ctx.bezierCurveTo(cx, topY, cx - s / 2, topY, cx - s / 2, topY + top);
+  ctx.bezierCurveTo(cx - s / 2, topY + (s + top) / 2, cx, topY + (s + top) / 2, cx, topY + s);
+  ctx.bezierCurveTo(cx, topY + (s + top) / 2, cx + s / 2, topY + (s + top) / 2, cx + s / 2, topY + top);
+  ctx.bezierCurveTo(cx + s / 2, topY, cx, topY, cx, topY + top);
+  ctx.closePath();
+  ctx.fill();
 }
 
 function drawCoffee(ctx, S) {
-  const cx = S * 0.47;
-  ctx.fillStyle = "#e8d8c4";
-  ctx.beginPath();
-  ctx.ellipse(cx, S * 0.82, S * 0.29, S * 0.065, 0, 0, Math.PI * 2);
-  ctx.fill();
+  const { cx, cy, r } = drawBadgeBase(ctx, S, "#5c3d2e");
+  const w = r * 0.7, h = r * 0.62;
   ctx.fillStyle = "#f0e4d0";
   ctx.beginPath();
-  ctx.moveTo(cx - S * 0.22, S * 0.34);
-  ctx.lineTo(cx + S * 0.22, S * 0.34);
-  ctx.lineTo(cx + S * 0.17, S * 0.76);
-  ctx.lineTo(cx - S * 0.17, S * 0.76);
+  ctx.moveTo(cx - w / 2, cy - h / 2);
+  ctx.lineTo(cx + w / 2, cy - h / 2);
+  ctx.lineTo(cx + w * 0.4, cy + h / 2);
+  ctx.lineTo(cx - w * 0.4, cy + h / 2);
   ctx.closePath();
   ctx.fill();
-  ctx.fillStyle = "#5c3d2e";
+  ctx.strokeStyle = "#f0e4d0";
+  ctx.lineWidth = r * 0.14;
   ctx.beginPath();
-  ctx.ellipse(cx, S * 0.35, S * 0.21, S * 0.062, 0, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.strokeStyle = "#e0d0b8";
-  ctx.lineWidth = S * 0.07;
-  ctx.lineCap = "round";
-  ctx.beginPath();
-  ctx.arc(cx + S * 0.27, S * 0.55, S * 0.11, -Math.PI * 0.5, Math.PI * 0.5);
+  ctx.arc(cx + w * 0.5, cy - h * 0.05, r * 0.22, -Math.PI * 0.5, Math.PI * 0.5);
   ctx.stroke();
-  ctx.strokeStyle = "rgba(220,220,220,0.5)";
-  ctx.lineWidth = S * 0.038;
-  for (let i = 0; i < 3; i++) {
-    const sx = cx - S * 0.09 + i * S * 0.09;
-    ctx.beginPath();
-    ctx.moveTo(sx, S * 0.24);
-    ctx.bezierCurveTo(sx - S * 0.04, S * 0.17, sx + S * 0.04, S * 0.11, sx, S * 0.05);
-    ctx.stroke();
-  }
 }
 
 // --- Emissive map: "ozzo's blog" two-line text with glow ---
-function buildSphereEmissiveMap() {
-  const W = 512, H = 512;
-  const c = document.createElement("canvas");
-  c.width = W; c.height = H;
-  const ctx = c.getContext("2d");
+// Painted in Playfair Display (a high-contrast display serif) for an elegant
+// wordmark that contrasts with the sans body. next/font exposes the
+// self-hosted family name via .style.fontFamily — the only handle canvas
+// text can use (CSS variables don't resolve on a canvas). Webfonts load
+// async, so the text layer is repainted from the effect once the weight is
+// actually available.
+const MOON_FONT_FAMILY = playfairDisplay.style.fontFamily;
+const MOON_FONT_SIZE = 60;
+const MOON_FONT = `900 ${MOON_FONT_SIZE}px ${MOON_FONT_FAMILY}, serif`;
+const MOON_FONT_LOAD = `900 ${MOON_FONT_SIZE}px ${MOON_FONT_FAMILY}`;
+
+function paintEmissiveMap(ctx, W, H) {
   ctx.fillStyle = "#000";
   ctx.fillRect(0, 0, W, H);
   const cx = W / 2, cy = H / 2;
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
-  ctx.font = "bold 58px Georgia, 'Times New Roman', serif";
-  const lines = [{ text: "ozzo's", y: cy - 42 }, { text: "blog", y: cy + 42 }];
-  // subtle glow — keep blur small so serif details stay sharp
+  ctx.font = MOON_FONT;
+  const lines = [{ text: "ozzo's", y: cy - 44 }, { text: "blog", y: cy + 44 }];
+  // subtle glow — keep blur small so glyph edges stay crisp
   ctx.shadowColor = "rgba(130,190,255,0.9)";
   ctx.shadowBlur = 6;
   ctx.fillStyle = "rgba(255,255,255,0.5)";
@@ -183,6 +182,98 @@ function buildSphereEmissiveMap() {
   ctx.shadowBlur = 0;
   ctx.fillStyle = "#ffffff";
   lines.forEach(({ text, y }) => ctx.fillText(text, cx, y));
+}
+
+function buildSphereEmissiveMap() {
+  const W = 512, H = 512;
+  const c = document.createElement("canvas");
+  c.width = W; c.height = H;
+  paintEmissiveMap(c.getContext("2d"), W, H);
+  return c;
+}
+
+// --- Moon surface texture (procedural grayscale lunar map) ---
+// One canvas is used twice — as the sphere's albedo (map) and as its bumpMap —
+// so crater rims catch the directional sunlight and the surface gets real
+// relief shading as the moon turns. Features are drawn wrapped horizontally
+// so the equirectangular seam (where u=0 meets u=1) doesn't cut them in half.
+// Seeded so the moon looks identical on every load.
+function mulberry32(seed) {
+  return function () {
+    seed |= 0; seed = (seed + 0x6d2b79f5) | 0;
+    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+const clampByte = (v) => (v < 0 ? 0 : v > 255 ? 255 : v);
+
+function drawMaria(ctx, x, y, r) {
+  const g = ctx.createRadialGradient(x, y, r * 0.1, x, y, r);
+  g.addColorStop(0, "rgba(38,36,38,0.85)");
+  g.addColorStop(0.6, "rgba(54,51,51,0.5)");
+  g.addColorStop(1, "rgba(70,66,64,0)");
+  ctx.fillStyle = g;
+  ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
+}
+
+function drawCrater(ctx, x, y, r) {
+  // Dark floor → depression in the bump.
+  const g = ctx.createRadialGradient(x, y, 0, x, y, r);
+  g.addColorStop(0, "rgba(24,22,22,0.55)");
+  g.addColorStop(0.75, "rgba(24,22,22,0.16)");
+  g.addColorStop(1, "rgba(24,22,22,0)");
+  ctx.fillStyle = g;
+  ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
+  // Bright rim → raised in the bump, catches the sun.
+  ctx.strokeStyle = "rgba(240,240,240,0.32)";
+  ctx.lineWidth = Math.max(0.5, r * 0.14);
+  ctx.beginPath(); ctx.arc(x, y, r * 0.9, 0, Math.PI * 2); ctx.stroke();
+}
+
+function buildMoonTexture() {
+  const W = 1024, H = 512;
+  const c = document.createElement("canvas");
+  c.width = W; c.height = H;
+  const ctx = c.getContext("2d");
+  const rng = mulberry32(20260623);
+
+  // Highland base — light gray regolith.
+  ctx.fillStyle = "#a8a8a8";
+  ctx.fillRect(0, 0, W, H);
+
+  // Maria (the dark lunar "seas"), wrapped across the seam.
+  const maria = [
+    [260, 205, 155], [470, 185, 110], [365, 300, 100],
+    [760, 225, 135], [905, 305, 82], [150, 320, 72],
+    [625, 335, 78], [840, 175, 64],
+  ];
+  maria.forEach(([x, y, r]) => {
+    for (let k = -1; k <= 1; k++) drawMaria(ctx, x + k * W, y, r);
+  });
+
+  // Medium + small craters, wrapped across the seam.
+  for (let i = 0; i < 80; i++) {
+    const x = rng() * W, y = 36 + rng() * (H - 72), r = 6 + rng() * 24;
+    for (let k = -1; k <= 1; k++) drawCrater(ctx, x + k * W, y, r);
+  }
+  for (let i = 0; i < 280; i++) {
+    const x = rng() * W, y = 18 + rng() * (H - 36), r = 1.5 + rng() * 4.5;
+    for (let k = -1; k <= 1; k++) drawCrater(ctx, x + k * W, y, r);
+  }
+
+  // Fine regolith grain.
+  const img = ctx.getImageData(0, 0, W, H);
+  const d = img.data;
+  for (let i = 0; i < d.length; i += 4) {
+    const n = (rng() - 0.5) * 16;
+    d[i] = clampByte(d[i] + n);
+    d[i + 1] = clampByte(d[i + 1] + n);
+    d[i + 2] = clampByte(d[i + 2] + n);
+  }
+  ctx.putImageData(img, 0, 0);
+
   return c;
 }
 
@@ -218,6 +309,7 @@ const MoonHero = ({ size = 220 }) => {
   useEffect(() => {
     const mount = mountRef.current;
     if (!mount) return;
+    let disposed = false;
 
     const prefersReducedMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)"
@@ -235,29 +327,52 @@ const MoonHero = ({ size = 220 }) => {
     const camera = new THREE.OrthographicCamera(-s, s, s, -s, 0.01, 50);
     camera.position.set(0, 3.5, 8.5);
 
-    scene.add(new THREE.AmbientLight(0xffffff, 0.4));
-    const key = new THREE.DirectionalLight(0xc8d8f0, 2.0);
-    key.position.set(2, 1.5, 3);
+    // Sunlight from the upper-right-front; ambient + a faint cool fill are
+    // kept low so the moon gets a real day/night terminator. Lights only
+    // affect the sphere — rings and planet sprites are unlit materials.
+    scene.add(new THREE.AmbientLight(0x6b7280, 0.12));
+    const key = new THREE.DirectionalLight(0xfff3e6, 1.9);
+    key.position.set(3.5, 2.2, 4);
     scene.add(key);
-    const fill = new THREE.DirectionalLight(0x303858, 0.5);
-    fill.position.set(-2, -1, 1);
+    const fill = new THREE.DirectionalLight(0x2a3a66, 0.18);
+    fill.position.set(-3, -1.5, -2);
     scene.add(fill);
 
     // Group wrapping the whole solar system — used for X-axis tilt animation
     const systemGroup = new THREE.Group();
     scene.add(systemGroup);
 
-    // Central sphere — dark base color + self-lit "ozzo" via emissiveMap
+    // Central moon — procedural lunar surface (albedo + bump) self-lit with
+    // "ozzo's blog" via the emissiveMap, so the brand glows on both the lit
+    // highlands and the dark limb.
     const sphereGeo = new THREE.SphereGeometry(1, 64, 64);
+    const moonTex = new THREE.CanvasTexture(buildMoonTexture());
+    moonTex.colorSpace = THREE.SRGBColorSpace;
+    moonTex.anisotropy = renderer.capabilities.getMaxAnisotropy();
     const zEmissiveTex = new THREE.CanvasTexture(buildSphereEmissiveMap());
     zEmissiveTex.colorSpace = THREE.SRGBColorSpace;
+    // Webfonts load async; if Playfair wasn't ready when the text canvas was
+    // first painted, repaint it now that it is.
+    if (document.fonts && document.fonts.load) {
+      document.fonts
+        .load(MOON_FONT_LOAD, "ozzo's blog")
+        .then(() => {
+          if (disposed) return;
+          paintEmissiveMap(zEmissiveTex.image.getContext("2d"), 512, 512);
+          zEmissiveTex.needsUpdate = true;
+        })
+        .catch(() => {});
+    }
     const sphereMat = new THREE.MeshStandardMaterial({
-      color: new THREE.Color("#3a4252"),
+      color: 0xffffff,
+      map: moonTex,
+      bumpMap: moonTex,
+      bumpScale: 0.04,
       emissiveMap: zEmissiveTex,
       emissive: new THREE.Color(1, 1, 1),
-      emissiveIntensity: 0.82,
-      roughness: 0.82,
-      metalness: 0.06,
+      emissiveIntensity: 1.0,
+      roughness: 0.97,
+      metalness: 0.0,
     });
     systemGroup.add(new THREE.Mesh(sphereGeo, sphereMat));
 
@@ -276,7 +391,7 @@ const MoonHero = ({ size = 220 }) => {
       [drawBook,     1.72, 0.5,               0.55],
       [drawPencil,   1.72, 0.5 + PI * 2 / 3, 0.68],
       [drawHeart,    1.72, 0.5 + PI * 4 / 3, 0.46],
-      [drawBMW,      2.02, 1.1,               0.32],
+      [drawRoundel, 2.02, 1.1,                0.32],
       [drawCoffee,   2.02, 1.1 + PI,          0.40],
     ];
 
@@ -324,12 +439,14 @@ const MoonHero = ({ size = 220 }) => {
     animate();
 
     return () => {
+      disposed = true;
       cancelAnimationFrame(frameId);
       controls.removeEventListener("start", onStart);
       controls.removeEventListener("end", onEnd);
       controls.dispose();
       sphereGeo.dispose();
       sphereMat.dispose();
+      moonTex.dispose();
       zEmissiveTex.dispose();
       rings.forEach((r) => { r.geometry.dispose(); r.material.dispose(); });
       planetData.forEach(({ tex, mat }) => { tex.dispose(); mat.dispose(); });
