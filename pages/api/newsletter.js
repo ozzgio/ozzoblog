@@ -20,7 +20,7 @@ export default async function handler(req, res) {
       {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${process.env.BUTTONDOWN_API_KEY}`,
+          Authorization: `Token ${process.env.BUTTONDOWN_API_KEY}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ email_address: email, tags: ["ozzo-blog"] }),
