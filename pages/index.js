@@ -486,7 +486,9 @@ const Home = ({
   );
 };
 
-export async function getStaticProps() {
+export async function getServerSideProps({ res }) {
+  res.setHeader("Cache-Control", "s-maxage=60, stale-while-revalidate=300");
+
   const [articlesRes, booksRes] = await Promise.allSettled([
     fetch(
       "https://raw.githubusercontent.com/ozzgio/portfolio-data/main/articles.json",
@@ -539,7 +541,6 @@ export async function getStaticProps() {
 
   return {
     props: { latestArticles, articlesError, currentBook },
-    revalidate: 3600,
   };
 }
 

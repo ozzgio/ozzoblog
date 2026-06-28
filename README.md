@@ -51,7 +51,7 @@ The SEO health workflow (`.github/workflows/seo-health.yml`) runs on every PR an
 
 ## Content pipeline
 
-Articles and books are fetched at build time from [portfolio-data](https://github.com/ozzgio/portfolio-data):
+Articles and books are fetched from [portfolio-data](https://github.com/ozzgio/portfolio-data) and cached at the edge:
 
 - **Articles**: `https://raw.githubusercontent.com/ozzgio/portfolio-data/main/articles.json`
 - **Books**: `https://raw.githubusercontent.com/ozzgio/portfolio-data/main/books.json`

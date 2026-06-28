@@ -121,32 +121,30 @@ export default function ArticleDetailPage({ article }) {
   );
 }
 
-export async function getStaticPaths() {
-  const response = await fetch(
-    "https://raw.githubusercontent.com/ozzgio/portfolio-data/main/articles.json",
-  );
-  const articles = response.ok ? await response.json() : [];
-
-  const paths = Array.isArray(articles)
-    ? articles
-        .filter((article) => isInternalArticle(article))
-        .map((article) => ({ params: { slug: String(article.slug) } }))
-    : [];
-
+function mapArticle(article) {
   return {
-    paths,
-    fallback: "blocking",
+    title: String(article.title || ""),
+    description: String(article.description || ""),
+    date: String(article.date || ""),
+    slug: String(article.slug || ""),
+    content: getArticleBody(article),
+    tags: Array.isArray(article.tags) ? article.tags.filter(Boolean) : [],
+    book: String(article.book || ""),
+    book_url: String(article.book_url || ""),
+    thumbnail: article.thumbnail ? resolvePortfolioAssetUrl(article.thumbnail) : "",
   };
 }
 
-export async function getStaticProps({ params }) {
+export async function getServerSideProps({ params, res }) {
+  res.setHeader("Cache-Control", "s-maxage=60, stale-while-revalidate=300");
+
   try {
     const response = await fetch(
       "https://raw.githubusercontent.com/ozzgio/portfolio-data/main/articles.json",
     );
 
     if (!response.ok) {
-      return { notFound: true, revalidate: 60 };
+      return { notFound: true };
     }
 
     const articles = await response.json();
@@ -160,28 +158,15 @@ export async function getStaticProps({ params }) {
       : null;
 
     if (!article) {
-      return { notFound: true, revalidate: 60 };
+      return { notFound: true };
     }
 
     return {
       props: {
-        article: {
-          title: String(article.title || ""),
-          description: String(article.description || ""),
-          date: String(article.date || ""),
-          slug: String(article.slug || ""),
-          content: getArticleBody(article),
-          tags: Array.isArray(article.tags) ? article.tags.filter(Boolean) : [],
-          book: String(article.book || ""),
-          book_url: String(article.book_url || ""),
-          thumbnail: article.thumbnail
-            ? resolvePortfolioAssetUrl(article.thumbnail)
-            : "",
-        },
+        article: mapArticle(article),
       },
-      revalidate: 60,
     };
   } catch {
-    return { notFound: true, revalidate: 60 };
+    return { notFound: true };
   }
 }

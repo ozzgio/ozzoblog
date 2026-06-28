@@ -1,5 +1,5 @@
-// Touching this file forces a fresh production deploy so Vercel rebuilds
-// the article Lambda against the current portfolio-data content.
+// Trigger a fresh production build/deploy: the article-detail Lambda was
+// frozen on the 2026-06-19 build, predating recent portfolio-data content.
 const nextConfig = {
   reactStrictMode: true,
   webpack: (config, { dev, isServer }) => {
