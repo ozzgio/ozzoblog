@@ -486,7 +486,7 @@ const Home = ({
   );
 };
 
-export async function getStaticProps() {
+export async function getServerSideProps({ res }) {
   const [articlesRes, booksRes] = await Promise.allSettled([
     fetch(
       "https://raw.githubusercontent.com/ozzgio/portfolio-data/main/articles.json",
@@ -537,9 +537,17 @@ export async function getStaticProps() {
     // no current book is fine
   }
 
+  // The homepage still renders fully (with a fallback message in the
+  // latest-writing section) when only the articles fetch fails, so this
+  // stays a 200 and skips the shared cache rather than serving a 503 for a
+  // page that can render.
+  res.setHeader(
+    "Cache-Control",
+    articlesError ? "no-store" : "s-maxage=60, stale-while-revalidate=300",
+  );
+
   return {
     props: { latestArticles, articlesError, currentBook },
-    revalidate: 3600,
   };
 }
 

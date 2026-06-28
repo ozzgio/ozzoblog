@@ -442,7 +442,7 @@ const ArticlesPage = ({ articles, error }) => {
   );
 };
 
-export const getStaticProps = async () => {
+export const getServerSideProps = async ({ res }) => {
   try {
     const response = await fetch(
       "https://raw.githubusercontent.com/ozzgio/portfolio-data/main/articles.json",
@@ -494,14 +494,18 @@ export const getStaticProps = async () => {
       })
       .filter((article) => article.title && article.url);
 
+    res.setHeader("Cache-Control", "s-maxage=60, stale-while-revalidate=300");
+
     return {
       props: {
         articles: Array.isArray(articles) ? articles : [],
       },
-      revalidate: 10,
     };
   } catch (error) {
-    console.error("Failed to fetch articles in getStaticProps:", error);
+    console.error("Failed to fetch articles in getServerSideProps:", error);
+    res.statusCode = 503;
+    res.setHeader("Cache-Control", "no-store");
+
     return {
       props: {
         articles: [],

@@ -178,9 +178,21 @@ export default function MarkdownProse({ children, size = "article" }) {
       const className = child?.props?.className || "";
       const match = className.match(/language-([\w-]+)/);
       const language = match?.[1];
+      const rawChildren = child?.props?.children;
+      const codeText = Array.isArray(rawChildren)
+        ? rawChildren.map((part) => String(part)).join("")
+        : String(rawChildren || "");
 
       if (className === "language-mermaid") {
-        return <MermaidDiagram chart={String(child.props.children).trim()} />;
+        const chart = codeText.trim();
+        if (!chart) {
+          return (
+            <Box as="pre" bg={codeBg} p={4} borderRadius="md" overflowX="auto" mb={paragraphMb}>
+              {children}
+            </Box>
+          );
+        }
+        return <MermaidDiagram chart={chart} />;
       }
 
       if (language) {
@@ -209,7 +221,7 @@ export default function MarkdownProse({ children, size = "article" }) {
                 },
               }}
             >
-              {String(child.props.children).replace(/\n$/, "")}
+              {codeText.replace(/\n$/, "")}
             </SyntaxHighlighter>
           </Box>
         );
