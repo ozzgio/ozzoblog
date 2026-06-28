@@ -27,7 +27,7 @@ import {
 
 const READING_FONT = "var(--font-merriweather), Georgia, serif";
 
-export default function ArticleDetailPage({ article }) {
+export default function ArticleDetailPage({ article, fetchError, slug }) {
   const mutedText = useColorModeValue("gray.600", "gray.400");
   const ruleColor = useColorModeValue("orange.400", "orange.500");
   // orange.500 is 3.11:1 against the light page background -- fails AA.
@@ -35,7 +35,43 @@ export default function ArticleDetailPage({ article }) {
   // background (5.12:1), so this needs to vary by mode, not be a single token.
   const linkOrange = useColorModeValue("orange.700", "orange.500");
 
-  if (!article) return null;
+  if (fetchError || !article) {
+    return (
+      <Layout title="Article temporarily unavailable">
+        <Head>
+          <meta name="description" content="Article temporarily unavailable" />
+          <meta name="robots" content="noindex" />
+        </Head>
+
+        <Container maxW="2xl" py={{ base: 6, md: 10 }}>
+          <VStack align="start" spacing={6}>
+            <Link as={NextLink} href="/articles" color={linkOrange} fontWeight="semibold">
+              <HStack spacing={2}>
+                <Icon as={IoArrowBackOutline} />
+                <Text>Back to articles</Text>
+              </HStack>
+            </Link>
+
+            <VStack align="start" spacing={3} w="100%">
+              <Heading as="h1" size="lg" lineHeight="1.25" fontFamily={READING_FONT}>
+                Article temporarily unavailable
+              </Heading>
+              <Text color={mutedText} lineHeight="1.7">
+                We could not refresh this article from the upstream content source right now.
+                Please try again in a moment; if the page was already published, the cached
+                version will continue serving once it is available again.
+              </Text>
+              {slug && (
+                <Text color={mutedText} fontSize="sm">
+                  Slug: {slug}
+                </Text>
+              )}
+            </VStack>
+          </VStack>
+        </Container>
+      </Layout>
+    );
+  }
 
   const canonicalUrl = `https://ozzo.blog/articles/${article.slug}`;
   const bookReference = getArticleBookReference(article);
@@ -135,38 +171,83 @@ function mapArticle(article) {
   };
 }
 
-export async function getServerSideProps({ params, res }) {
-  res.setHeader("Cache-Control", "s-maxage=60, stale-while-revalidate=300");
+const ARTICLES_URL = "https://raw.githubusercontent.com/ozzgio/portfolio-data/main/articles.json";
+const REVALIDATE_SECONDS = 60;
+
+const fetchInternalArticles = async () => {
+  const response = await fetch(ARTICLES_URL);
+
+  if (!response.ok) {
+    return { ok: false, articles: [] };
+  }
+
+  const articles = await response.json();
+  return { ok: true, articles: Array.isArray(articles) ? articles : [] };
+};
+
+const findInternalArticle = (articles, slug) =>
+  Array.isArray(articles)
+    ? articles.find(
+        (entry) =>
+          isInternalArticle(entry) &&
+          entry?.slug === slug &&
+          getArticleBody(entry),
+      )
+    : null;
+
+export async function getStaticPaths() {
+  try {
+    const { articles } = await fetchInternalArticles();
+    const paths = articles
+      .map((article) => String(article?.slug || "").trim())
+      .filter(Boolean)
+      .map((slug) => ({ params: { slug } }));
+
+    return { paths, fallback: "blocking" };
+  } catch {
+    return { paths: [], fallback: "blocking" };
+  }
+}
+
+export async function getStaticProps({ params }) {
+  const slug = String(params?.slug || "").trim();
 
   try {
-    const response = await fetch(
-      "https://raw.githubusercontent.com/ozzgio/portfolio-data/main/articles.json",
-    );
+    const { ok, articles } = await fetchInternalArticles();
 
-    if (!response.ok) {
-      return { notFound: true };
+    if (!ok) {
+      return {
+        props: {
+          article: null,
+          fetchError: true,
+          slug,
+        },
+        revalidate: REVALIDATE_SECONDS,
+      };
     }
 
-    const articles = await response.json();
-    const article = Array.isArray(articles)
-      ? articles.find(
-          (entry) =>
-            isInternalArticle(entry) &&
-            entry?.slug === params?.slug &&
-            getArticleBody(entry),
-        )
-      : null;
+    const article = findInternalArticle(articles, slug);
 
     if (!article) {
-      return { notFound: true };
+      return { notFound: true, revalidate: REVALIDATE_SECONDS };
     }
 
     return {
       props: {
         article: mapArticle(article),
+        fetchError: false,
+        slug,
       },
+      revalidate: REVALIDATE_SECONDS,
     };
   } catch {
-    return { notFound: true };
+    return {
+      props: {
+        article: null,
+        fetchError: true,
+        slug,
+      },
+      revalidate: REVALIDATE_SECONDS,
+    };
   }
 }
