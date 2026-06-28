@@ -443,8 +443,6 @@ const ArticlesPage = ({ articles, error }) => {
 };
 
 export const getServerSideProps = async ({ res }) => {
-  res.setHeader("Cache-Control", "s-maxage=60, stale-while-revalidate=300");
-
   try {
     const response = await fetch(
       "https://raw.githubusercontent.com/ozzgio/portfolio-data/main/articles.json",
@@ -496,6 +494,8 @@ export const getServerSideProps = async ({ res }) => {
       })
       .filter((article) => article.title && article.url);
 
+    res.setHeader("Cache-Control", "s-maxage=60, stale-while-revalidate=300");
+
     return {
       props: {
         articles: Array.isArray(articles) ? articles : [],
@@ -503,6 +503,9 @@ export const getServerSideProps = async ({ res }) => {
     };
   } catch (error) {
     console.error("Failed to fetch articles in getServerSideProps:", error);
+    res.statusCode = 503;
+    res.setHeader("Cache-Control", "no-store");
+
     return {
       props: {
         articles: [],

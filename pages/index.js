@@ -487,8 +487,6 @@ const Home = ({
 };
 
 export async function getServerSideProps({ res }) {
-  res.setHeader("Cache-Control", "s-maxage=60, stale-while-revalidate=300");
-
   const [articlesRes, booksRes] = await Promise.allSettled([
     fetch(
       "https://raw.githubusercontent.com/ozzgio/portfolio-data/main/articles.json",
@@ -537,6 +535,13 @@ export async function getServerSideProps({ res }) {
     }
   } catch {
     // no current book is fine
+  }
+
+  if (articlesError) {
+    res.statusCode = 503;
+    res.setHeader("Cache-Control", "no-store");
+  } else {
+    res.setHeader("Cache-Control", "s-maxage=60, stale-while-revalidate=300");
   }
 
   return {
