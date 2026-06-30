@@ -60,6 +60,7 @@ export default async function handler(req, res) {
         email,
         subscriber_id: body.data?.id ?? null,
       }),
+      signal: AbortSignal.timeout(8000),
     });
 
     if (!relay.ok) {
