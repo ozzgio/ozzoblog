@@ -34,7 +34,7 @@ const NewsletterConfirmed = () => (
             maxW="sm"
             mx="auto"
           >
-            Welcome. You&apos;ll get new articles in your inbox — no noise, just
+            Welcome. You&apos;ll get new articles in your inbox. No noise, just
             the stuff worth reading.
           </Text>
           <Stack direction={{ base: "column", sm: "row" }} spacing={3} justify="center">
