@@ -12,13 +12,15 @@ async function readRawBody(req) {
 }
 
 function verifySignature(rawBody, secret, header) {
+  // Buttondown sends the header as "sha256=<hex>"; strip the prefix before comparing.
+  const sig = header?.startsWith("sha256=") ? header.slice(7) : (header ?? "");
   const expected = crypto
     .createHmac("sha256", secret)
     .update(rawBody)
     .digest("hex");
   try {
     return crypto.timingSafeEqual(
-      Buffer.from(header ?? "", "utf8"),
+      Buffer.from(sig, "utf8"),
       Buffer.from(expected, "utf8"),
     );
   } catch {
@@ -52,12 +54,14 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: "Invalid JSON" });
   }
 
-  // Only act on confirmed subscriptions; silently ack everything else.
-  if (body?.event_type !== "subscriber.activated") {
+  // Only act on opt-in confirmations; silently ack everything else.
+  // Buttondown's event for a confirmed subscription is subscriber.confirmed,
+  // and subscriber fields live under data, not payload.
+  if (body?.event_type !== "subscriber.confirmed") {
     return res.status(200).json({ ok: true, ignored: true });
   }
 
-  const email = body?.payload?.email_address;
+  const email = body?.data?.email_address;
   if (!email) {
     return res.status(400).json({ error: "Missing email in payload" });
   }
@@ -74,7 +78,7 @@ export default async function handler(req, res) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         email,
-        subscriber_id: body.payload?.id ?? null,
+        subscriber_id: body.data?.id ?? null,
       }),
     });
 
