@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useRouter } from "next/router";
 import {
   Box,
   Button,
@@ -11,13 +12,13 @@ import {
 const STATUS = {
   IDLE: "idle",
   LOADING: "loading",
-  SUCCESS: "success",
   ERROR: "error",
 };
 
 const NewsletterSubscribe = (props) => {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState(STATUS.IDLE);
+  const router = useRouter();
 
   const mutedText = useColorModeValue("gray.600", "gray.400");
   const borderColor = useColorModeValue("gray.200", "whiteAlpha.200");
@@ -41,32 +42,11 @@ const NewsletterSubscribe = (props) => {
 
       if (!response.ok) throw new Error("Subscription failed");
 
-      setStatus(STATUS.SUCCESS);
+      router.push("/newsletter/pending");
     } catch {
       setStatus(STATUS.ERROR);
     }
   };
-
-  if (status === STATUS.SUCCESS) {
-    return (
-      <Box
-        borderTopWidth="1px"
-        borderTopColor={borderColor}
-        pt={8}
-        mt={8}
-        {...props}
-      >
-        <Text
-          fontSize="sm"
-          fontWeight="medium"
-          color="orange.700"
-          _dark={{ color: "orange.300" }}
-        >
-          You&apos;re in. First article lands in your inbox Sunday.
-        </Text>
-      </Box>
-    );
-  }
 
   return (
     <Box
