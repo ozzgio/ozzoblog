@@ -1,6 +1,4 @@
-import crypto from "crypto";
-
-// Disable body parsing so we can read the raw bytes for HMAC verification.
+// Disable body parsing so we can read the raw bytes for JSON parsing.
 export const config = {
   api: { bodyParser: false },
 };
@@ -11,41 +9,21 @@ async function readRawBody(req) {
   return Buffer.concat(chunks);
 }
 
-function verifySignature(rawBody, secret, header) {
-  // Buttondown sends the header as "sha256=<hex>"; strip the prefix before comparing.
-  const sig = header?.startsWith("sha256=") ? header.slice(7) : (header ?? "");
-  const expected = crypto
-    .createHmac("sha256", secret)
-    .update(rawBody)
-    .digest("hex");
-  try {
-    return crypto.timingSafeEqual(
-      Buffer.from(sig, "utf8"),
-      Buffer.from(expected, "utf8"),
-    );
-  } catch {
-    return false;
-  }
-}
-
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     res.setHeader("Allow", "POST");
     return res.status(405).end();
   }
 
-  const rawBody = await readRawBody(req);
-
-  // Verify Buttondown HMAC signature when the secret is configured.
+  // Authenticate via a shared secret in the URL query string.
+  // Buttondown's signing-key feature is not usable via their API,
+  // so we embed the secret in the webhook URL instead and check it here.
   const secret = process.env.BUTTONDOWN_WEBHOOK_SECRET;
-  if (secret) {
-    const sig =
-      req.headers["x-buttondown-signature"] ??
-      req.headers["x-buttondown-signature-v1"];
-    if (!verifySignature(rawBody, secret, sig)) {
-      return res.status(401).json({ error: "Invalid signature" });
-    }
+  if (secret && req.query.secret !== secret) {
+    return res.status(401).json({ error: "Unauthorized" });
   }
+
+  const rawBody = await readRawBody(req);
 
   let body;
   try {
