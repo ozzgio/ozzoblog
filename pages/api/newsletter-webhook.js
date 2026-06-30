@@ -18,8 +18,10 @@ export default async function handler(req, res) {
   // Authenticate via a shared secret in the URL query string.
   // Buttondown's signing-key feature is not usable via their API,
   // so we embed the secret in the webhook URL instead and check it here.
+  // Fail closed: missing env var = reject, not skip, to prevent an
+  // unconfigured deployment from becoming an open email/job trigger.
   const secret = process.env.BUTTONDOWN_WEBHOOK_SECRET;
-  if (secret && req.query.secret !== secret) {
+  if (!secret || req.query.secret !== secret) {
     return res.status(401).json({ error: "Unauthorized" });
   }
 
