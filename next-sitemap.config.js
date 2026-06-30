@@ -8,7 +8,7 @@ module.exports = {
   autoLastmod: true,
   // Exclude dynamic routes backed by external data (slugs can change between builds)
   // and server-side routes that are not indexable content pages.
-  exclude: ["/books/*", "/articles/*", "/rss.xml"],
+  exclude: ["/books/*", "/articles/*", "/rss.xml", "/newsletter/*"],
   transform: async (config, path) => {
     let priority = 0.7;
     let changefreq = "weekly";
