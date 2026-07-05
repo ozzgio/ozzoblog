@@ -20,6 +20,8 @@ import Layout from "../components/layouts/layout";
 import BaseCard from "../components/basecard";
 import NewsletterSubscribe from "../components/NewsletterSubscribe";
 import {
+  fetchArticles,
+  fetchBooks,
   getArticleSummary,
   isInternalArticle,
   resolvePortfolioAssetUrl,
@@ -487,54 +489,40 @@ const Home = ({
 };
 
 export async function getServerSideProps({ res }) {
-  const [articlesRes, booksRes] = await Promise.allSettled([
-    fetch(
-      "https://raw.githubusercontent.com/ozzgio/portfolio-data/main/articles.json",
-    ),
-    fetch(
-      "https://raw.githubusercontent.com/ozzgio/portfolio-data/main/books.json",
-    ),
+  const [articlesResult, booksResult] = await Promise.allSettled([
+    fetchArticles(),
+    fetchBooks(),
   ]);
 
   let latestArticles = [];
   let articlesError = false;
   let currentBook = null;
 
-  try {
-    if (articlesRes.status === "fulfilled" && articlesRes.value.ok) {
-      const articlesData = await articlesRes.value.json();
-      if (Array.isArray(articlesData)) {
-        latestArticles = articlesData
-          .filter((article) => article && article.title && article.date)
-          .map(normalizeArticle)
-          .filter((article) => article.url)
-          .sort((a, b) => new Date(b.date) - new Date(a.date))
-          .slice(0, 2);
-      }
-    } else {
-      articlesError = true;
-    }
-  } catch {
+  const articlesPayload =
+    articlesResult.status === "fulfilled" ? articlesResult.value : null;
+  if (articlesPayload?.ok && Array.isArray(articlesPayload.articles)) {
+    latestArticles = articlesPayload.articles
+      .filter((article) => article && article.title && article.date)
+      .map(normalizeArticle)
+      .filter((article) => article.url)
+      .sort((a, b) => new Date(b.date) - new Date(a.date))
+      .slice(0, 2);
+  } else {
     articlesError = true;
   }
 
-  try {
-    if (booksRes.status === "fulfilled" && booksRes.value.ok) {
-      const booksData = await booksRes.value.json();
-      if (Array.isArray(booksData)) {
-        const reading = booksData.find(
-          (b) => b.status === "reading" && b.title && b.author,
-        );
-        if (reading) {
-          currentBook = {
-            title: String(reading.title),
-            author: String(reading.author),
-          };
-        }
-      }
+  const booksPayload =
+    booksResult.status === "fulfilled" ? booksResult.value : null;
+  if (booksPayload?.ok && Array.isArray(booksPayload.books)) {
+    const reading = booksPayload.books.find(
+      (b) => b.status === "reading" && b.title && b.author,
+    );
+    if (reading) {
+      currentBook = {
+        title: String(reading.title),
+        author: String(reading.author),
+      };
     }
-  } catch {
-    // no current book is fine
   }
 
   // The homepage still renders fully (with a fallback message in the

@@ -30,6 +30,7 @@ import {
 import RatingStar from "../../components/ratingstar";
 import Layout from "../../components/layouts/layout";
 import {
+  fetchBooks,
   formatAbsoluteDate,
   getBookSlug,
   getBookNotes,
@@ -330,10 +331,7 @@ export default function BookDetailPage({ book }) {
 }
 
 export async function getStaticPaths() {
-  const response = await fetch(
-    "https://raw.githubusercontent.com/ozzgio/portfolio-data/main/books.json",
-  );
-  const books = response.ok ? await response.json() : [];
+  const { books } = await fetchBooks();
 
   const paths = Array.isArray(books)
     ? books
@@ -347,13 +345,10 @@ export async function getStaticPaths() {
 
 export async function getStaticProps({ params }) {
   try {
-    const response = await fetch(
-      "https://raw.githubusercontent.com/ozzgio/portfolio-data/main/books.json",
-    );
+    const { ok, books } = await fetchBooks();
 
-    if (!response.ok) return { notFound: true, revalidate: 60 };
+    if (!ok) return { notFound: true, revalidate: 60 };
 
-    const books = await response.json();
     const book = Array.isArray(books)
       ? books.find((entry) => getBookSlug(entry) === params?.slug)
       : null;

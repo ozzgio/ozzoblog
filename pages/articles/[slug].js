@@ -17,6 +17,7 @@ import NewsletterSubscribe from "../../components/NewsletterSubscribe";
 import { IoArrowBackOutline, IoCalendarOutline } from "react-icons/io5";
 import Layout from "../../components/layouts/layout";
 import {
+  fetchArticles,
   formatAbsoluteDate,
   getArticleBody,
   getArticleBookReference,
@@ -171,19 +172,7 @@ function mapArticle(article) {
   };
 }
 
-const ARTICLES_URL = "https://raw.githubusercontent.com/ozzgio/portfolio-data/main/articles.json";
 const REVALIDATE_SECONDS = 60;
-
-const fetchInternalArticles = async () => {
-  const response = await fetch(ARTICLES_URL);
-
-  if (!response.ok) {
-    return { ok: false, articles: [] };
-  }
-
-  const articles = await response.json();
-  return { ok: true, articles: Array.isArray(articles) ? articles : [] };
-};
 
 const findInternalArticle = (articles, slug) =>
   Array.isArray(articles)
@@ -197,7 +186,7 @@ const findInternalArticle = (articles, slug) =>
 
 export async function getStaticPaths() {
   try {
-    const { articles } = await fetchInternalArticles();
+    const { articles } = await fetchArticles();
     const paths = articles
       .map((article) => String(article?.slug || "").trim())
       .filter(Boolean)
@@ -213,7 +202,7 @@ export async function getStaticProps({ params }) {
   const slug = String(params?.slug || "").trim();
 
   try {
-    const { ok, articles } = await fetchInternalArticles();
+    const { ok, articles } = await fetchArticles();
 
     if (!ok) {
       return {

@@ -127,3 +127,50 @@ export const formatAbsoluteDate = (dateStr) => {
     return dateStr;
   }
 };
+
+// --- Portfolio-data fetching -------------------------------------------------
+//
+// One fetcher for every page that reads portfolio-data, so the timeout and
+// retry policy lives in exactly one place. The raw CDN is slowest in the
+// minute or two after a publish (edge revalidation) and rate-limits under
+// load; a bare fetch() with no deadline can hang past Vercel's serverless
+// timeout and surface as a 500 — almost always on the newest article, since
+// it has no cached page yet and must generate on demand.
+//
+// Returns { ok, data } where data is the validated array on success or [] on
+// failure. Callers own their own filtering/normalization and decide how to
+// degrade (graceful empty list, "temporarily unavailable", or notFound).
+
+const PORTFOLIO_ARTICLES_URL =
+  "https://raw.githubusercontent.com/ozzgio/portfolio-data/main/articles.json";
+const PORTFOLIO_BOOKS_URL =
+  "https://raw.githubusercontent.com/ozzgio/portfolio-data/main/books.json";
+const PORTFOLIO_FETCH_TIMEOUT_MS = 8000;
+const PORTFOLIO_FETCH_RETRIES = 1;
+
+async function fetchPortfolioArray(url) {
+  for (let attempt = 0; ; attempt++) {
+    try {
+      const response = await fetch(url, {
+        signal: AbortSignal.timeout(PORTFOLIO_FETCH_TIMEOUT_MS),
+      });
+      if (response.ok) {
+        const data = await response.json();
+        if (Array.isArray(data)) return { ok: true, data };
+      }
+    } catch {
+      // Timeout, DNS, or JSON parse error — retry once, then give up gracefully.
+    }
+    if (attempt >= PORTFOLIO_FETCH_RETRIES) return { ok: false, data: [] };
+  }
+}
+
+export async function fetchArticles() {
+  const { ok, data } = await fetchPortfolioArray(PORTFOLIO_ARTICLES_URL);
+  return { ok, articles: ok ? data : [] };
+}
+
+export async function fetchBooks() {
+  const { ok, data } = await fetchPortfolioArray(PORTFOLIO_BOOKS_URL);
+  return { ok, books: ok ? data : [] };
+}
