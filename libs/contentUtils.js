@@ -141,11 +141,13 @@ export const formatAbsoluteDate = (dateStr) => {
 // failure. Callers own their own filtering/normalization and decide how to
 // degrade (graceful empty list, "temporarily unavailable", or notFound).
 
-const PORTFOLIO_ARTICLES_URL =
-  "https://raw.githubusercontent.com/ozzgio/portfolio-data/main/articles.json";
-const PORTFOLIO_BOOKS_URL =
-  "https://raw.githubusercontent.com/ozzgio/portfolio-data/main/books.json";
-const PORTFOLIO_FETCH_TIMEOUT_MS = 8000;
+const PORTFOLIO_ARTICLES_URL = `https://raw.githubusercontent.com/${DATA_REPO}/${DATA_BRANCH}/articles.json`;
+const PORTFOLIO_BOOKS_URL = `https://raw.githubusercontent.com/${DATA_REPO}/${DATA_BRANCH}/books.json`;
+// Per-attempt deadline sized so the worst case (timeout + one retry) stays
+// under Vercel's 10s serverless-function limit on the SSR pages and on the
+// on-demand fallback:"blocking" generation for new article slugs. A healthy
+// CDN response lands in well under a second, so 4s is still a generous cutoff.
+const PORTFOLIO_FETCH_TIMEOUT_MS = 4000;
 const PORTFOLIO_FETCH_RETRIES = 1;
 
 async function fetchPortfolioArray(url) {
@@ -158,8 +160,10 @@ async function fetchPortfolioArray(url) {
         const data = await response.json();
         if (Array.isArray(data)) return { ok: true, data };
       }
-    } catch {
-      // Timeout, DNS, or JSON parse error — retry once, then give up gracefully.
+    } catch (err) {
+      // Timeout, DNS, or JSON parse error — surface it so a broken upstream
+      // or a data-shape regression isn't silently swallowed, then retry.
+      console.error("portfolio-data fetch failed:", err?.message || err);
     }
     if (attempt >= PORTFOLIO_FETCH_RETRIES) return { ok: false, data: [] };
   }

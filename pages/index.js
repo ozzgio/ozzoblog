@@ -489,7 +489,9 @@ const Home = ({
 };
 
 export async function getServerSideProps({ res }) {
-  const [articlesResult, booksResult] = await Promise.allSettled([
+  // The helpers never reject (they resolve to { ok:false } on any failure),
+  // so Promise.all is safe and each source degrades independently via .ok.
+  const [articlesPayload, booksPayload] = await Promise.all([
     fetchArticles(),
     fetchBooks(),
   ]);
@@ -498,9 +500,7 @@ export async function getServerSideProps({ res }) {
   let articlesError = false;
   let currentBook = null;
 
-  const articlesPayload =
-    articlesResult.status === "fulfilled" ? articlesResult.value : null;
-  if (articlesPayload?.ok && Array.isArray(articlesPayload.articles)) {
+  if (articlesPayload.ok && Array.isArray(articlesPayload.articles)) {
     latestArticles = articlesPayload.articles
       .filter((article) => article && article.title && article.date)
       .map(normalizeArticle)
@@ -511,9 +511,7 @@ export async function getServerSideProps({ res }) {
     articlesError = true;
   }
 
-  const booksPayload =
-    booksResult.status === "fulfilled" ? booksResult.value : null;
-  if (booksPayload?.ok && Array.isArray(booksPayload.books)) {
+  if (booksPayload.ok && Array.isArray(booksPayload.books)) {
     const reading = booksPayload.books.find(
       (b) => b.status === "reading" && b.title && b.author,
     );
