@@ -127,3 +127,54 @@ export const formatAbsoluteDate = (dateStr) => {
     return dateStr;
   }
 };
+
+// --- Portfolio-data fetching -------------------------------------------------
+//
+// One fetcher for every page that reads portfolio-data, so the timeout and
+// retry policy lives in exactly one place. The raw CDN is slowest in the
+// minute or two after a publish (edge revalidation) and rate-limits under
+// load; a bare fetch() with no deadline can hang past Vercel's serverless
+// timeout and surface as a 500 — almost always on the newest article, since
+// it has no cached page yet and must generate on demand.
+//
+// Returns { ok, data } where data is the validated array on success or [] on
+// failure. Callers own their own filtering/normalization and decide how to
+// degrade (graceful empty list, "temporarily unavailable", or notFound).
+
+const PORTFOLIO_ARTICLES_URL = `https://raw.githubusercontent.com/${DATA_REPO}/${DATA_BRANCH}/articles.json`;
+const PORTFOLIO_BOOKS_URL = `https://raw.githubusercontent.com/${DATA_REPO}/${DATA_BRANCH}/books.json`;
+// Per-attempt deadline sized so the worst case (timeout + one retry) stays
+// under Vercel's 10s serverless-function limit on the SSR pages and on the
+// on-demand fallback:"blocking" generation for new article slugs. A healthy
+// CDN response lands in well under a second, so 4s is still a generous cutoff.
+const PORTFOLIO_FETCH_TIMEOUT_MS = 4000;
+const PORTFOLIO_FETCH_RETRIES = 1;
+
+async function fetchPortfolioArray(url) {
+  for (let attempt = 0; ; attempt++) {
+    try {
+      const response = await fetch(url, {
+        signal: AbortSignal.timeout(PORTFOLIO_FETCH_TIMEOUT_MS),
+      });
+      if (response.ok) {
+        const data = await response.json();
+        if (Array.isArray(data)) return { ok: true, data };
+      }
+    } catch (err) {
+      // Timeout, DNS, or JSON parse error — surface it so a broken upstream
+      // or a data-shape regression isn't silently swallowed, then retry.
+      console.error("portfolio-data fetch failed:", err?.message || err);
+    }
+    if (attempt >= PORTFOLIO_FETCH_RETRIES) return { ok: false, data: [] };
+  }
+}
+
+export async function fetchArticles() {
+  const { ok, data } = await fetchPortfolioArray(PORTFOLIO_ARTICLES_URL);
+  return { ok, articles: ok ? data : [] };
+}
+
+export async function fetchBooks() {
+  const { ok, data } = await fetchPortfolioArray(PORTFOLIO_BOOKS_URL);
+  return { ok, books: ok ? data : [] };
+}

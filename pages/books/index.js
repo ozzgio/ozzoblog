@@ -32,6 +32,7 @@ import {
 import Layout from "../../components/layouts/layout";
 import BookCard from "../../components/cards/bookcard";
 import {
+  fetchBooks,
   getBookSlug,
   getBookNotes,
   getBookSummary,
@@ -499,18 +500,10 @@ const BooksPage = ({ books, error }) => {
 
 export const getStaticProps = async () => {
   try {
-    const response = await fetch(
-      "https://raw.githubusercontent.com/ozzgio/portfolio-data/main/books.json",
-    );
+    const { ok, books: booksData } = await fetchBooks();
 
-    if (!response.ok) {
-      throw new Error(`Failed to fetch books: ${response.status} ${response.statusText}`);
-    }
-
-    const booksData = await response.json();
-
-    if (!Array.isArray(booksData)) {
-      throw new Error("Invalid JSON format: expected an array");
+    if (!ok) {
+      throw new Error("Failed to fetch books from portfolio-data");
     }
 
     const books = booksData

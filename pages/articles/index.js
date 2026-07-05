@@ -32,6 +32,7 @@ import {
 import Layout from "../../components/layouts/layout";
 import ArticleCard from "../../components/cards/articlecard";
 import {
+  fetchArticles,
   formatAbsoluteDate,
   getArticleBody,
   getArticleSummary,
@@ -444,20 +445,10 @@ const ArticlesPage = ({ articles, error }) => {
 
 export const getServerSideProps = async ({ res }) => {
   try {
-    const response = await fetch(
-      "https://raw.githubusercontent.com/ozzgio/portfolio-data/main/articles.json",
-    );
+    const { ok, articles: articlesData } = await fetchArticles();
 
-    if (!response.ok) {
-      throw new Error(
-        `Failed to fetch articles: ${response.status} ${response.statusText}`,
-      );
-    }
-
-    const articlesData = await response.json();
-
-    if (!Array.isArray(articlesData)) {
-      throw new Error("Invalid JSON format: expected an array");
+    if (!ok) {
+      throw new Error("Failed to fetch articles from portfolio-data");
     }
 
     const articles = articlesData
