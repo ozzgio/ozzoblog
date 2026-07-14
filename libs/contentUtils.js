@@ -65,11 +65,17 @@ export const getArticleBookReference = (article) =>
 export const getArticleBookUrl = (article) =>
   getTextContent(article?.book_url || article?.bookUrl);
 
+// Only http(s) URLs may become clickable links. Anything else arriving
+// from upstream data (e.g. a "javascript:" scheme) is treated as no link.
+const WEB_URL = /^https?:\/\//i;
+
 // Optional frontmatter-driven citation list. The sync layer emits each
 // reference as an object (label + url), the same shape produced for the
 // "Referenced book" path. Entries missing both label and url are dropped;
 // a missing or non-array field yields [] so the References block simply
 // does not render. String entries are tolerated as label-only.
+// Non-http(s) URLs are stripped to "" (defense in depth, independent of
+// the data-side validator) so an unsafe scheme can never render as an href.
 export const getArticleReferences = (article) => {
   const raw = article?.references;
   if (!Array.isArray(raw)) return [];
@@ -83,6 +89,10 @@ export const getArticleReferences = (article) => {
       }
       return { label: getTextContent(entry), url: "" };
     })
+    .map((ref) => ({
+      label: ref.label,
+      url: WEB_URL.test(ref.url) ? ref.url : "",
+    }))
     .filter((ref) => ref.label || ref.url);
 };
 
