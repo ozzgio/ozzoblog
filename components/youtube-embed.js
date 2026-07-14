@@ -15,13 +15,17 @@ export function parseYouTubeId(value) {
   try {
     const parsed = new URL(url.startsWith("http") ? url : `https://${url}`);
     const host = parsed.hostname.replace(/^www\./, "");
+    const idPattern = /^[A-Za-z0-9_-]{11}$/;
 
     if (host === "youtu.be") {
-      return parsed.pathname.slice(1).split("/")[0] || "";
+      const id = parsed.pathname.slice(1).split("/")[0] || "";
+      return idPattern.test(id) ? id : "";
     }
 
+    if (host !== "youtube.com" && host !== "m.youtube.com") return "";
+
     const v = parsed.searchParams.get("v");
-    if (v) return v;
+    if (v && idPattern.test(v)) return v;
 
     const match = parsed.pathname.match(/\/(?:embed|shorts|live)\/([A-Za-z0-9_-]+)/);
     if (match) return match[1];
