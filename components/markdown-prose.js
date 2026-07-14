@@ -18,6 +18,7 @@ import {
   oneDark,
   oneLight,
 } from "react-syntax-highlighter/dist/cjs/styles/prism";
+import YoutubeEmbed, { parseYouTubeId } from "./youtube-embed";
 
 const MermaidDiagram = dynamic(() => import("./mermaid-diagram"), { ssr: false });
 
@@ -193,6 +194,20 @@ export default function MarkdownProse({ children, size = "article" }) {
           );
         }
         return <MermaidDiagram chart={chart} />;
+      }
+
+      if (className === "language-youtube") {
+        const videoUrl = codeText.trim();
+        if (videoUrl && parseYouTubeId(videoUrl)) {
+          return <YoutubeEmbed url={videoUrl} />;
+        }
+        // No recognizable URL: render the raw fence as a plain code block so
+        // a malformed embed is visible, not silently dropped.
+        return (
+          <Box as="pre" bg={codeBg} p={4} borderRadius="md" overflowX="auto" mb={paragraphMb}>
+            {children}
+          </Box>
+        );
       }
 
       if (language) {
