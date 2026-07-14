@@ -65,6 +65,27 @@ export const getArticleBookReference = (article) =>
 export const getArticleBookUrl = (article) =>
   getTextContent(article?.book_url || article?.bookUrl);
 
+// Optional frontmatter-driven citation list. The sync layer emits each
+// reference as an object (label + url), the same shape produced for the
+// "Referenced book" path. Entries missing both label and url are dropped;
+// a missing or non-array field yields [] so the References block simply
+// does not render. String entries are tolerated as label-only.
+export const getArticleReferences = (article) => {
+  const raw = article?.references;
+  if (!Array.isArray(raw)) return [];
+  return raw
+    .map((entry) => {
+      if (entry && typeof entry === "object") {
+        return {
+          label: getTextContent(entry.label || entry.title),
+          url: getTextContent(entry.url || entry.href),
+        };
+      }
+      return { label: getTextContent(entry), url: "" };
+    })
+    .filter((ref) => ref.label || ref.url);
+};
+
 export const isInternalArticle = (article) =>
   Boolean(getTextContent(article?.slug) && getArticleBody(article));
 

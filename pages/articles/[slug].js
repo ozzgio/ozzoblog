@@ -22,6 +22,7 @@ import {
   getArticleBody,
   getArticleBookReference,
   getArticleBookUrl,
+  getArticleReferences,
   isInternalArticle,
   resolvePortfolioAssetUrl,
 } from "../../libs/contentUtils";
@@ -77,6 +78,7 @@ export default function ArticleDetailPage({ article, fetchError, slug }) {
   const canonicalUrl = `https://ozzo.blog/articles/${article.slug}`;
   const bookReference = getArticleBookReference(article);
   const bookUrl = getArticleBookUrl(article);
+  const references = Array.isArray(article.references) ? article.references : [];
 
   return (
     <Layout title={article.title}>
@@ -151,6 +153,50 @@ export default function ArticleDetailPage({ article, fetchError, slug }) {
             <MarkdownProse>{article.content}</MarkdownProse>
           </Box>
 
+          {references.length > 0 && (
+            <Box
+              w="100%"
+              borderLeftWidth="3px"
+              borderLeftColor={ruleColor}
+              pl={4}
+              py={3}
+              borderRadius="sm"
+            >
+              <Text
+                fontFamily={READING_FONT}
+                fontSize="xs"
+                fontWeight="semibold"
+                color={mutedText}
+                mb={2}
+                textTransform="uppercase"
+                letterSpacing="wider"
+              >
+                References
+              </Text>
+              <VStack align="start" spacing={1}>
+                {references.map((ref, index) => {
+                  const label = ref.label || ref.url;
+                  return ref.url ? (
+                    <Link
+                      key={index}
+                      href={ref.url}
+                      isExternal
+                      color={linkOrange}
+                      fontSize="sm"
+                      fontWeight="medium"
+                    >
+                      {label}
+                    </Link>
+                  ) : (
+                    <Text key={index} color={mutedText} fontSize="sm">
+                      {label}
+                    </Text>
+                  );
+                })}
+              </VStack>
+            </Box>
+          )}
+
           <NewsletterSubscribe w="100%" />
         </VStack>
       </Container>
@@ -168,6 +214,7 @@ function mapArticle(article) {
     tags: Array.isArray(article.tags) ? article.tags.filter(Boolean) : [],
     book: String(article.book || ""),
     book_url: String(article.book_url || ""),
+    references: getArticleReferences(article),
     thumbnail: article.thumbnail ? resolvePortfolioAssetUrl(article.thumbnail) : "",
   };
 }
