@@ -107,6 +107,7 @@ const SectionLabel = ({ children }) => (
 const Projects = () => {
   const featured = projectData.find((p) => p.status === "featured");
   const active = projectData.filter((p) => p.status === "active");
+  const maintenance = projectData.filter((p) => p.status === "maintenance");
   const earlier = projectData.filter((p) => p.status === "learning");
 
   return (
@@ -147,6 +148,26 @@ const Projects = () => {
               <SectionLabel>Internal tools</SectionLabel>
               <SimpleGrid columns={{ base: 1, md: 2 }} spacing={[6, 8]}>
                 {active.map((project) => (
+                  <ProjectCard
+                    key={project.id}
+                    id={project.id}
+                    title={project.title}
+                    thumbnail={project.thumbnail}
+                    stack={project.stack}
+                    date={project.date}
+                  >
+                    {project.description}
+                  </ProjectCard>
+                ))}
+              </SimpleGrid>
+            </>
+          )}
+
+          {maintenance.length > 0 && (
+            <>
+              <SectionLabel>Maintenance</SectionLabel>
+              <SimpleGrid columns={{ base: 1, md: 2 }} spacing={[6, 8]}>
+                {maintenance.map((project) => (
                   <ProjectCard
                     key={project.id}
                     id={project.id}

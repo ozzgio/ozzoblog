@@ -254,37 +254,6 @@ const Home = ({
               pl={5}
             >
               <Heading as="h2" fontSize="md" fontWeight="semibold" mb={1.5}>
-                Synergym (maintenance)
-              </Heading>
-              <Text
-                fontSize="sm"
-                color="gray.600"
-                _dark={{ color: "gray.400" }}
-                mb={2}
-              >
-                A Rails app for personal trainers. Development stopped,
-                maintenance only now. The distribution lessons from building
-                it shape how I ship everything else.
-              </Text>
-              <Link
-                as={NextLink}
-                href="/projects/synergym"
-                color="orange.700"
-                _dark={{ color: "orange.300" }}
-                fontSize="sm"
-                fontWeight="medium"
-              >
-                View project page →
-              </Link>
-            </Box>
-
-            <Box
-              borderLeftWidth="2px"
-              borderLeftColor="gray.200"
-              _dark={{ borderLeftColor: "whiteAlpha.200" }}
-              pl={5}
-            >
-              <Heading as="h2" fontSize="md" fontWeight="semibold" mb={1.5}>
                 Self-hosted infrastructure
               </Heading>
               <Text
@@ -306,6 +275,43 @@ const Home = ({
                 fontWeight="medium"
               >
                 Full breakdown →
+              </Link>
+            </Box>
+          </VStack>
+        </Section>
+
+        {/* In maintenance */}
+        <Section delay={0.1}>
+          <SectionLabel>In maintenance</SectionLabel>
+          <VStack spacing={8} align="stretch">
+            <Box
+              borderLeftWidth="2px"
+              borderLeftColor="gray.200"
+              _dark={{ borderLeftColor: "whiteAlpha.200" }}
+              pl={5}
+            >
+              <Heading as="h2" fontSize="md" fontWeight="semibold" mb={1.5}>
+                Synergym
+              </Heading>
+              <Text
+                fontSize="sm"
+                color="gray.600"
+                _dark={{ color: "gray.400" }}
+                mb={2}
+              >
+                A Rails app for personal trainers. Development stopped,
+                maintenance only now. The distribution lessons from building
+                it shape how I ship everything else.
+              </Text>
+              <Link
+                as={NextLink}
+                href="/projects/synergym"
+                color="orange.700"
+                _dark={{ color: "orange.300" }}
+                fontSize="sm"
+                fontWeight="medium"
+              >
+                View project page →
               </Link>
             </Box>
           </VStack>
