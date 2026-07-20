@@ -260,11 +260,22 @@ const Home = ({
                 fontSize="sm"
                 color="gray.600"
                 _dark={{ color: "gray.400" }}
+                mb={2}
               >
                 A Rails app for personal trainers. Development stopped,
                 maintenance only now. The distribution lessons from building
                 it shape how I ship everything else.
               </Text>
+              <Link
+                as={NextLink}
+                href="/projects/synergym"
+                color="orange.700"
+                _dark={{ color: "orange.300" }}
+                fontSize="sm"
+                fontWeight="medium"
+              >
+                View project page →
+              </Link>
             </Box>
 
             <Box

@@ -59,7 +59,7 @@ const NewsletterSubscribe = (props) => {
       {...props}
     >
       <Text fontSize="sm" color={mutedText} mb={3}>
-        Weekly articles on building systems for autonomy. No noise.
+        Weekly notes on building Rails apps in public. No noise.
       </Text>
       <Stack direction={{ base: "column", sm: "row" }} spacing={3}>
         <Input
