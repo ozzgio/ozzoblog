@@ -113,7 +113,7 @@ const Home = ({
         ],
         jobTitle: "Full-stack Developer",
         description:
-          "Full-stack developer shipping Synergym and building systems for autonomy.",
+          "Full-stack developer building useful things with Ruby on Rails. Shipping in public.",
       },
       {
         "@type": "WebSite",
@@ -121,7 +121,7 @@ const Home = ({
         url: "https://ozzo.blog",
         name: "Ozzo.blog",
         description:
-          "Writing about Synergym, my personal operating system, and the stack decisions behind both.",
+          "Building small Rails apps in public. Stack decisions, trade-offs, and the craft of shipping.",
         publisher: { "@id": "https://ozzo.blog/#person" },
       },
     ],
@@ -130,9 +130,9 @@ const Home = ({
   return (
     <Layout
       title="Home"
-      metaTitle="Full-stack developer shipping Synergym and building systems for autonomy"
-      description="Solo developer building systems for autonomy. Writing about Synergym, practical AI, and the stack decisions behind both."
-      keywords="solo developer, practical AI, systems for autonomy, Synergym, Italian developer, build in public"
+      metaTitle="Full-stack developer building useful things with Ruby on Rails"
+      description="Building small Rails apps in public. Writing about stack decisions, trade-offs, and the craft of shipping."
+      keywords="ruby on rails, build in public, solo developer, stack decisions, shipping, italian developer"
       path="/"
       jsonLd={homepageSchema}
     >
@@ -154,9 +154,9 @@ const Home = ({
             _dark={{ color: "white" }}
             style={{ fontFamily: "var(--font-bricolage-grotesque), sans-serif" }}
           >
-            Full-stack developer shipping Synergym
+            Building useful things with Ruby on Rails
             <br />
-            and building systems for autonomy.
+            and shipping in public, one app at a time.
           </Heading>
         </Box>
 
@@ -205,7 +205,7 @@ const Home = ({
               color="gray.600"
               _dark={{ color: "gray.400" }}
             >
-              Building in public: Synergym, agentic systems, homelab.
+              Building Rails apps in public. Six-week bets, real trade-offs, honest process.
             </Text>
           </Box>
         </Box>
@@ -223,7 +223,7 @@ const Home = ({
               pl={5}
             >
               <Heading as="h2" fontSize="md" fontWeight="semibold" mb={1.5}>
-                Synergym.fit
+                Rails portfolio
               </Heading>
               <Text
                 fontSize="sm"
@@ -231,20 +231,19 @@ const Home = ({
                 _dark={{ color: "gray.400" }}
                 mb={2}
               >
-                Gym management SaaS on Rails 8: PostgreSQL, Redis, Sidekiq for
-                background jobs, Playwright for full E2E coverage. Trainer and
-                athlete workflows, workout program creation, progress tracking.
-                Running in production.
+                Small Rails apps shipped in public on a six-week Shape Up
+                cadence. Rails 8, SQLite, DaisyUI, deployed with Kamal on
+                Hetzner. Building useful things, one bet at a time.
               </Text>
               <Link
                 as={NextLink}
-                href="/projects/synergym"
+                href="/projects"
                 color="orange.700"
                 _dark={{ color: "orange.300" }}
                 fontSize="sm"
                 fontWeight="medium"
               >
-                View project page →
+                View projects →
               </Link>
             </Box>
 
@@ -255,16 +254,16 @@ const Home = ({
               pl={5}
             >
               <Heading as="h2" fontSize="md" fontWeight="semibold" mb={1.5}>
-                Agentic system
+                Synergym (maintenance)
               </Heading>
               <Text
                 fontSize="sm"
                 color="gray.600"
                 _dark={{ color: "gray.400" }}
               >
-                A personal operating system built on AI agents. Vault is truth,
-                Telegram is transport, nvim is cockpit. Hermes is the routing
-                agent at the centre of it.
+                A Rails app for personal trainers. Development stopped,
+                maintenance only now. The distribution lessons from building
+                it shape how I ship everything else.
               </Text>
             </Box>
 
@@ -283,10 +282,9 @@ const Home = ({
                 _dark={{ color: "gray.400" }}
                 mb={2}
               >
-                25+ Dockerized services on an Intel NUC14. Custom MCP server
-                exposing the Obsidian vault to AI agents. n8n, Letta, ChromaDB,
-                Ollama, Faster-Whisper, Gitea with act_runner CI/CD. The
-                infrastructure layer behind everything else here.
+                Dockerized services on an Intel NUC14 supporting the work,
+                including a custom MCP server exposing the Obsidian vault to
+                AI agents. The infrastructure layer behind everything else.
               </Text>
               <Link
                 as={NextLink}
@@ -306,24 +304,23 @@ const Home = ({
         <Section delay={0.2}>
           <SectionLabel>Why this exists</SectionLabel>
           <Paragraph>
-            This isn&apos;t a portfolio. It&apos;s my space on the internet.
+            This is my space on the internet. Part portfolio, part build log.
             LinkedIn makes you a user ID. GitHub shows code. This shows the
-            person behind the work.
+            person and the process behind the work.
           </Paragraph>
           <Paragraph>
-            I build systems that help me and other people operate with more
-            clarity and less friction. Some of that is product work, some of it
-            is internal tooling, and some of it is learning in public while the
-            thing is still being built.
+            I build small Rails apps in public, on a fixed cadence, and write
+            about the decisions and trade-offs behind each one. The work and
+            the writing are the same loop.
           </Paragraph>
           <Paragraph>
-            I work with AI, not against it. It increases leverage, but only when
-            there&apos;s human review, judgment, and enough taste to know what
-            should not ship.
+            I work with AI, not against it. It increases leverage, but only
+            with human review, judgment, and the taste to know what should
+            not ship.
           </Paragraph>
           <Paragraph>
-            I lift 4x a week, read constantly, and build software outside of
-            work. That&apos;s the whole personality section.
+            I lift four times a week, read constantly, and build software
+            outside of work. That is the whole personality section.
           </Paragraph>
           <Box display="flex" gap={3} mt={8} flexWrap="wrap">
             <Button
