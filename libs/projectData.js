@@ -10,7 +10,7 @@ const projectData = [
     demo: "https://synergym.fit",
     date: "2025-10",
     tags: ["Full Stack", "Rails"],
-    status: "featured",
+    status: "maintenance",
   },
   {
     id: "agentic-hub",
