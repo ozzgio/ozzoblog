@@ -1,4 +1,25 @@
+// Each project carries three manual signals (not git-derived):
+//   effort     1-5  how much total work went in
+//   difficulty 1-5  how technically hard it was
+//   focus      "now" | "shipped" | "earlier"  how current the focus is
+// The /projects page groups by `focus` (NOW -> SHIPPED -> EARLIER) and sorts
+// within each group by effort desc. See pages/projects.js.
 const projectData = [
+  {
+    id: "buildlog",
+    title: "Buildlog",
+    description:
+      "My build-in-public dev journal. A tiny Rails app where I post what I ship each day. Not a product, a forcing function for daily shipping and the raw material for the weekly articles.",
+    thumbnail: "/thumbs/buildlog.svg",
+    stack: ["Ruby on Rails", "SQLite", "Kamal", "DaisyUI"],
+    github: "https://github.com/ozzgio/buildlog",
+    demo: "https://log.ozzo.blog",
+    date: "2026-07",
+    tags: ["Full Stack", "Rails"],
+    effort: 3,
+    difficulty: 2,
+    focus: "now",
+  },
   {
     id: "synergym",
     title: "Synergym.fit",
@@ -10,20 +31,9 @@ const projectData = [
     demo: "https://synergym.fit",
     date: "2025-10",
     tags: ["Full Stack", "Rails"],
-    status: "maintenance",
-  },
-  {
-    id: "agentic-hub",
-    title: "Agentic Hub",
-    description:
-      "Personal ops dashboard running on the NUC. Chat, tasks board, fleet view for cron jobs, Telegram topics, wiki, terminal. Built against the Hermes open-source gateway API. Next.js 15, Tailwind, shadcn/ui.",
-    thumbnail: "/thumbs/agentic-hub.svg",
-    stack: ["Next.js", "Tailwind CSS", "TypeScript", "shadcn/ui"],
-    github: null,
-    demo: null,
-    date: "2026-01",
-    tags: ["Full Stack", "Next.js"],
-    status: "active",
+    effort: 5,
+    difficulty: 5,
+    focus: "shipped",
   },
   {
     id: "homelab",
@@ -36,7 +46,39 @@ const projectData = [
     demo: null,
     date: "2024-01",
     tags: ["DevOps", "Infrastructure"],
-    status: "active",
+    effort: 5,
+    difficulty: 4,
+    focus: "shipped",
+  },
+  {
+    id: "agentic-hub",
+    title: "Agentic Hub",
+    description:
+      "Personal ops dashboard running on the NUC. Chat, tasks board, fleet view for cron jobs, Telegram topics, wiki, terminal. Built against the Hermes open-source gateway API. Next.js 15, Tailwind, shadcn/ui.",
+    thumbnail: "/thumbs/agentic-hub.svg",
+    stack: ["Next.js", "Tailwind CSS", "TypeScript", "shadcn/ui"],
+    github: null,
+    demo: null,
+    date: "2026-01",
+    tags: ["Full Stack", "Next.js"],
+    effort: 4,
+    difficulty: 4,
+    focus: "shipped",
+  },
+  {
+    id: "portfolio",
+    title: "This Site",
+    description:
+      "Next.js 15, Chakra UI, Framer Motion. Articles and book notes sync from Obsidian via a Python script and GitHub Actions pipeline. Still being improved; this is where the writing and the UI experiments live.",
+    thumbnail: "/thumbs/portfolio.png",
+    stack: ["Next.js", "Chakra UI", "Framer Motion", "GitHub Actions"],
+    github: "https://github.com/ozzgio/devozzo-homepage",
+    demo: "https://ozzo.blog",
+    date: "2023-05",
+    tags: ["Frontend", "Next.js"],
+    effort: 4,
+    difficulty: 3,
+    focus: "shipped",
   },
   {
     id: "rubychess",
@@ -49,7 +91,9 @@ const projectData = [
     demo: null,
     date: "2025-05",
     tags: ["Ruby"],
-    status: "learning",
+    effort: 3,
+    difficulty: 3,
+    focus: "earlier",
   },
   {
     id: "meteomapbot",
@@ -62,24 +106,13 @@ const projectData = [
     demo: "https://t.me/meteomapbot",
     date: "2024-08",
     tags: ["Backend", "Node.js"],
-    status: "learning",
-  },
-  {
-    id: "portfolio",
-    title: "This Site",
-    description:
-      "Next.js 15, Chakra UI, Framer Motion. Articles and book notes sync from Obsidian via a Python script and GitHub Actions pipeline. Still being improved; this is where the writing and the UI experiments live.",
-    thumbnail: "/thumbs/portfolio.png",
-    stack: ["Next.js", "Chakra UI", "Framer Motion", "GitHub Actions"],
-    github: "https://github.com/ozzgio/devozzo-homepage",
-    demo: null,
-    date: "2023-05",
-    tags: ["Frontend", "Next.js"],
-    status: "active",
+    effort: 2,
+    difficulty: 2,
+    focus: "earlier",
   },
   {
     id: "kellyspub",
-    title: "Kelly\'s Pub",
+    title: "Kelly's Pub",
     description:
       "WordPress site for a local pub. Content, plugins, custom styling. Still live.",
     thumbnail: "/thumbs/kellyspub.png",
@@ -88,7 +121,9 @@ const projectData = [
     demo: "https://birreriakellys.it",
     date: "2024-06",
     tags: ["WordPress"],
-    status: "learning",
+    effort: 2,
+    difficulty: 3,
+    focus: "earlier",
   },
   {
     id: "fbetsui",
@@ -101,7 +136,9 @@ const projectData = [
     demo: null,
     date: "2024-03",
     tags: ["Frontend", "Angular"],
-    status: "learning",
+    effort: 3,
+    difficulty: 4,
+    focus: "earlier",
   },
   {
     id: "fbetsapi",
@@ -114,7 +151,9 @@ const projectData = [
     demo: null,
     date: "2024-02",
     tags: ["Backend", "C#"],
-    status: "learning",
+    effort: 3,
+    difficulty: 4,
+    focus: "earlier",
   },
 ];
 
