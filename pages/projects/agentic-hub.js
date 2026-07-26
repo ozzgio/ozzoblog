@@ -25,6 +25,7 @@ const Project = ({ project }) => {
       imageFit="contain"
       imageBg="#0f172a"
       imagePadding={8}
+      socialImageUrl={project.socialImage}
       dateInfo={{ display: true, value: "2026 - Present" }}
     >
       <P>{description}</P>

@@ -20,6 +20,7 @@ const ProjectDetailsLayout = ({
   imageFit,
   imageBg,
   imagePadding,
+  socialImageUrl,
   dateInfo,
   path,
 }) => (
@@ -69,7 +70,11 @@ const ProjectDetailsLayout = ({
           />
           <meta
             property="og:image"
-            content={imageUrl ? `https://ozzo.blog${imageUrl}` : "https://ozzo.blog/images/propic.jpg"}
+            content={
+              socialImageUrl || imageUrl
+                ? `https://ozzo.blog${socialImageUrl || imageUrl}`
+                : "https://ozzo.blog/images/propic.jpg"
+            }
           />
           <meta name="twitter:card" content="summary_large_image" />
           <meta name="twitter:title" content={`${title} - Ozzo`} />
@@ -82,7 +87,11 @@ const ProjectDetailsLayout = ({
           />
           <meta
             name="twitter:image"
-            content={imageUrl ? `https://ozzo.blog${imageUrl}` : "https://ozzo.blog/images/propic.jpg"}
+            content={
+              socialImageUrl || imageUrl
+                ? `https://ozzo.blog${socialImageUrl || imageUrl}`
+                : "https://ozzo.blog/images/propic.jpg"
+            }
           />
           {path && (
             <script
