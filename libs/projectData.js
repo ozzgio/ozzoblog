@@ -72,7 +72,7 @@ const projectData = [
       "Next.js 15, Chakra UI, Framer Motion. Articles and book notes sync from Obsidian via a Python script and GitHub Actions pipeline. Still being improved; this is where the writing and the UI experiments live.",
     thumbnail: "/thumbs/portfolio.png",
     stack: ["Next.js", "Chakra UI", "Framer Motion", "GitHub Actions"],
-    github: "https://github.com/ozzgio/devozzo-homepage",
+    github: "https://github.com/ozzgio/ozzoblog",
     demo: "https://ozzo.blog",
     date: "2023-05",
     tags: ["Frontend", "Next.js"],

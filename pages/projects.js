@@ -337,7 +337,7 @@ const Projects = () => {
           <Text fontSize="sm" color={muted} mb={3}>
             Building in public, one bet at a time. What I&apos;m shipping now, the
             shipped work behind it, and earlier experiments. Every entry links to
-            live code or a live site.
+            live code or a live site, or is flagged private/self-hosted.
           </Text>
 
           {/* Legend */}

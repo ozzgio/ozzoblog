@@ -43,7 +43,7 @@ const Project = ({ project }) => {
         </ListItem>
         {demo && (
           <ListItem display="flex" alignItems="center" mb={2}>
-            <Link href={demo} target="_blank">
+            <Link href={demo} target="_blank" rel="noopener noreferrer">
               <Meta>Live</Meta>
               log.ozzo.blog
               <ExternalLinkIcon mx="2px" />
@@ -52,7 +52,7 @@ const Project = ({ project }) => {
         )}
         {github && (
           <ListItem display="flex" alignItems="center" mb={2}>
-            <Link href={github} target="_blank">
+            <Link href={github} target="_blank" rel="noopener noreferrer">
               <Meta>Repo</Meta>
               github.com/ozzgio/buildlog
               <ExternalLinkIcon mx="2px" />
@@ -73,7 +73,7 @@ const Project = ({ project }) => {
           A tiny Rails app where I post short daily entries — what I built or learned,
           two or three sentences, a timestamp, an optional tag. Public feed, newest
           first. My dev journal, live at{" "}
-          <Link href="https://log.ozzo.blog" target="_blank" color="orange.500" _dark={{ color: "orange.300" }}>
+          <Link href="https://log.ozzo.blog" target="_blank" rel="noopener noreferrer" color="orange.500" _dark={{ color: "orange.300" }}>
             log.ozzo.blog
           </Link>
           .
