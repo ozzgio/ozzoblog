@@ -42,6 +42,7 @@ const projectData = [
     description:
       "Intel NUC14 running Linux and 25+ Docker services. Self-hosted git and CI with Gitea, local inference with Ollama, n8n for automation, ChromaDB for vectors, Faster-Whisper for speech-to-text. A custom MCP server connects the Obsidian vault to AI agents. Private repos, self-hosted on Gitea. Infrastructure for personal autonomy, not meant as a demo.",
     thumbnail: "/thumbs/homelab.svg",
+    socialImage: "/thumbs/homelab-social.png",
     stack: ["Docker", "Linux", "Gitea", "n8n", "Ollama"],
     github: null,
     demo: null,
@@ -57,6 +58,7 @@ const projectData = [
     description:
       "Personal ops dashboard running on the NUC. Chat, tasks board, fleet view for cron jobs, Telegram topics, wiki, terminal. Built against the Hermes open-source gateway API. Next.js 15, Tailwind, shadcn/ui.",
     thumbnail: "/thumbs/agentic-hub.svg",
+    socialImage: "/thumbs/agentic-hub-social.png",
     stack: ["Next.js", "Tailwind CSS", "TypeScript", "shadcn/ui"],
     github: null,
     demo: null,
