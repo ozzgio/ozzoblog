@@ -71,7 +71,7 @@ const Project = ({ project }) => {
           What it is
         </Heading>
         <P>
-          A tiny Rails app where I post short daily entries — what I built or learned,
+          A tiny Rails app where I post short daily entries. What I built or learned,
           two or three sentences, a timestamp, an optional tag. Public feed, newest
           first. My dev journal, live at{" "}
           <Link href="https://log.ozzo.blog" target="_blank" rel="noopener noreferrer" color="orange.500" _dark={{ color: "orange.300" }}>
@@ -87,9 +87,9 @@ const Project = ({ project }) => {
         </Heading>
         <P>
           Not a product. It has no users to serve and no market to win. A build-in-public
-          journal for one person isn&apos;t a business — and pretending otherwise would be
-          the kind of framing I try to avoid. The app exists because I use it every day,
-          not because anyone asked for it.
+          journal for one person is not a business. Pretending otherwise is the kind of
+          framing I try to avoid. The app exists because I use it every day, not because
+          anyone asked for it.
         </P>
       </Box>
 
@@ -102,12 +102,12 @@ const Project = ({ project }) => {
           <Link href="/projects" color="orange.500" _dark={{ color: "orange.300" }}>
             Shape Up
           </Link>{" "}
-          bet, and it has three jobs. <strong>Prove the cadence</strong>: that I can shape,
-          pitch, plan and ship solo on a fixed deadline without moving the date.
-          <strong> Ship proof #1</strong>: a real public artifact, linked from this site —
+          bet, and it has three jobs. <strong>Prove the cadence</strong>: shape,
+          pitch, plan, and ship solo on a fixed deadline without moving the date.
+          <strong> Ship proof #1</strong>: a real public artifact, linked from this site,
           the first portfolio piece. <strong>Be the content engine</strong>: each daily
           entry becomes a daily X post and raw material for the weekly article. It
-          doesn&apos;t compete with the writing; it produces it.
+          doesn&apos;t compete with the writing. It produces it.
         </P>
       </Box>
 
@@ -116,7 +116,7 @@ const Project = ({ project }) => {
           What I&apos;m still figuring out
         </Heading>
         <P>
-          The code is deliberately small — entries, auth, a public feed, RSS, a feedback
+          The code is deliberately small: entries, auth, a public feed, RSS, a feedback
           form. The interesting question isn&apos;t technical. It&apos;s whether the
           daily-posting habit compounds over six weeks, or whether I&apos;m rationalizing a
           side project as discipline. The bet closes with an honest call: keep shipping it

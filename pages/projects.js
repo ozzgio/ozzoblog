@@ -15,6 +15,7 @@ import {
 import { ExternalLinkIcon } from "@chakra-ui/icons";
 import { motion } from "framer-motion";
 import NextLink from "next/link";
+import { useRouter } from "next/router";
 import Image from "next/image";
 import Layout from "../components/layouts/layout";
 import BaseCard from "../components/basecard";
@@ -106,6 +107,7 @@ const ProofLinks = ({ demo, github, size = "sm" }) => {
             rel="noopener noreferrer"
             fontSize={size}
             fontWeight="semibold"
+            onClick={(e) => e.stopPropagation()}
           >
             live <ExternalLinkIcon mx="4px" fontSize="xs" />
           </Link>
@@ -119,6 +121,7 @@ const ProofLinks = ({ demo, github, size = "sm" }) => {
             rel="noopener noreferrer"
             fontSize={size}
             fontWeight="semibold"
+            onClick={(e) => e.stopPropagation()}
           >
             repo <ExternalLinkIcon mx="4px" fontSize="xs" />
           </Link>
@@ -144,6 +147,7 @@ const SectionLabel = ({ children }) => (
 );
 
 const NowCard = ({ project }) => {
+  const router = useRouter();
   const { colors } = useTheme();
   const bodyText = useColorModeValue(colors.bodyText.default, colors.bodyText._dark);
   const headingText = useColorModeValue(colors.headingText.default, colors.headingText._dark);
@@ -152,7 +156,13 @@ const NowCard = ({ project }) => {
     project;
 
   return (
-    <BaseCard p={0} maxW="none" mx="0">
+    <BaseCard
+      p={0}
+      maxW="none"
+      mx="0"
+      cursor="pointer"
+      onClick={() => router.push(`/projects/${id}`)}
+    >
       <Flex direction={{ base: "column", md: "row" }} minH={{ md: "220px" }}>
         <Box
           w={{ base: "100%", md: "42%" }}
@@ -203,6 +213,7 @@ const NowCard = ({ project }) => {
 };
 
 const ShippedCard = ({ project }) => {
+  const router = useRouter();
   const { colors } = useTheme();
   const bodyText = useColorModeValue(colors.bodyText.default, colors.bodyText._dark);
   const headingText = useColorModeValue(colors.headingText.default, colors.headingText._dark);
@@ -219,6 +230,8 @@ const ShippedCard = ({ project }) => {
       display="flex"
       flexDirection="column"
       h="100%"
+      cursor="pointer"
+      onClick={() => router.push(`/projects/${id}`)}
     >
       <Box
         w="100%"
