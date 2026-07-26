@@ -99,7 +99,13 @@ const Project = ({ project }) => {
         </Heading>
         <P>
           It&apos;s my first{" "}
-          <Link href="/projects" color="orange.500" _dark={{ color: "orange.300" }}>
+          <Link
+            href="https://basecamp.com/shapeup"
+            target="_blank"
+            rel="noopener noreferrer"
+            color="orange.500"
+            _dark={{ color: "orange.300" }}
+          >
             Shape Up
           </Link>{" "}
           bet, and it has three jobs. <strong>Prove the cadence</strong>: shape,
