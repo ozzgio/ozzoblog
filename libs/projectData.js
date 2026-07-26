@@ -11,6 +11,7 @@ const projectData = [
     description:
       "My build-in-public dev journal. A tiny Rails app where I post what I ship each day. Not a product, a forcing function for daily shipping and the raw material for the weekly articles.",
     thumbnail: "/thumbs/buildlog.svg",
+    socialImage: "/thumbs/buildlog-social.png",
     stack: ["Ruby on Rails", "SQLite", "Kamal", "DaisyUI"],
     github: "https://github.com/ozzgio/buildlog",
     demo: "https://log.ozzo.blog",
