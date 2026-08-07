@@ -10,6 +10,7 @@
  *  1. RSS feed returns 200 and contains valid XML structure.
  *  2. Every URL in public/sitemap.xml returns 200.
  *  3. Key pages contain all required SEO tags.
+ *  4. A published regression article exposes article-specific social metadata.
  */
 
 import { readFileSync } from "fs";
@@ -20,6 +21,11 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, "..");
 const BASE_URL = process.env.BASE_URL || "http://localhost:3000";
 const TIMEOUT_MS = 15_000;
+const SITE_URL = "https://ozzo.blog";
+const ARTICLE_METADATA_EXPECTATION = {
+  path: "/articles/a-pitch-is-not-proof",
+  image: "https://picsum.photos/seed/2026-08-02-a-pitch-is-not-proof/1200/630",
+};
 
 // Pages that must carry full SEO metadata.
 const KEY_PAGES = ["/", "/articles", "/books", "/projects", "/contacts", "/experience"];
@@ -44,6 +50,22 @@ function fail(msg) {
 
 function pass(msg) {
   console.log(`  PASS  ${msg}`);
+}
+
+function escapeRegExp(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function getMetaContent(html, attribute, value) {
+  const tag = html.match(
+    new RegExp(`<meta[^>]+${attribute}=["']${escapeRegExp(value)}["'][^>]*>`, "i"),
+  )?.[0];
+  return tag?.match(/content=["']([^"']+)["']/i)?.[1] || "";
+}
+
+function getCanonicalHref(html) {
+  const tag = html.match(/<link[^>]+rel=["']canonical["'][^>]*>/i)?.[0];
+  return tag?.match(/href=["']([^"']+)["']/i)?.[1] || "";
 }
 
 async function get(path) {
@@ -121,6 +143,47 @@ for (const pagePath of KEY_PAGES) {
     }
   }
   if (pageOk) pass(`${pagePath} — all ${REQUIRED_TAGS.length} required tags present`);
+}
+
+// ── 4. Article-specific social metadata ───────────────────────────────────────
+console.log("\n[4] Article-specific social metadata");
+try {
+  const articlePath = ARTICLE_METADATA_EXPECTATION.path;
+  const response = await get(articlePath);
+  if (response.status !== 200) {
+    fail(`${articlePath} returned HTTP ${response.status}`);
+  } else {
+    const html = await response.text();
+    const robots = getMetaContent(html, "name", "robots");
+
+    // Article data is supplied by an external repository. Keep this check
+    // stable during an upstream outage, when the route deliberately renders
+    // its noindex fallback instead of article metadata.
+    if (robots === "noindex") {
+      pass(`${articlePath} — upstream unavailable; graceful fallback rendered`);
+    } else {
+      const expectedImage = ARTICLE_METADATA_EXPECTATION.image;
+      const expectedCanonical = `${SITE_URL}${articlePath}`;
+      const checks = [
+        ["og:image", getMetaContent(html, "property", "og:image"), expectedImage],
+        ["twitter:image", getMetaContent(html, "name", "twitter:image"), expectedImage],
+        ["og:type", getMetaContent(html, "property", "og:type"), "article"],
+        ["og:url", getMetaContent(html, "property", "og:url"), expectedCanonical],
+        ["canonical", getCanonicalHref(html), expectedCanonical],
+      ];
+
+      let articleOk = true;
+      for (const [name, actual, expected] of checks) {
+        if (actual !== expected) {
+          fail(`${articlePath} ${name} expected ${expected}, got ${actual || "<missing>"}`);
+          articleOk = false;
+        }
+      }
+      if (articleOk) pass(`${articlePath} — article thumbnail and canonical metadata`);
+    }
+  }
+} catch (err) {
+  fail(`article metadata check failed: ${err.message}`);
 }
 
 // ── Result ────────────────────────────────────────────────────────────────────

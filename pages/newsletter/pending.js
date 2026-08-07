@@ -6,7 +6,7 @@ import Section from "../../components/section";
 const NewsletterPending = () => (
   <Layout
     title="Check your email"
-    description="One more step — confirm your subscription to the Ozzo newsletter."
+    description="Confirm your subscription to Ozzo's weekly field notes on building toward independent work."
     robots="noindex,nofollow"
     path="/newsletter/pending"
   >
@@ -35,7 +35,7 @@ const NewsletterPending = () => (
             mx="auto"
           >
             We sent you a confirmation link. Click it to activate your
-            subscription and start receiving articles.
+            subscription and start receiving one field note each week.
           </Text>
           <Button as={NextLink} href="/" colorScheme="orange" size="md">
             Back to home

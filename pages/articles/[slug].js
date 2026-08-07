@@ -75,18 +75,18 @@ export default function ArticleDetailPage({ article, fetchError, slug }) {
     );
   }
 
-  const canonicalUrl = `https://ozzo.blog/articles/${article.slug}`;
   const bookReference = getArticleBookReference(article);
   const bookUrl = getArticleBookUrl(article);
   const references = Array.isArray(article.references) ? article.references : [];
 
   return (
-    <Layout title={article.title}>
-      <Head>
-        <meta name="description" content={article.description || "Article on ozzo.blog"} />
-        <link rel="canonical" href={canonicalUrl} />
-      </Head>
-
+    <Layout
+      title={article.title}
+      description={article.description || "Article on ozzo.blog"}
+      path={`/articles/${article.slug}`}
+      image={article.thumbnail || undefined}
+      ogType="article"
+    >
       {/* Measure tuned for long-form reading: ~70 characters per line at the
           body font size, rather than stretching to the same width used by
           card-grid pages. */}
