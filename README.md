@@ -3,7 +3,7 @@
 [![Production](https://img.shields.io/badge/Production-Live-00C58E?logo=vercel&logoColor=white)](https://ozzo.blog)
 [![Preview](https://img.shields.io/badge/Preview-Available-999999?logo=vercel&logoColor=white)](https://devozzo-portfolio.vercel.app)
 
-Personal technical blog. Articles on software architecture, Rails, and building in public. Books page with reading notes. Built on Next.js and Chakra UI, content sourced from an Obsidian vault via a public JSON layer.
+Personal brand, portfolio, and newsletter for experienced developers learning the parts of independent work that coding alone does not teach. Field notes cover demand, delivery, distribution, and business, backed by real software projects and decisions. Built on Next.js and Chakra UI, with content sourced from an Obsidian vault through a public JSON layer.
 
 ---
 

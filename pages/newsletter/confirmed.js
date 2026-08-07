@@ -6,7 +6,7 @@ import Section from "../../components/section";
 const NewsletterConfirmed = () => (
   <Layout
     title="You're in"
-    description="Your subscription to the Ozzo newsletter is confirmed."
+    description="Your subscription to Ozzo's weekly field notes is confirmed."
     robots="noindex,nofollow"
     path="/newsletter/confirmed"
   >
@@ -34,8 +34,8 @@ const NewsletterConfirmed = () => (
             maxW="sm"
             mx="auto"
           >
-            Welcome. You&apos;ll get new articles in your inbox. No noise, just
-            the stuff worth reading.
+            Welcome. You&apos;ll get field notes on finding demand, shipping useful
+            software, earning attention, and building toward independent work.
           </Text>
           <Stack direction={{ base: "column", sm: "row" }} spacing={3} justify="center">
             <Button as={NextLink} href="/articles" colorScheme="orange" size="md">

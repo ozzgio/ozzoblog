@@ -113,7 +113,7 @@ const Home = ({
         ],
         jobTitle: "Full-stack Developer",
         description:
-          "Full-stack developer building useful things with Ruby on Rails. Shipping in public.",
+          "Full-stack developer documenting the path from capable developer to independent operator.",
       },
       {
         "@type": "WebSite",
@@ -121,7 +121,7 @@ const Home = ({
         url: "https://ozzo.blog",
         name: "Ozzo.blog",
         description:
-          "Building small Rails apps in public. Stack decisions, trade-offs, and the craft of shipping.",
+          "Field notes on finding demand, shipping useful software, earning attention, and building toward independent work.",
         publisher: { "@id": "https://ozzo.blog/#person" },
       },
     ],
@@ -130,9 +130,9 @@ const Home = ({
   return (
     <Layout
       title="Home"
-      metaTitle="Full-stack developer building useful things with Ruby on Rails"
-      description="Building small Rails apps in public. Writing about stack decisions, trade-offs, and the craft of shipping."
-      keywords="ruby on rails, build in public, solo developer, stack decisions, shipping, italian developer"
+      metaTitle="From developer to independent operator | Ozzo"
+      description="Field notes for experienced developers learning to find demand, ship useful software, earn attention, and build toward independent work."
+      keywords="independent developer, product validation, software distribution, build in public, Ruby on Rails, solo developer"
       path="/"
       jsonLd={homepageSchema}
     >
@@ -154,9 +154,9 @@ const Home = ({
             _dark={{ color: "white" }}
             style={{ fontFamily: "var(--font-bricolage-grotesque), sans-serif" }}
           >
-            Building useful things with Ruby on Rails
+            Learning the parts of independent work
             <br />
-            and shipping in public, one app at a time.
+            that coding alone does not teach.
           </Heading>
         </Box>
 
@@ -205,7 +205,8 @@ const Home = ({
               color="gray.600"
               _dark={{ color: "gray.400" }}
             >
-              Building Rails apps in public. Six-week bets, real trade-offs, honest process.
+              Finding demand, shipping useful software, earning attention, and
+              building toward independent work.
             </Text>
           </Box>
         </Box>
@@ -233,7 +234,7 @@ const Home = ({
               >
                 Small Rails apps shipped in public on a six-week Shape Up
                 cadence. Rails 8, SQLite, DaisyUI, deployed with Kamal on
-                Hetzner. Building useful things, one bet at a time.
+                DigitalOcean. Building useful things, one bet at a time.
               </Text>
               <Link
                 as={NextLink}
@@ -321,19 +322,18 @@ const Home = ({
         <Section delay={0.2}>
           <SectionLabel>Why this exists</SectionLabel>
           <Paragraph>
-            This is my space on the internet. Part portfolio, part build log.
-            LinkedIn makes you a user ID. GitHub shows code. This shows the
-            person and the process behind the work.
+            I know how to build software. The harder transition is learning
+            what deserves to be built, how it reaches people, and how it can
+            become sustainable work.
           </Paragraph>
           <Paragraph>
-            I build small Rails apps in public, on a fixed cadence, and write
-            about the decisions and trade-offs behind each one. The work and
-            the writing are the same loop.
+            This site documents that transition through four lenses: demand,
+            delivery, distribution, and business. Each article starts from
+            something that actually happened.
           </Paragraph>
           <Paragraph>
-            I work with AI, not against it. It increases leverage, but only
-            with human review, judgment, and the taste to know what should
-            not ship.
+            Rails apps, AI workflows, and infrastructure are evidence. The
+            point is the judgment behind what I build, cut, share, or stop.
           </Paragraph>
           <Paragraph>
             I lift four times a week, read constantly, and build software

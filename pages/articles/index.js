@@ -180,7 +180,7 @@ const ArticlesPage = ({ articles, error }) => {
   return (
     <Layout
       title="Articles"
-      description="Architecture calls, decisions, and things that broke while building in public. Writing about Synergym, agentic systems, and the stack decisions behind both."
+      description="Field notes for experienced developers learning to find demand, ship useful software, earn attention, and build toward independent work."
       path="/articles"
     >
       <MotionBox
@@ -229,7 +229,7 @@ const ArticlesPage = ({ articles, error }) => {
                   fontSize="xs"
                   textTransform="uppercase"
                 >
-                  Build in public log
+                  Field notes
                 </Badge>
                 <Box>
                   <Heading
@@ -239,10 +239,11 @@ const ArticlesPage = ({ articles, error }) => {
                     lineHeight="1.2"
                     mb={2}
                   >
-                    What I&apos;m shipping
+                    Beyond the code
                   </Heading>
                   <Text fontSize="sm" color={mutedText}>
-                    Architecture calls, decisions, and things that broke on the way.
+                    Real experiments in demand, delivery, distribution, and
+                    business while building toward independent work.
                   </Text>
                 </Box>
                 <HStack spacing={3} flexWrap="wrap">

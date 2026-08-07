@@ -40,9 +40,9 @@ function generateRSSFeed(articles) {
   return `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
-    <title>Ozzo's Articles</title>
+    <title>Ozzo's Field Notes</title>
     <link>${siteUrl}</link>
-    <description>Latest articles from Giorgio Ozzola - Full Stack Developer</description>
+    <description>Field notes on finding demand, shipping useful software, earning attention, and building toward independent work.</description>
     <language>en-us</language>
     <lastBuildDate>${currentDate}</lastBuildDate>
     <atom:link href="${siteUrl}/rss.xml" rel="self" type="application/rss+xml"/>

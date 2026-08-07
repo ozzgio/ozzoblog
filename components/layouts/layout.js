@@ -2,11 +2,11 @@ import Head from "next/head";
 import { Flex } from "@chakra-ui/react";
 
 const SITE_URL = "https://ozzo.blog";
-const DEFAULT_TITLE = "Ozzo | Solo developer building systems for autonomy";
+const DEFAULT_TITLE = "Ozzo | From developer to independent operator";
 const DEFAULT_DESCRIPTION =
-  "Solo developer building systems for autonomy. Writing about Synergym, practical AI, and the stack decisions behind both.";
+  "Field notes for experienced developers learning to find demand, ship useful software, earn attention, and build toward independent work.";
 const DEFAULT_KEYWORDS =
-  "solo developer, indie builder, Italian developer, practical AI, autonomy systems, Synergym, software engineering";
+  "independent developer, product validation, software distribution, build in public, Ruby on Rails, solo developer, personal brand";
 const DEFAULT_OG_IMAGE = `${SITE_URL}/images/zicon.png`;
 
 const Layout = ({
@@ -19,6 +19,7 @@ const Layout = ({
   robots = "index,follow,max-image-preview:large",
   path = "",
   image = DEFAULT_OG_IMAGE,
+  ogType = "website",
   jsonLd = null,
 }) => {
   const pageTitle = metaTitle || (title ? `${title} | Ozzo` : DEFAULT_TITLE);
@@ -45,7 +46,7 @@ const Layout = ({
         <link rel="manifest" href="/site.webmanifest" />
         <meta property="og:title" content={shareTitle} />
         <meta property="og:description" content={description} />
-        <meta property="og:type" content="website" />
+        <meta property="og:type" content={ogType} />
         <meta property="og:url" content={canonicalUrl || SITE_URL} />
         <meta property="og:site_name" content="Ozzo" />
         <meta property="og:image" content={image} />
