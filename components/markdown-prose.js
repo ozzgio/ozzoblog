@@ -11,6 +11,13 @@ import {
   Divider,
   Code,
   Link,
+  Table,
+  TableContainer,
+  Thead,
+  Tbody,
+  Tr,
+  Th,
+  Td,
   useColorModeValue,
 } from "@chakra-ui/react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
@@ -70,6 +77,7 @@ const SIZES = {
     fontSize: "17px",
     lineHeight: "1.8",
     listFontSize: "16px",
+    tableFontSize: "15px",
     paragraphMb: 6,
     listSpacing: 3,
     headingMt: { h1: 8, h2: 10, h3: 8, h4: 6 },
@@ -78,6 +86,7 @@ const SIZES = {
     fontSize: "15px",
     lineHeight: "1.75",
     listFontSize: "14px",
+    tableFontSize: "14px",
     paragraphMb: 4,
     listSpacing: 2,
     headingMt: { h1: 6, h2: 6, h3: 5, h4: 4 },
@@ -91,8 +100,11 @@ export default function MarkdownProse({ children, size = "article" }) {
   const quoteBg = useColorModeValue("orange.50", "whiteAlpha.50");
   const codeBg = useColorModeValue("gray.100", "whiteAlpha.200");
   const codeBorder = useColorModeValue("gray.200", "whiteAlpha.300");
+  const tableBorder = useColorModeValue("gray.200", "whiteAlpha.300");
+  const tableHeaderBg = useColorModeValue("gray.100", "whiteAlpha.100");
+  const tableStripeBg = useColorModeValue("gray.50", "whiteAlpha.50");
   const syntaxTheme = useColorModeValue(accessibleOneLight, accessibleOneDark);
-  const { fontSize, lineHeight, listFontSize, paragraphMb, listSpacing, headingMt } = SIZES[size] || SIZES.article;
+  const { fontSize, lineHeight, listFontSize, tableFontSize, paragraphMb, listSpacing, headingMt } = SIZES[size] || SIZES.article;
 
   const components = {
     h1: ({ children }) => (
@@ -173,6 +185,81 @@ export default function MarkdownProse({ children, size = "article" }) {
     ),
     li: ({ children }) => (
       <ListItem lineHeight={lineHeight}>{children}</ListItem>
+    ),
+    table: ({ children }) => (
+      <TableContainer
+        w="100%"
+        maxW="100%"
+        role="region"
+        aria-label="Scrollable Markdown data table. Use arrow keys to scroll horizontally."
+        tabIndex={0}
+        mb={paragraphMb}
+        overflowX="auto"
+        overflowY="hidden"
+        whiteSpace="normal"
+        borderWidth="1px"
+        borderColor={tableBorder}
+        borderRadius="md"
+        sx={{ WebkitOverflowScrolling: "touch" }}
+      >
+        <Table
+          aria-label="Markdown data table"
+          w="100%"
+          minW={{ base: "42rem", md: "100%" }}
+          size={size === "compact" ? "sm" : "md"}
+          variant="simple"
+          whiteSpace="normal"
+          sx={{ tableLayout: "auto" }}
+        >
+          {children}
+        </Table>
+      </TableContainer>
+    ),
+    thead: ({ children }) => <Thead bg={tableHeaderBg}>{children}</Thead>,
+    tbody: ({ children }) => (
+      <Tbody sx={{ "tr:nth-of-type(even)": { bg: tableStripeBg } }}>
+        {children}
+      </Tbody>
+    ),
+    tr: ({ children }) => <Tr>{children}</Tr>,
+    th: ({ children, style }) => (
+      <Th
+        scope="col"
+        px={{ base: 3, md: 4 }}
+        py={3}
+        bg={tableHeaderBg}
+        color={headingColor}
+        borderColor={tableBorder}
+        borderBottomWidth="2px"
+        fontFamily={READING_FONT}
+        fontSize={tableFontSize}
+        lineHeight="1.4"
+        textTransform="none"
+        letterSpacing="normal"
+        textAlign={style?.textAlign}
+        whiteSpace="normal"
+        wordBreak="break-word"
+      >
+        {children}
+      </Th>
+    ),
+    td: ({ children, style }) => (
+      <Td
+        px={{ base: 3, md: 4 }}
+        py={3}
+        color={bodyColor}
+        borderColor={tableBorder}
+        borderBottomWidth="1px"
+        fontFamily={READING_FONT}
+        fontSize={tableFontSize}
+        lineHeight={lineHeight}
+        verticalAlign="top"
+        textAlign={style?.textAlign}
+        whiteSpace="normal"
+        wordBreak="break-word"
+      >
+        {children}
+      </Td>
     ),
     hr: () => <Divider my={6} />,
     pre: ({ children }) => {

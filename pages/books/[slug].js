@@ -73,6 +73,8 @@ function ReadingArc({ sections }) {
       borderLeftColor={railColor}
       ml={{ base: 2, md: 3 }}
       pl={{ base: 6, md: 8 }}
+      alignSelf="stretch"
+      minW={0}
     >
       {sections.map((section, index) => {
         const isDecision = /decision|decided/i.test(section.label);

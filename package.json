@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "verify:native": "bash scripts/verify-native-fs.sh",
-    "verify:markdown": "node scripts/verify-markdown-rendering.mjs"
+    "verify:markdown": "node scripts/verify-markdown-rendering.mjs",
+    "verify:markdown:presentation": "node scripts/verify-markdown-table-presentation.mjs"
   },
   "dependencies": {
     "@chakra-ui/icons": "^2.1.1",
