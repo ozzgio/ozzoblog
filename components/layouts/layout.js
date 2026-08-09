@@ -1,13 +1,16 @@
 import Head from "next/head";
 import { Flex } from "@chakra-ui/react";
+import {
+  DEFAULT_SOCIAL_IMAGE_URL,
+  SITE_URL,
+  resolveSocialImageUrl,
+} from "../../libs/socialMetadata.mjs";
 
-const SITE_URL = "https://ozzo.blog";
 const DEFAULT_TITLE = "Ozzo | From developer to independent operator";
 const DEFAULT_DESCRIPTION =
   "Field notes for experienced developers learning to find demand, ship useful software, earn attention, and build toward independent work.";
 const DEFAULT_KEYWORDS =
   "independent developer, product validation, software distribution, build in public, Ruby on Rails, solo developer, personal brand";
-const DEFAULT_OG_IMAGE = `${SITE_URL}/images/zicon.png`;
 
 const Layout = ({
   children,
@@ -18,13 +21,14 @@ const Layout = ({
   keywords = DEFAULT_KEYWORDS,
   robots = "index,follow,max-image-preview:large",
   path = "",
-  image = DEFAULT_OG_IMAGE,
+  image = DEFAULT_SOCIAL_IMAGE_URL,
   ogType = "website",
   jsonLd = null,
 }) => {
   const pageTitle = metaTitle || (title ? `${title} | Ozzo` : DEFAULT_TITLE);
   const shareTitle = socialTitle || pageTitle;
   const canonicalUrl = path ? `${SITE_URL}${path}` : null;
+  const socialImage = resolveSocialImageUrl(image);
 
   return (
     <Flex direction="column">
@@ -49,11 +53,11 @@ const Layout = ({
         <meta property="og:type" content={ogType} />
         <meta property="og:url" content={canonicalUrl || SITE_URL} />
         <meta property="og:site_name" content="Ozzo" />
-        <meta property="og:image" content={image} />
+        <meta property="og:image" content={socialImage} />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={shareTitle} />
         <meta name="twitter:description" content={description} />
-        <meta name="twitter:image" content={image} />
+        <meta name="twitter:image" content={socialImage} />
         {jsonLd && (
           <script
             type="application/ld+json"

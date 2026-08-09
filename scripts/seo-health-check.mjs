@@ -16,16 +16,19 @@
 import { readFileSync } from "fs";
 import { resolve, dirname } from "path";
 import { fileURLToPath } from "url";
+import { resolvePortfolioAssetUrl } from "../libs/portfolioAssets.mjs";
+import {
+  DEFAULT_SOCIAL_IMAGE_URL,
+  SITE_URL,
+  resolveSocialImageUrl,
+} from "../libs/socialMetadata.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, "..");
 const BASE_URL = process.env.BASE_URL || "http://localhost:3000";
 const TIMEOUT_MS = 15_000;
-const SITE_URL = "https://ozzo.blog";
-const ARTICLE_METADATA_EXPECTATION = {
-  path: "/articles/a-pitch-is-not-proof",
-  image: "https://picsum.photos/seed/2026-08-02-a-pitch-is-not-proof/1200/630",
-};
+const PORTFOLIO_ARTICLES_URL =
+  "https://raw.githubusercontent.com/ozzgio/portfolio-data/main/articles.json";
 
 // Pages that must carry full SEO metadata.
 const KEY_PAGES = ["/", "/articles", "/books", "/projects", "/contacts", "/experience"];
@@ -72,6 +75,53 @@ async function get(path) {
   const url = `${BASE_URL}${path}`;
   const res = await fetch(url, { signal: AbortSignal.timeout(TIMEOUT_MS) });
   return res;
+}
+
+function getArticleMetadataExpectation(articles) {
+  if (!Array.isArray(articles)) return null;
+
+  const article = articles.find((entry) => {
+    const slug = typeof entry?.slug === "string" ? entry.slug.trim() : "";
+    const thumbnail =
+      typeof entry?.thumbnail === "string" ? entry.thumbnail.trim() : "";
+    const content =
+      typeof (entry?.content || entry?.body) === "string"
+        ? (entry.content || entry.body).trim()
+        : "";
+
+    return Boolean(slug && thumbnail && content && !slug.includes("/"));
+  });
+
+  if (!article) return null;
+
+  const slug = article.slug.trim();
+  const path = `/articles/${encodeURIComponent(slug)}`;
+  const thumbnail = resolvePortfolioAssetUrl(article.thumbnail);
+
+  return {
+    path,
+    expectedCanonical: `${SITE_URL}${path}`,
+    expectedImage: resolveSocialImageUrl(thumbnail, DEFAULT_SOCIAL_IMAGE_URL),
+  };
+}
+
+async function fetchArticleMetadataExpectation() {
+  try {
+    const response = await fetch(PORTFOLIO_ARTICLES_URL, {
+      signal: AbortSignal.timeout(TIMEOUT_MS),
+    });
+
+    if (!response.ok) {
+      return { expectation: null, reason: `upstream returned HTTP ${response.status}` };
+    }
+
+    const expectation = getArticleMetadataExpectation(await response.json());
+    return expectation
+      ? { expectation, reason: "" }
+      : { expectation: null, reason: "no routable article with a thumbnail" };
+  } catch (err) {
+    return { expectation: null, reason: `upstream unavailable (${err.message})` };
+  }
 }
 
 // ── 1. RSS ────────────────────────────────────────────────────────────────────
@@ -145,45 +195,71 @@ for (const pagePath of KEY_PAGES) {
   if (pageOk) pass(`${pagePath} — all ${REQUIRED_TAGS.length} required tags present`);
 }
 
-// ── 4. Article-specific social metadata ───────────────────────────────────────
-console.log("\n[4] Article-specific social metadata");
-try {
-  const articlePath = ARTICLE_METADATA_EXPECTATION.path;
-  const response = await get(articlePath);
-  if (response.status !== 200) {
-    fail(`${articlePath} returned HTTP ${response.status}`);
+// ── 4. Social image URL resolution ────────────────────────────────────────────
+console.log("\n[4] Social image URL resolution");
+const socialImageCases = [
+  ["site-local image", "/images/articles/example.png", `${SITE_URL}/images/articles/example.png`],
+  ["external image", "https://cdn.example.com/article.png", "https://cdn.example.com/article.png"],
+  ["default fallback", "", DEFAULT_SOCIAL_IMAGE_URL],
+];
+
+for (const [name, image, expected] of socialImageCases) {
+  const actual = resolveSocialImageUrl(image);
+  if (actual !== expected) {
+    fail(`${name} expected ${expected}, got ${actual || "<missing>"}`);
   } else {
-    const html = await response.text();
-    const robots = getMetaContent(html, "name", "robots");
+    pass(`${name} resolves to ${actual}`);
+  }
+}
 
-    // Article data is supplied by an external repository. Keep this check
-    // stable during an upstream outage, when the route deliberately renders
-    // its noindex fallback instead of article metadata.
-    if (robots === "noindex") {
-      pass(`${articlePath} — upstream unavailable; graceful fallback rendered`);
+// ── 5. Article-specific social metadata ───────────────────────────────────────
+console.log("\n[5] Article-specific social metadata");
+const { expectation, reason } = await fetchArticleMetadataExpectation();
+
+if (!expectation) {
+  // The editorial record is external. A renamed, removed, thumbnail-less, or
+  // temporarily unavailable record should not make the site health check flaky.
+  pass(`article metadata check skipped — ${reason}`);
+} else {
+  try {
+    const response = await get(expectation.path);
+
+    if (response.status !== 200) {
+      fail(`${expectation.path} returned HTTP ${response.status}`);
     } else {
-      const expectedImage = ARTICLE_METADATA_EXPECTATION.image;
-      const expectedCanonical = `${SITE_URL}${articlePath}`;
-      const checks = [
-        ["og:image", getMetaContent(html, "property", "og:image"), expectedImage],
-        ["twitter:image", getMetaContent(html, "name", "twitter:image"), expectedImage],
-        ["og:type", getMetaContent(html, "property", "og:type"), "article"],
-        ["og:url", getMetaContent(html, "property", "og:url"), expectedCanonical],
-        ["canonical", getCanonicalHref(html), expectedCanonical],
-      ];
+      const html = await response.text();
+      const robots = getMetaContent(html, "name", "robots");
 
-      let articleOk = true;
-      for (const [name, actual, expected] of checks) {
-        if (actual !== expected) {
-          fail(`${articlePath} ${name} expected ${expected}, got ${actual || "<missing>"}`);
-          articleOk = false;
+      // During an upstream outage the route deliberately renders its noindex
+      // fallback instead of article metadata.
+      if (robots === "noindex") {
+        pass(`${expectation.path} — upstream unavailable; graceful fallback rendered`);
+      } else {
+        const checks = [
+          ["og:image", getMetaContent(html, "property", "og:image"), expectation.expectedImage],
+          ["twitter:image", getMetaContent(html, "name", "twitter:image"), expectation.expectedImage],
+          ["og:type", getMetaContent(html, "property", "og:type"), "article"],
+          ["og:url", getMetaContent(html, "property", "og:url"), expectation.expectedCanonical],
+          ["canonical", getCanonicalHref(html), expectation.expectedCanonical],
+        ];
+
+        let articleOk = true;
+        for (const [name, actual, expected] of checks) {
+          if (actual !== expected) {
+            fail(
+              `${expectation.path} ${name} expected ${expected}, got ${actual || "<missing>"}`,
+            );
+            articleOk = false;
+          }
+        }
+        if (articleOk) {
+          pass(`${expectation.path} — article thumbnail and canonical metadata`);
         }
       }
-      if (articleOk) pass(`${articlePath} — article thumbnail and canonical metadata`);
     }
+  } catch (err) {
+    fail(`${expectation.path} metadata check failed: ${err.message}`);
   }
-} catch (err) {
-  fail(`article metadata check failed: ${err.message}`);
 }
 
 // ── Result ────────────────────────────────────────────────────────────────────

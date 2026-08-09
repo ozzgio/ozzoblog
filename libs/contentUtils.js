@@ -1,5 +1,9 @@
+import { resolvePortfolioAssetUrl } from "./portfolioAssets.mjs";
+
 const DATA_REPO = "ozzgio/portfolio-data";
 const DATA_BRANCH = "main";
+
+export { resolvePortfolioAssetUrl };
 
 export const getTextContent = (value) =>
   typeof value === "string" ? value.trim() : "";
@@ -11,17 +15,6 @@ export const slugify = (value = "") =>
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
-
-export const resolvePortfolioAssetUrl = (url, directory = "images") => {
-  const value = getTextContent(url);
-
-  if (!value) return "";
-  if (value.startsWith("http://") || value.startsWith("https://") || value.startsWith("/")) {
-    return value;
-  }
-
-  return `https://cdn.jsdelivr.net/gh/${DATA_REPO}@${DATA_BRANCH}/${directory}/${value}`;
-};
 
 export const stripMarkdown = (value = "") =>
   getTextContent(value)
