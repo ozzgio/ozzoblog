@@ -10,7 +10,10 @@
  *  1. RSS feed returns 200 and contains valid XML structure.
  *  2. Every URL in public/sitemap.xml returns 200.
  *  3. Key pages contain all required SEO tags.
- *  4. A published regression article exposes article-specific social metadata.
+ *  4. A current published article exposes article-specific social metadata.
+ *
+ * Set VERIFY_ARTICLE_OUTAGE=1 to run only the deterministic article-fallback
+ * check against a server whose portfolio-data article endpoint is unavailable.
  */
 
 import { readFileSync } from "fs";
@@ -27,6 +30,8 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, "..");
 const BASE_URL = process.env.BASE_URL || "http://localhost:3000";
 const TIMEOUT_MS = 15_000;
+const VERIFY_ARTICLE_OUTAGE = process.env.VERIFY_ARTICLE_OUTAGE === "1";
+const ARTICLE_OUTAGE_PATH = "/articles/seo-upstream-outage";
 const PORTFOLIO_ARTICLES_URL =
   "https://raw.githubusercontent.com/ozzgio/portfolio-data/main/articles.json";
 
@@ -122,6 +127,56 @@ async function fetchArticleMetadataExpectation() {
   } catch (err) {
     return { expectation: null, reason: `upstream unavailable (${err.message})` };
   }
+}
+
+async function checkArticleOutageFallback() {
+  console.log("\n[Outage] Article fallback route");
+
+  try {
+    const response = await get(ARTICLE_OUTAGE_PATH);
+
+    if (response.status !== 200) {
+      fail(`${ARTICLE_OUTAGE_PATH} returned HTTP ${response.status}`);
+      return;
+    }
+
+    const html = await response.text();
+    const checks = [
+      ["fallback message", html.includes("Article temporarily unavailable"), true],
+      ["robots", getMetaContent(html, "name", "robots"), "noindex"],
+      ["og:image", getMetaContent(html, "property", "og:image"), DEFAULT_SOCIAL_IMAGE_URL],
+      ["twitter:image", getMetaContent(html, "name", "twitter:image"), DEFAULT_SOCIAL_IMAGE_URL],
+    ];
+
+    let fallbackOk = true;
+    for (const [name, actual, expected] of checks) {
+      if (actual !== expected) {
+        fail(
+          `${ARTICLE_OUTAGE_PATH} fallback ${name} expected ${expected}, got ${actual || "<missing>"}`,
+        );
+        fallbackOk = false;
+      }
+    }
+
+    if (fallbackOk) {
+      pass(`${ARTICLE_OUTAGE_PATH} — noindex fallback and absolute social images`);
+    }
+  } catch (err) {
+    fail(`${ARTICLE_OUTAGE_PATH} fallback request failed: ${err.message}`);
+  }
+}
+
+if (VERIFY_ARTICLE_OUTAGE) {
+  await checkArticleOutageFallback();
+
+  console.log(`\n${"─".repeat(56)}`);
+  if (failures === 0) {
+    console.log("Article outage fallback check passed.");
+    process.exit(0);
+  }
+
+  console.error(`${failures} check(s) failed.`);
+  process.exit(1);
 }
 
 // ── 1. RSS ────────────────────────────────────────────────────────────────────
