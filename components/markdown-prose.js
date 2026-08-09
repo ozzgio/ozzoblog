@@ -19,6 +19,7 @@ import {
   oneLight,
 } from "react-syntax-highlighter/dist/cjs/styles/prism";
 import YoutubeEmbed, { parseYouTubeId } from "./youtube-embed";
+import { remarkPlugins } from "../libs/markdown-plugins.mjs";
 
 const MermaidDiagram = dynamic(() => import("./mermaid-diagram"), { ssr: false });
 
@@ -264,5 +265,9 @@ export default function MarkdownProse({ children, size = "article" }) {
     ),
   };
 
-  return <ReactMarkdown components={components}>{children}</ReactMarkdown>;
+  return (
+    <ReactMarkdown components={components} remarkPlugins={remarkPlugins}>
+      {children}
+    </ReactMarkdown>
+  );
 }

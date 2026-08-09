@@ -1,5 +1,6 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import ReactMarkdown from "react-markdown";
+import { remarkPlugins } from "./markdown-plugins.mjs";
 
 // Mermaid (components/mermaid-diagram.js) only renders in a browser via
 // useEffect -- there's no diagram to draw server-side, so RSS readers and
@@ -43,7 +44,9 @@ const components = {
 // which feed readers and email clients can't load anyway.
 export const renderArticleHtml = (markdown) =>
   renderToStaticMarkup(
-    <ReactMarkdown components={components}>{markdown}</ReactMarkdown>,
+    <ReactMarkdown components={components} remarkPlugins={remarkPlugins}>
+      {markdown}
+    </ReactMarkdown>,
   );
 
 // CDATA sections can't contain a literal "]]>" -- split it across two
