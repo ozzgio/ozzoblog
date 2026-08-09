@@ -54,3 +54,27 @@ jobs:
         run: node scripts/seo-health-check.mjs
         env:
           BASE_URL: http://localhost:3000
+
+      - name: Start server with portfolio-data articles unavailable
+        run: npm start -- --port 3001 &
+        env:
+          PORTFOLIO_ARTICLES_URL: http://127.0.0.1:9/articles.json
+
+      - name: Wait for outage server to be ready
+        run: |
+          for i in $(seq 1 20); do
+            if curl -sf http://localhost:3001/ > /dev/null 2>&1; then
+              echo "Outage server is ready"
+              exit 0
+            fi
+            echo "Waiting... ($i/20)"
+            sleep 2
+          done
+          echo "Outage server did not become ready in time"
+          exit 1
+
+      - name: Verify article fallback during upstream outage
+        run: node scripts/seo-health-check.mjs
+        env:
+          BASE_URL: http://localhost:3001
+          VERIFY_ARTICLE_OUTAGE: "1"

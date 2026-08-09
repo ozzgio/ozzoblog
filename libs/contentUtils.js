@@ -1,5 +1,9 @@
+import { resolvePortfolioAssetUrl } from "./portfolioAssets.mjs";
+
 const DATA_REPO = "ozzgio/portfolio-data";
 const DATA_BRANCH = "main";
+
+export { resolvePortfolioAssetUrl };
 
 export const getTextContent = (value) =>
   typeof value === "string" ? value.trim() : "";
@@ -11,17 +15,6 @@ export const slugify = (value = "") =>
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
-
-export const resolvePortfolioAssetUrl = (url, directory = "images") => {
-  const value = getTextContent(url);
-
-  if (!value) return "";
-  if (value.startsWith("http://") || value.startsWith("https://") || value.startsWith("/")) {
-    return value;
-  }
-
-  return `https://cdn.jsdelivr.net/gh/${DATA_REPO}@${DATA_BRANCH}/${directory}/${value}`;
-};
 
 export const stripMarkdown = (value = "") =>
   getTextContent(value)
@@ -172,7 +165,12 @@ export const formatAbsoluteDate = (dateStr) => {
 // failure. Callers own their own filtering/normalization and decide how to
 // degrade (graceful empty list, "temporarily unavailable", or notFound).
 
-const PORTFOLIO_ARTICLES_URL = `https://raw.githubusercontent.com/${DATA_REPO}/${DATA_BRANCH}/articles.json`;
+// The article endpoint is overrideable for the local outage regression check.
+// Production continues to use the canonical portfolio-data URL unless an
+// explicitly supplied server-side environment variable says otherwise.
+const PORTFOLIO_ARTICLES_URL =
+  process.env.PORTFOLIO_ARTICLES_URL ||
+  `https://raw.githubusercontent.com/${DATA_REPO}/${DATA_BRANCH}/articles.json`;
 const PORTFOLIO_BOOKS_URL = `https://raw.githubusercontent.com/${DATA_REPO}/${DATA_BRANCH}/books.json`;
 // Per-attempt deadline sized so the worst case (timeout + one retry) stays
 // under Vercel's 10s serverless-function limit on the SSR pages and on the
