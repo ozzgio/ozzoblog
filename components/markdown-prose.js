@@ -204,8 +204,8 @@ export default function MarkdownProse({ children, size = "article" }) {
       >
         <Table
           aria-label="Markdown data table"
-          w="100%"
-          minW={{ base: "42rem", md: "100%" }}
+          w="fit-content"
+          minW="100%"
           size={size === "compact" ? "sm" : "md"}
           variant="simple"
           whiteSpace="normal"

@@ -8,11 +8,15 @@ import { chromium } from "@playwright/test";
 const HOST = "127.0.0.1";
 const ARTICLE_PATH = "/articles/markdown-table-fixture";
 const BOOK_PATH = "/books/markdown-table-book-fixture";
-const TABLE_MARKDOWN = [
-  "| Left | Center | Right |",
-  "| :--- | :---: | ---: |",
-  "| A long left value | A centred value | A long right value |",
-  "| Another row | Keeps readable spacing | Tests overflow handling |",
+const SHORT_TABLE_MARKDOWN = [
+  "| Left | Right |",
+  "| :--- | ---: |",
+  "| Short value | 1 |",
+].join("\n");
+const WIDE_TABLE_MARKDOWN = [
+  "| One | Two | Three | Four | Five | Six | Seven | Eight | Nine | Ten | Eleven | Twelve | Thirteen | Fourteen |",
+  "| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |",
+  "| a | b | c | d | e | f | g | h | i | j | k | l | m | n |",
 ].join("\n");
 
 const fixtureArticles = [{
@@ -20,7 +24,12 @@ const fixtureArticles = [{
   description: "Stable renderer fixture",
   date: "2026-08-09",
   slug: "markdown-table-fixture",
-  content: ["# Markdown table fixture", "This verifies article prose.", TABLE_MARKDOWN].join("\n\n"),
+  content: [
+    "# Markdown table fixture",
+    "This verifies article prose.",
+    SHORT_TABLE_MARKDOWN,
+    WIDE_TABLE_MARKDOWN,
+  ].join("\n\n"),
 }];
 
 const fixtureBooks = [{
@@ -32,7 +41,8 @@ const fixtureBooks = [{
     "**What it teaches**",
     "This verifies the compact prose path.",
     "**Implementation**",
-    TABLE_MARKDOWN,
+    SHORT_TABLE_MARKDOWN,
+    WIDE_TABLE_MARKDOWN,
   ].join("\n\n"),
 }];
 
@@ -130,7 +140,12 @@ async function startFixtureSite(fixtureBaseUrl) {
   siteProcess.stderr.on("data", appendOutput);
 
   const baseUrl = "http://" + HOST + ":" + port;
-  await waitForSite(baseUrl, siteProcess, () => output);
+  try {
+    await waitForSite(baseUrl, siteProcess, () => output);
+  } catch (error) {
+    await stopProcess(siteProcess);
+    throw error;
+  }
 
   return { siteProcess, baseUrl };
 }
@@ -153,14 +168,14 @@ async function closeServer(server) {
   await once(server, "close");
 }
 
-async function tableMetrics(page) {
-  const table = page.locator("table").first();
+async function tableMetrics(page, tableFixture) {
+  const table = page.locator("table").nth(tableFixture.index);
   await assert.doesNotReject(
     () => table.waitFor({ state: "visible", timeout: 15_000 }),
     "Expected a visible Markdown table",
   );
 
-  return table.evaluate((element) => {
+  return table.evaluate((element, alignmentCount) => {
     const header = element.querySelector("th");
     const cell = element.querySelector("td");
     const container = element.parentElement;
@@ -180,7 +195,7 @@ async function tableMetrics(page) {
       cellBorderBottomWidth: cellStyle?.borderBottomWidth,
       cellPaddingLeft: cellStyle?.paddingLeft,
       cellFontSize: cellStyle?.fontSize,
-      cellAlignments: [...element.querySelectorAll("tbody td")].slice(0, 3).map(
+      cellAlignments: [...element.querySelectorAll("tbody td")].slice(0, alignmentCount).map(
         (item) => getComputedStyle(item).textAlign,
       ),
       containerClientWidth: container?.clientWidth ?? 0,
@@ -190,27 +205,28 @@ async function tableMetrics(page) {
       containerLabel: container?.getAttribute("aria-label"),
       containerTabIndex: container?.tabIndex,
     };
-  });
+  }, tableFixture.alignments.length);
 }
 
-function assertTablePresentation(metrics, context, mode) {
-  assert.equal(metrics.tableDisplay, "table", context.name + " " + mode + ": must retain table semantics");
-  assert.notEqual(metrics.headerBorderBottomWidth, "0px", context.name + " " + mode + ": headers need a visible separator");
-  assert.notEqual(metrics.cellBorderBottomWidth, "0px", context.name + " " + mode + ": rows need visible separators");
-  assert.ok(parseFloat(metrics.headerPaddingLeft) >= 12, context.name + " " + mode + ": headers need readable horizontal padding");
-  assert.ok(parseFloat(metrics.cellPaddingLeft) >= 12, context.name + " " + mode + ": cells need readable horizontal padding");
-  assert.equal(metrics.cellFontSize, context.fontSize, context.name + " " + mode + ": must use its configured prose size");
-  assert.deepEqual(metrics.headerAlignments, ["left", "center", "right"], context.name + " " + mode + ": must preserve GFM header alignment");
-  assert.deepEqual(metrics.cellAlignments, ["left", "center", "right"], context.name + " " + mode + ": must preserve GFM cell alignment");
-  assert.notEqual(metrics.headerBackground, "rgba(0, 0, 0, 0)", context.name + " " + mode + ": headers need a distinct surface");
-  assert.equal(metrics.containerRole, "region", context.name + " " + mode + ": horizontal scroll must be a named region");
-  assert.equal(metrics.containerTabIndex, 0, context.name + " " + mode + ": horizontal scroll must be keyboard-focusable");
-  assert.match(metrics.containerLabel || "", /scroll horizontally/i, context.name + " " + mode + ": scroll region needs instructions");
+function assertTablePresentation(metrics, context, tableFixture, mode) {
+  const label = context.name + " " + tableFixture.name + " " + mode;
+  assert.equal(metrics.tableDisplay, "table", label + ": must retain table semantics");
+  assert.notEqual(metrics.headerBorderBottomWidth, "0px", label + ": headers need a visible separator");
+  assert.notEqual(metrics.cellBorderBottomWidth, "0px", label + ": rows need visible separators");
+  assert.ok(parseFloat(metrics.headerPaddingLeft) >= 12, label + ": headers need readable horizontal padding");
+  assert.ok(parseFloat(metrics.cellPaddingLeft) >= 12, label + ": cells need readable horizontal padding");
+  assert.equal(metrics.cellFontSize, context.fontSize, label + ": must use its configured prose size");
+  assert.deepEqual(metrics.headerAlignments, tableFixture.alignments, label + ": must preserve GFM header alignment");
+  assert.deepEqual(metrics.cellAlignments, tableFixture.alignments, label + ": must preserve GFM cell alignment");
+  assert.notEqual(metrics.headerBackground, "rgba(0, 0, 0, 0)", label + ": headers need a distinct surface");
+  assert.equal(metrics.containerRole, "region", label + ": horizontal scroll must be a named region");
+  assert.equal(metrics.containerTabIndex, 0, label + ": horizontal scroll must be keyboard-focusable");
+  assert.match(metrics.containerLabel || "", /scroll horizontally/i, label + ": scroll region needs instructions");
 }
 
-async function assertMobileLayout(page, context, mode) {
-  const metrics = await tableMetrics(page);
-  assertTablePresentation(metrics, context, mode + " mobile");
+async function assertMobileLayout(page, context, tableFixture, mode) {
+  const metrics = await tableMetrics(page, tableFixture);
+  assertTablePresentation(metrics, context, tableFixture, mode + " mobile");
 
   const viewportMetrics = await page.evaluate(() => ({
     documentWidth: document.documentElement.scrollWidth,
@@ -219,18 +235,25 @@ async function assertMobileLayout(page, context, mode) {
 
   assert.ok(
     viewportMetrics.documentWidth <= viewportMetrics.viewportWidth,
-    context.name + " " + mode + " mobile: the page must not overflow horizontally (" +
+    context.name + " " + tableFixture.name + " " + mode + " mobile: the page must not overflow horizontally (" +
       viewportMetrics.documentWidth + "px > " + viewportMetrics.viewportWidth + "px; table " +
       metrics.containerClientWidth + "px / " + metrics.containerScrollWidth + "px)",
   );
   assert.ok(
     ["auto", "scroll"].includes(metrics.containerOverflowX),
-    context.name + " " + mode + " mobile: the container must handle horizontal overflow",
+    context.name + " " + tableFixture.name + " " + mode + " mobile: the container must handle horizontal overflow",
   );
-  assert.ok(
-    metrics.containerScrollWidth > metrics.containerClientWidth,
-    context.name + " " + mode + " mobile: wide tables must scroll inside the container",
-  );
+  if (tableFixture.shouldScroll) {
+    assert.ok(
+      metrics.containerScrollWidth > metrics.containerClientWidth,
+      context.name + " " + tableFixture.name + " " + mode + " mobile: wide tables must scroll inside the container",
+    );
+  } else {
+    assert.ok(
+      metrics.containerScrollWidth <= metrics.containerClientWidth + 1,
+      context.name + " " + tableFixture.name + " " + mode + " mobile: fitting tables must not force horizontal panning",
+    );
+  }
 }
 
 async function setColorMode(page, expectedMode) {
@@ -252,6 +275,10 @@ const contexts = [
   { name: "article prose", path: ARTICLE_PATH, fontSize: "15px" },
   { name: "compact book prose", path: BOOK_PATH, fontSize: "14px" },
 ];
+const tableFixtures = [
+  { name: "short table", index: 0, alignments: ["left", "right"], shouldScroll: false },
+  { name: "wide table", index: 1, alignments: Array(14).fill("left"), shouldScroll: true },
+];
 
 const fixture = await createFixtureServer();
 let site;
@@ -268,25 +295,33 @@ try {
     await page.goto(site.baseUrl + proseContext.path, { waitUntil: "networkidle" });
 
     await setColorMode(page, "light");
-    const lightMetrics = await tableMetrics(page);
-    assertTablePresentation(lightMetrics, proseContext, "light desktop");
+    const lightMetrics = await Promise.all(tableFixtures.map((tableFixture) => tableMetrics(page, tableFixture)));
+    for (const [index, metrics] of lightMetrics.entries()) {
+      assertTablePresentation(metrics, proseContext, tableFixtures[index], "light desktop");
+    }
 
     await setColorMode(page, "dark");
-    const darkMetrics = await tableMetrics(page);
-    assertTablePresentation(darkMetrics, proseContext, "dark desktop");
-    assert.notEqual(
-      darkMetrics.headerBackground,
-      lightMetrics.headerBackground,
-      proseContext.name + ": table headers must adapt to the active color mode",
-    );
+    const darkMetrics = await Promise.all(tableFixtures.map((tableFixture) => tableMetrics(page, tableFixture)));
+    for (const [index, metrics] of darkMetrics.entries()) {
+      assertTablePresentation(metrics, proseContext, tableFixtures[index], "dark desktop");
+      assert.notEqual(
+        metrics.headerBackground,
+        lightMetrics[index].headerBackground,
+        proseContext.name + " " + tableFixtures[index].name + ": table headers must adapt to the active color mode",
+      );
+    }
 
     await page.setViewportSize({ width: 390, height: 844 });
     await page.reload({ waitUntil: "networkidle" });
     await setColorMode(page, "dark");
-    await assertMobileLayout(page, proseContext, "dark");
+    for (const tableFixture of tableFixtures) {
+      await assertMobileLayout(page, proseContext, tableFixture, "dark");
+    }
 
     await setColorMode(page, "light");
-    await assertMobileLayout(page, proseContext, "light");
+    for (const tableFixture of tableFixtures) {
+      await assertMobileLayout(page, proseContext, tableFixture, "light");
+    }
   }
 
   console.log("Markdown table presentation verified with stable article and compact-book fixtures.");
