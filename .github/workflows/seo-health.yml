@@ -55,6 +55,12 @@ jobs:
         env:
           BASE_URL: http://localhost:3000
 
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Verify Markdown table presentation
+        run: npm run verify:markdown:presentation
+
       - name: Start server with portfolio-data articles unavailable
         run: npm start -- --port 3001 &
         env:

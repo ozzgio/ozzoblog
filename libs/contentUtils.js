@@ -165,13 +165,15 @@ export const formatAbsoluteDate = (dateStr) => {
 // failure. Callers own their own filtering/normalization and decide how to
 // degrade (graceful empty list, "temporarily unavailable", or notFound).
 
-// The article endpoint is overrideable for the local outage regression check.
-// Production continues to use the canonical portfolio-data URL unless an
+// The endpoints are overrideable for local outage and renderer-fixture checks.
+// Production continues to use the canonical portfolio-data URLs unless an
 // explicitly supplied server-side environment variable says otherwise.
 const PORTFOLIO_ARTICLES_URL =
   process.env.PORTFOLIO_ARTICLES_URL ||
   `https://raw.githubusercontent.com/${DATA_REPO}/${DATA_BRANCH}/articles.json`;
-const PORTFOLIO_BOOKS_URL = `https://raw.githubusercontent.com/${DATA_REPO}/${DATA_BRANCH}/books.json`;
+const PORTFOLIO_BOOKS_URL =
+  process.env.PORTFOLIO_BOOKS_URL ||
+  `https://raw.githubusercontent.com/${DATA_REPO}/${DATA_BRANCH}/books.json`;
 // Per-attempt deadline sized so the worst case (timeout + one retry) stays
 // under Vercel's 10s serverless-function limit on the SSR pages and on the
 // on-demand fallback:"blocking" generation for new article slugs. A healthy
