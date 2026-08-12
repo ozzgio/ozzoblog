@@ -7,7 +7,6 @@ import {
   Link,
   SimpleGrid,
   Text,
-  useBreakpointValue,
   VStack,
 } from "@chakra-ui/react";
 import { ChevronRightIcon, ExternalLinkIcon } from "@chakra-ui/icons";
@@ -107,10 +106,6 @@ const Home = ({
   articlesError = false,
   currentBook = null,
 }) => {
-  const moonSize = useBreakpointValue(
-    { base: 280, sm: 340 },
-    { fallback: "base" }
-  );
   const homepageSchema = {
     "@context": "https://schema.org",
     "@graph": [
@@ -151,7 +146,7 @@ const Home = ({
     >
       {/* Hero */}
       <Box textAlign="center" pt={4} mb={2}>
-        <MoonHero size={moonSize || 280} />
+                  <MoonHero size={340} />
       </Box>
 
       <Container>
