@@ -1,4 +1,5 @@
 import { ChakraProvider } from "@chakra-ui/react";
+import { MotionConfig } from "framer-motion";
 import Layout from "../components/layouts/main";
 import theme from "../libs/theme";
 
@@ -9,9 +10,11 @@ if (typeof window !== "undefined") {
 function Website({ Component, pageProps, router }) {
   return (
     <ChakraProvider theme={theme}>
-      <Layout router={router}>
-        <Component {...pageProps} />
-      </Layout>
+      <MotionConfig reducedMotion="user">
+        <Layout router={router}>
+          <Component {...pageProps} />
+        </Layout>
+      </MotionConfig>
     </ChakraProvider>
   );
 }

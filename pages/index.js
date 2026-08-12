@@ -31,10 +31,18 @@ import {
 // keep it out of the homepage's initial bundle, same pattern already used
 // for MermaidDiagram in markdown-prose.js. A same-size loading placeholder
 // reserves the 340x340 hero's layout space so hydration doesn't shift the
-// statement/profile content below it (CLS).
+// statement/profile content below it (CLS). The canvas has a smaller base
+// size so it fits alongside the homepage's mobile gutters.
 const MoonHero = dynamic(() => import("../components/icons/moon-hero"), {
   ssr: false,
-  loading: () => <Box width={340} height={340} display="inline-block" />,
+  loading: () => (
+    <Box
+      width={{ base: "280px", sm: "340px" }}
+      maxW="100%"
+      aspectRatio={1}
+      display="inline-block"
+    />
+  ),
 });
 
 const formatAbsoluteDate = (dateStr) => {
@@ -138,7 +146,7 @@ const Home = ({
     >
       {/* Hero */}
       <Box textAlign="center" pt={4} mb={2}>
-        <MoonHero size={340} />
+                  <MoonHero size={340} />
       </Box>
 
       <Container>

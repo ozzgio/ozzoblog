@@ -34,7 +34,7 @@ const WorkEntry = ({ title, company, companyUrl, period, location, bullets, stac
     <Box borderLeftWidth="2px" borderLeftColor={borderColor} pl={5} py={1}>
       <Heading as="h3" fontSize="md" fontWeight="semibold">{title}</Heading>
       <HStack spacing={2} mt={1} flexWrap="wrap">
-        <Link href={companyUrl} isExternal color="orange.500" fontWeight="medium" fontSize="sm">{company}</Link>
+        <Link href={companyUrl} isExternal color="accent.link" fontWeight="medium" fontSize="sm">{company}</Link>
         <Text fontSize="sm" color={mutedText}>·</Text>
         <Text fontSize="sm" color={mutedText}>{location}</Text>
         <Text fontSize="sm" color={mutedText}>·</Text>
@@ -65,7 +65,7 @@ const ProjectEntry = ({ id, title, url, period, description, stack }) => {
       <HStack spacing={3} flexWrap="wrap">
         <Heading as="h3" fontSize="md" fontWeight="semibold">{title}</Heading>
         {url && (
-          <Link href={url} isExternal color="orange.500" fontSize="sm" fontWeight="medium">{url}</Link>
+          <Link href={url} isExternal color="accent.link" fontSize="sm" fontWeight="medium">{url}</Link>
         )}
         <Text fontSize="sm" color={mutedText}>{period}</Text>
       </HStack>
@@ -222,7 +222,7 @@ const Experience = () => {
 
         <Section delay={0.6}>
           <Box textAlign="center" pt={4}>
-            <Link as={NextLink} href="/contacts" color="orange.500" fontWeight="semibold" fontSize="sm">
+            <Link as={NextLink} href="/contacts" color="accent.link" fontWeight="semibold" fontSize="sm">
               Want to work together? Get in touch →
             </Link>
           </Box>

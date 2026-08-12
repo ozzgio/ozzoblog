@@ -1,9 +1,10 @@
 import { Box, VStack, Text, useColorModeValue } from "@chakra-ui/react";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import Image from "next/image";
 import { useState } from "react";
 
 const EnhancedChip = ({ tech, delay = 0 }) => {
+  const shouldReduceMotion = useReducedMotion();
   const bg = useColorModeValue("white", "gray.800");
   const borderColor = useColorModeValue("gray.200", "gray.600");
   const hoverBg = useColorModeValue("gray.50", "gray.700");
@@ -16,9 +17,9 @@ const EnhancedChip = ({ tech, delay = 0 }) => {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 30 }}
+      initial={shouldReduceMotion ? false : { opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, delay }}
+      transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.6, delay }}
     >
       <Box
         bg={bg}

@@ -57,7 +57,7 @@ const Project = ({ project }) => {
       </List>
 
       <Box mt={8}>
-        <Heading as="h3" fontSize="lg" mb={3}>What it does</Heading>
+        <Heading as="h2" fontSize="lg" mb={3}>What it does</Heading>
         <P>
           Gym management SaaS for trainers and athletes. Trainers create workout programs, assign them to athletes,
           manage an exercise library, and track progress. Athletes log sessions and follow assigned plans. Role-based
@@ -73,7 +73,7 @@ const Project = ({ project }) => {
       </Box>
 
       <Box mt={8}>
-        <Heading as="h3" fontSize="lg" mb={3}>The architecture work</Heading>
+        <Heading as="h2" fontSize="lg" mb={3}>The architecture work</Heading>
         <P>
           The codebase accumulated the way most codebases do. Each local decision looked reasonable. The bill
           arrived later. By early 2026 I had three files carrying everything:
@@ -101,8 +101,7 @@ const Project = ({ project }) => {
           The full reasoning is in the{" "}
           <Link
             href="/articles/rails-architecture-accumulated-by-default"
-            color="orange.500"
-            _dark={{ color: "orange.300" }}
+            color="accent.link"
           >
             architecture article
           </Link>
@@ -111,7 +110,7 @@ const Project = ({ project }) => {
       </Box>
 
       <Box mt={8}>
-        <Heading as="h3" fontSize="lg" mb={3}>What I&apos;m still figuring out</Heading>
+        <Heading as="h2" fontSize="lg" mb={3}>What I&apos;m still figuring out</Heading>
         <P>
           The technical side is in decent shape. The codebase has documented architecture decisions, a CI gate
           that enforces structural boundaries, and E2E coverage for the critical paths. That part I can execute.

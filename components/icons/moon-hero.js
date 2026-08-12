@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { useColorMode } from "@chakra-ui/react";
+import { Box, useColorMode } from "@chakra-ui/react";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { playfairDisplay } from "../fonts";
@@ -318,6 +318,9 @@ const MoonHero = ({ size = 220 }) => {
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(size, size);
+    renderer.domElement.style.display = "block";
+    renderer.domElement.style.maxWidth = "100%";
+    renderer.domElement.style.height = "auto";
     mount.appendChild(renderer.domElement);
 
     const scene = new THREE.Scene();
@@ -456,16 +459,15 @@ const MoonHero = ({ size = 220 }) => {
   }, [size, colorMode]);
 
   return (
-    <div
+    <Box
       ref={mountRef}
-      style={{
-        width: size,
-        height: size,
-        cursor: "grab",
-        display: "inline-block",
-        touchAction: "none",
-        filter: "drop-shadow(0 0 14px rgba(160,160,210,0.45))",
-      }}
+      width={{ base: "280px", sm: "340px" }}
+      maxW="100%"
+      aspectRatio={1}
+      cursor="grab"
+      display="inline-block"
+      touchAction="none"
+      filter="drop-shadow(0 0 14px rgba(160,160,210,0.45))"
     />
   );
 };

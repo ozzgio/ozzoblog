@@ -1,5 +1,5 @@
 import { Container, Badge, Box } from "@chakra-ui/react";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import Head from "next/head";
 import { WorkImage, Title } from "../project";
 
@@ -23,15 +23,18 @@ const ProjectDetailsLayout = ({
   socialImageUrl,
   dateInfo,
   path,
-}) => (
-  <motion.article
-    initial="hidden"
-    animate="enter"
-    exit="exit"
-    variants={variants}
-    transition={{ duration: 0.4, type: "easeInOut" }}
-    style={{ position: "relative" }}
-  >
+}) => {
+  const shouldReduceMotion = useReducedMotion();
+
+  return (
+    <motion.article
+      initial={shouldReduceMotion ? false : "hidden"}
+      animate="enter"
+      exit="exit"
+      variants={variants}
+      transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.4, type: "easeInOut" }}
+      style={{ position: "relative" }}
+    >
     <>
       {" "}
       {title && (
@@ -133,7 +136,8 @@ const ProjectDetailsLayout = ({
         <Box mt={6}>{children}</Box>
       </Container>
     </>
-  </motion.article>
-);
+    </motion.article>
+  );
+};
 
 export default ProjectDetailsLayout;

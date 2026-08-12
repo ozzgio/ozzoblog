@@ -126,7 +126,7 @@ const BookCard = ({
               {typeof rating === "number" && rating > 0 && (
                 <HStack spacing={1}>
                   <IoStar color="#dd6b20" />
-                  <Text fontWeight="bold" color="orange.500">
+                  <Text fontWeight="bold" color="accent.link">
                     {rating.toFixed(1)}
                   </Text>
                 </HStack>
