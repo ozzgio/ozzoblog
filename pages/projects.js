@@ -12,10 +12,9 @@ import {
   useColorModeValue,
   useTheme,
 } from "@chakra-ui/react";
-import { ExternalLinkIcon } from "@chakra-ui/icons";
-import { motion } from "framer-motion";
+import { ChevronRightIcon, ExternalLinkIcon } from "@chakra-ui/icons";
+import { motion, useReducedMotion } from "framer-motion";
 import NextLink from "next/link";
-import { useRouter } from "next/router";
 import Image from "next/image";
 import Layout from "../components/layouts/layout";
 import BaseCard from "../components/basecard";
@@ -107,7 +106,11 @@ const ProofLinks = ({ demo, github, size = "sm" }) => {
             rel="noopener noreferrer"
             fontSize={size}
             fontWeight="semibold"
-            onClick={(e) => e.stopPropagation()}
+            display="inline-flex"
+            alignItems="center"
+            minH="44px"
+            px={2}
+            mx={-2}
           >
             live <ExternalLinkIcon mx="4px" fontSize="xs" />
           </Link>
@@ -121,7 +124,11 @@ const ProofLinks = ({ demo, github, size = "sm" }) => {
             rel="noopener noreferrer"
             fontSize={size}
             fontWeight="semibold"
-            onClick={(e) => e.stopPropagation()}
+            display="inline-flex"
+            alignItems="center"
+            minH="44px"
+            px={2}
+            mx={-2}
           >
             repo <ExternalLinkIcon mx="4px" fontSize="xs" />
           </Link>
@@ -147,7 +154,6 @@ const SectionLabel = ({ children }) => (
 );
 
 const NowCard = ({ project }) => {
-  const router = useRouter();
   const { colors } = useTheme();
   const bodyText = useColorModeValue(colors.bodyText.default, colors.bodyText._dark);
   const headingText = useColorModeValue(colors.headingText.default, colors.headingText._dark);
@@ -160,8 +166,6 @@ const NowCard = ({ project }) => {
       p={0}
       maxW="none"
       mx="0"
-      cursor="pointer"
-      onClick={() => router.push(`/projects/${id}`)}
     >
       <Flex direction={{ base: "column", md: "row" }} minH={{ md: "220px" }}>
         <Box
@@ -193,7 +197,7 @@ const NowCard = ({ project }) => {
               as={NextLink}
               href={`/projects/${id}`}
               color={headingText}
-              _hover={{ textDecoration: "none", color: "orange.500" }}
+              _hover={{ textDecoration: "none", color: "accent.link" }}
             >
               {title}
             </Link>
@@ -202,6 +206,17 @@ const NowCard = ({ project }) => {
             {description}
           </Text>
           <Box mb={3}>
+            <Link
+              as={NextLink}
+              href={`/projects/${id}`}
+              display="inline-flex"
+              alignItems="center"
+              minH="44px"
+              fontSize="sm"
+              fontWeight="semibold"
+            >
+              View project <ChevronRightIcon ml={1} />
+            </Link>
             <ProofLinks demo={demo} github={github} />
           </Box>
           <TechStack stack={stack} />
@@ -213,7 +228,6 @@ const NowCard = ({ project }) => {
 };
 
 const ShippedCard = ({ project }) => {
-  const router = useRouter();
   const { colors } = useTheme();
   const bodyText = useColorModeValue(colors.bodyText.default, colors.bodyText._dark);
   const headingText = useColorModeValue(colors.headingText.default, colors.headingText._dark);
@@ -230,8 +244,6 @@ const ShippedCard = ({ project }) => {
       display="flex"
       flexDirection="column"
       h="100%"
-      cursor="pointer"
-      onClick={() => router.push(`/projects/${id}`)}
     >
       <Box
         w="100%"
@@ -255,7 +267,7 @@ const ShippedCard = ({ project }) => {
             as={NextLink}
             href={`/projects/${id}`}
             color={headingText}
-            _hover={{ textDecoration: "none", color: "orange.500" }}
+            _hover={{ textDecoration: "none", color: "accent.link" }}
           >
             {title}
           </Link>
@@ -267,6 +279,17 @@ const ShippedCard = ({ project }) => {
           {description}
         </Text>
         <Box mb={3}>
+          <Link
+            as={NextLink}
+            href={`/projects/${id}`}
+            display="inline-flex"
+            alignItems="center"
+            minH="44px"
+            fontSize="sm"
+            fontWeight="semibold"
+          >
+            View project <ChevronRightIcon ml={1} />
+          </Link>
           <ProofLinks demo={demo} github={github} />
         </Box>
         <TechStack stack={stack} />
@@ -289,7 +312,7 @@ const EarlierItem = ({ project }) => {
           href={`/projects/${id}`}
           fontWeight="medium"
           fontSize="sm"
-          _hover={{ textDecoration: "none", color: "orange.500" }}
+          _hover={{ textDecoration: "none", color: "accent.link" }}
         >
           {title}
         </Link>
@@ -319,6 +342,7 @@ const EarlierItem = ({ project }) => {
 };
 
 const Projects = () => {
+  const shouldReduceMotion = useReducedMotion();
   const muted = useColorModeValue("gray.500", "gray.400");
   const byEffortDesc = (a, b) => (b.effort ?? 0) - (a.effort ?? 0);
   const now = projectData.filter((p) => p.focus === "now").sort(byEffortDesc);
@@ -333,9 +357,9 @@ const Projects = () => {
       path="/projects"
     >
       <MotionBox
-        initial={{ opacity: 0, y: 20 }}
+        initial={shouldReduceMotion ? false : { opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
+        transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.6 }}
       >
         <Container maxW="container.lg" px={[2, 4, 8]}>
           <Heading

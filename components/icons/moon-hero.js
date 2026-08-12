@@ -318,6 +318,9 @@ const MoonHero = ({ size = 220 }) => {
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(size, size);
+    renderer.domElement.style.display = "block";
+    renderer.domElement.style.maxWidth = "100%";
+    renderer.domElement.style.height = "auto";
     mount.appendChild(renderer.domElement);
 
     const scene = new THREE.Scene();
@@ -461,6 +464,7 @@ const MoonHero = ({ size = 220 }) => {
       style={{
         width: size,
         height: size,
+        maxWidth: "100%",
         cursor: "grab",
         display: "inline-block",
         touchAction: "none",

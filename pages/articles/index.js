@@ -19,7 +19,7 @@ import {
   WrapItem,
 } from "@chakra-ui/react";
 import { useMemo, useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import {
   IoCalendarOutline,
   IoCloseCircleOutline,
@@ -76,6 +76,7 @@ const formatDate = (dateStr) => {
 };
 
 const ArticlesPage = ({ articles, error }) => {
+  const shouldReduceMotion = useReducedMotion();
   const [selectedTag, setSelectedTag] = useState(null);
   const [sortOption, setSortOption] = useState("newest");
   const [searchQuery, setSearchQuery] = useState("");
@@ -184,9 +185,9 @@ const ArticlesPage = ({ articles, error }) => {
       path="/articles"
     >
       <MotionBox
-        initial={{ opacity: 0, y: 18 }}
+        initial={shouldReduceMotion ? false : { opacity: 0, y: 18 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.55 }}
+        transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.55 }}
       >
         <VStack spacing={8} align="stretch">
           <Box
@@ -250,7 +251,7 @@ const ArticlesPage = ({ articles, error }) => {
                   <Link
                     href="/rss.xml"
                     fontSize="sm"
-                    color="orange.500"
+                    color="accent.link"
                     fontWeight="semibold"
                     target="_blank"
                     _hover={{ textDecoration: "underline" }}
@@ -327,7 +328,7 @@ const ArticlesPage = ({ articles, error }) => {
           </Box>
 
           {error ? (
-            <Text color="red.500">{error}</Text>
+            <Text color="status.error">{error}</Text>
           ) : (
             <VStack spacing={6} align="stretch">
               <Box

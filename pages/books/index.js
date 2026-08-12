@@ -19,7 +19,7 @@ import {
   WrapItem,
 } from "@chakra-ui/react";
 import { useMemo, useState } from "react";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import {
   IoBookOutline,
   IoCloseCircleOutline,
@@ -67,6 +67,7 @@ const sortByDate = (a, b, direction = "desc") => {
 };
 
 const BooksPage = ({ books, error }) => {
+  const shouldReduceMotion = useReducedMotion();
   const [selectedTag, setSelectedTag] = useState(null);
   const [sortOption, setSortOption] = useState("highest_rating");
   const [searchQuery, setSearchQuery] = useState("");
@@ -212,9 +213,9 @@ const BooksPage = ({ books, error }) => {
       path="/books"
     >
       <MotionBox
-        initial={{ opacity: 0, y: 18 }}
+        initial={shouldReduceMotion ? false : { opacity: 0, y: 18 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.55 }}
+        transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.55 }}
       >
         <VStack spacing={8} align="stretch">
           <Box
@@ -344,7 +345,7 @@ const BooksPage = ({ books, error }) => {
           </Box>
 
           {error ? (
-            <Text color="red.500">{error}</Text>
+            <Text color="status.error">{error}</Text>
           ) : (
             <VStack spacing={6} align="stretch">
               <Box

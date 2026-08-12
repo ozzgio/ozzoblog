@@ -18,7 +18,27 @@ const theme = extendTheme({
       "*, *::before, &::after": {
         borderColor: mode("gray.200", "gray.700")(props),
       },
+      "@media (prefers-reduced-motion: reduce)": {
+        "*, *::before, *::after": {
+          animationDuration: "0.01ms !important",
+          animationIterationCount: "1 !important",
+          scrollBehavior: "auto !important",
+          transitionDuration: "0.01ms !important",
+        },
+      },
     }),
+  },
+  semanticTokens: {
+    colors: {
+      "accent.link": {
+        default: "orange.700",
+        _dark: "orange.300",
+      },
+      "status.error": {
+        default: "red.600",
+        _dark: "red.300",
+      },
+    },
   },
   components: {
     Heading: {

@@ -67,14 +67,14 @@ const Project = ({ project }) => {
       </List>
 
       <Box mt={8}>
-        <Heading as="h3" fontSize="lg" mb={3}>
+        <Heading as="h2" fontSize="lg" mb={3}>
           What it is
         </Heading>
         <P>
           A tiny Rails app where I post short daily entries. What I built or learned,
           two or three sentences, a timestamp, an optional tag. Public feed, newest
           first. My dev journal, live at{" "}
-          <Link href="https://log.ozzo.blog" target="_blank" rel="noopener noreferrer" color="orange.500" _dark={{ color: "orange.300" }}>
+          <Link href="https://log.ozzo.blog" target="_blank" rel="noopener noreferrer" color="accent.link">
             log.ozzo.blog
           </Link>
           .
@@ -82,7 +82,7 @@ const Project = ({ project }) => {
       </Box>
 
       <Box mt={8}>
-        <Heading as="h3" fontSize="lg" mb={3}>
+        <Heading as="h2" fontSize="lg" mb={3}>
           What it isn&apos;t
         </Heading>
         <P>
@@ -94,7 +94,7 @@ const Project = ({ project }) => {
       </Box>
 
       <Box mt={8}>
-        <Heading as="h3" fontSize="lg" mb={3}>
+        <Heading as="h2" fontSize="lg" mb={3}>
           Why it exists
         </Heading>
         <P>
@@ -103,8 +103,7 @@ const Project = ({ project }) => {
             href="https://basecamp.com/shapeup"
             target="_blank"
             rel="noopener noreferrer"
-            color="orange.500"
-            _dark={{ color: "orange.300" }}
+            color="accent.link"
           >
             Shape Up
           </Link>{" "}
@@ -118,7 +117,7 @@ const Project = ({ project }) => {
       </Box>
 
       <Box mt={8}>
-        <Heading as="h3" fontSize="lg" mb={3}>
+        <Heading as="h2" fontSize="lg" mb={3}>
           What I&apos;m still figuring out
         </Heading>
         <P>
