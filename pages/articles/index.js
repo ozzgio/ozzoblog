@@ -101,7 +101,9 @@ const ArticlesPage = ({ articles, error }) => {
       .filter((article) => article.date)
       .map((article) => {
         const formattedDate =
-          isMounted && article.date ? formatDate(article.date) : article.date || "";
+          isMounted && article.date
+            ? formatDate(article.date)
+            : article.date || "";
         const content = getArticleBody(article);
 
         return {
@@ -110,7 +112,9 @@ const ArticlesPage = ({ articles, error }) => {
           summary: article.summary || getArticleSummary(article),
           formattedDate: formattedDate || article.date || "",
           absoluteDate: article.date ? formatAbsoluteDate(article.date) : "",
-          year: article.date ? String(new Date(article.date).getFullYear()) : "",
+          year: article.date
+            ? String(new Date(article.date).getFullYear())
+            : "",
           book: String(article.book || ""),
           book_url: String(article.book_url || ""),
         };
@@ -152,9 +156,17 @@ const ArticlesPage = ({ articles, error }) => {
     const query = searchQuery.trim().toLowerCase();
 
     return sortedArticles.filter((article) => {
-      const matchesTag = selectedTag ? article.tags?.includes(selectedTag) : true;
+      const matchesTag = selectedTag
+        ? article.tags?.includes(selectedTag)
+        : true;
       const matchesQuery = query
-        ? [article.title, article.description, article.content, article.book, ...(article.tags || [])]
+        ? [
+            article.title,
+            article.description,
+            article.content,
+            article.book,
+            ...(article.tags || []),
+          ]
             .join(" ")
             .toLowerCase()
             .includes(query)
@@ -167,7 +179,9 @@ const ArticlesPage = ({ articles, error }) => {
   const latestArticle = sortedArticles[0] || null;
 
   const uniqueYears = useMemo(
-    () => [...new Set(sortedArticles.map((article) => article.year).filter(Boolean))],
+    () => [
+      ...new Set(sortedArticles.map((article) => article.year).filter(Boolean)),
+    ],
     [sortedArticles],
   );
 
@@ -341,19 +355,21 @@ const ArticlesPage = ({ articles, error }) => {
               >
                 <Stack direction={{ base: "column", xl: "row" }} spacing={4}>
                   <InputGroup flex={1}>
-                    <InputLeftElement pointerEvents="none">
+                    <InputLeftElement pointerEvents="none" h="44px">
                       <Icon as={IoSearchOutline} color="gray.400" />
                     </InputLeftElement>
                     <Input
                       placeholder="Search titles, summaries, notes, or tags"
                       value={searchQuery}
                       onChange={(event) => setSearchQuery(event.target.value)}
+                      minH="44px"
                     />
                   </InputGroup>
                   <Select
                     value={sortOption}
                     onChange={(event) => setSortOption(event.target.value)}
                     maxW={{ base: "100%", xl: "220px" }}
+                    minH="44px"
                   >
                     <option value="newest">Newest First</option>
                     <option value="oldest">Oldest First</option>
@@ -365,6 +381,7 @@ const ArticlesPage = ({ articles, error }) => {
                       variant="ghost"
                       colorScheme="orange"
                       onClick={resetFilters}
+                      minH="44px"
                     >
                       Clear filters
                     </Button>
@@ -375,6 +392,7 @@ const ArticlesPage = ({ articles, error }) => {
                   <WrapItem>
                     <Button
                       size="sm"
+                      minH="44px"
                       colorScheme={!selectedTag ? "orange" : "gray"}
                       variant={!selectedTag ? "solid" : "outline"}
                       onClick={() => setSelectedTag(null)}
@@ -386,6 +404,7 @@ const ArticlesPage = ({ articles, error }) => {
                     <WrapItem key={tag}>
                       <Button
                         size="sm"
+                        minH="44px"
                         colorScheme="orange"
                         variant={selectedTag === tag ? "solid" : "outline"}
                         onClick={() => setSelectedTag(tag)}
@@ -396,7 +415,13 @@ const ArticlesPage = ({ articles, error }) => {
                   ))}
                 </Wrap>
 
-                <HStack mt={4} spacing={3} color={mutedText} fontSize="sm" flexWrap="wrap">
+                <HStack
+                  mt={4}
+                  spacing={3}
+                  color={mutedText}
+                  fontSize="sm"
+                  flexWrap="wrap"
+                >
                   <HStack spacing={1}>
                     <Icon as={IoTimeOutline} />
                     <Text>{filteredArticles.length} selected</Text>
@@ -422,7 +447,12 @@ const ArticlesPage = ({ articles, error }) => {
                   textAlign="center"
                   bg={accentSubtle}
                 >
-                  <Icon as={IoFlashOutline} boxSize={8} color="orange.400" mb={3} />
+                  <Icon
+                    as={IoFlashOutline}
+                    boxSize={8}
+                    color="orange.400"
+                    mb={3}
+                  />
                   <Heading as="h2" size="md" mb={2}>
                     No articles found
                   </Heading>
@@ -433,7 +463,10 @@ const ArticlesPage = ({ articles, error }) => {
               ) : (
                 <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
                   {filteredArticles.map((article) => (
-                    <ArticleCard key={article.slug || article.url} {...article} />
+                    <ArticleCard
+                      key={article.slug || article.url}
+                      {...article}
+                    />
                   ))}
                 </SimpleGrid>
               )}

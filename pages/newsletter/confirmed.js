@@ -34,14 +34,31 @@ const NewsletterConfirmed = () => (
             maxW="sm"
             mx="auto"
           >
-            Welcome. You&apos;ll get field notes on finding demand, shipping useful
-            software, earning attention, and building toward independent work.
+            Welcome. You&apos;ll get field notes on finding demand, shipping
+            useful software, earning attention, and building toward independent
+            work.
           </Text>
-          <Stack direction={{ base: "column", sm: "row" }} spacing={3} justify="center">
-            <Button as={NextLink} href="/articles" colorScheme="orange" size="md">
+          <Stack
+            direction={{ base: "column", sm: "row" }}
+            spacing={3}
+            justify="center"
+          >
+            <Button
+              as={NextLink}
+              href="/articles"
+              colorScheme="orange"
+              size="md"
+              minH="44px"
+            >
               Read the articles
             </Button>
-            <Button as={NextLink} href="/" variant="ghost" size="md">
+            <Button
+              as={NextLink}
+              href="/"
+              variant="ghost"
+              size="md"
+              minH="44px"
+            >
               Back to home
             </Button>
           </Stack>

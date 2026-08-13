@@ -14,6 +14,9 @@ const LinkItem = ({ href, path, target, children, ...props }) => {
       scroll={false}
       p={2}
       px={3}
+      minH="44px"
+      display="inline-flex"
+      alignItems="center"
       borderRadius="md"
       color={active ? activeColor : inactiveColor}
       target={target}

@@ -10,6 +10,7 @@ const ThemeToggleButton = () => {
       colorScheme={colorMode === "light" ? "purple" : "orange"}
       icon={colorMode === "light" ? <MoonIcon /> : <SunIcon />}
       onClick={toggleColorMode}
+      size="lg"
     />
   );
 };
