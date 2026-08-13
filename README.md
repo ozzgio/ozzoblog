@@ -47,6 +47,12 @@ The SEO health workflow (`.github/workflows/seo-health.yml`) runs on every PR an
 - Verifies every URL in `public/sitemap.xml` returns 200
 - Checks key pages carry all required SEO tags: `title`, `meta description`, `canonical`, `og:*`, `twitter:card`
 
+## Security and quality automation
+
+- Dependabot opens grouped weekly npm and GitHub Actions update PRs. Security updates are grouped separately from normal version updates.
+- Dependency Health runs Dependency Review plus a full dependency audit on every PR and `main` push, and repeats weekly.
+- CodeQL runs the JavaScript/TypeScript `security-and-quality` suite on PRs, `main`, and weekly.
+
 ---
 
 ## Content pipeline
