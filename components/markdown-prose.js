@@ -191,7 +191,7 @@ export default function MarkdownProse({ children, size = "article" }) {
         w="100%"
         maxW="100%"
         role="region"
-        aria-label="Scrollable Markdown data table. Use arrow keys to scroll horizontally."
+        aria-label="Markdown data table. Scroll horizontally on smaller screens."
         tabIndex={0}
         mb={paragraphMb}
         overflowX="auto"
@@ -205,7 +205,7 @@ export default function MarkdownProse({ children, size = "article" }) {
         <Table
           aria-label="Markdown data table"
           w="fit-content"
-          minW="100%"
+          minW={{ base: "36rem", md: "100%" }}
           size={size === "compact" ? "sm" : "md"}
           variant="simple"
           whiteSpace="normal"
