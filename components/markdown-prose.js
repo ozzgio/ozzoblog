@@ -205,11 +205,18 @@ export default function MarkdownProse({ children, size = "article" }) {
         <Table
           aria-label="Markdown data table"
           w="fit-content"
-          minW={{ base: "36rem", md: "100%" }}
+          minW="100%"
           size={size === "compact" ? "sm" : "md"}
           variant="simple"
           whiteSpace="normal"
-          sx={{ tableLayout: "auto" }}
+          sx={{
+            tableLayout: "auto",
+            "@media screen and (max-width: 47.99em)": {
+              "&:has(th:nth-child(3))": {
+                minWidth: "36rem",
+              },
+            },
+          }}
         >
           {children}
         </Table>
