@@ -18,6 +18,11 @@ const COMPACT_THREE_COLUMN_TABLE_MARKDOWN = [
   "| :--- | :--- | :--- |",
   "| 1 | 2 | 3 |",
 ].join("\n");
+const VERBOSE_COMPACT_TABLE_MARKDOWN = [
+  "| Minimum supported version | Recommended deployment strategy |",
+  "| :--- | :--- |",
+  "| Version 1.0 | Container image |",
+].join("\n");
 const WIDE_TABLE_MARKDOWN = [
   "| One | Two | Three | Four | Five | Six | Seven | Eight | Nine | Ten | Eleven | Twelve | Thirteen | Fourteen |",
   "| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |",
@@ -34,6 +39,7 @@ const fixtureArticles = [{
     "This verifies article prose.",
     SHORT_TABLE_MARKDOWN,
     COMPACT_THREE_COLUMN_TABLE_MARKDOWN,
+    VERBOSE_COMPACT_TABLE_MARKDOWN,
     WIDE_TABLE_MARKDOWN,
   ].join("\n\n"),
 }];
@@ -49,6 +55,7 @@ const fixtureBooks = [{
     "**Implementation**",
     SHORT_TABLE_MARKDOWN,
     COMPACT_THREE_COLUMN_TABLE_MARKDOWN,
+    VERBOSE_COMPACT_TABLE_MARKDOWN,
     WIDE_TABLE_MARKDOWN,
   ].join("\n\n"),
 }];
@@ -285,7 +292,8 @@ const contexts = [
 const tableFixtures = [
   { name: "short table", index: 0, alignments: ["left", "right"], shouldScroll: false },
   { name: "compact three-column table", index: 1, alignments: Array(3).fill("left"), shouldScroll: false },
-  { name: "wide table", index: 2, alignments: Array(14).fill("left"), shouldScroll: true },
+  { name: "verbose compact table", index: 2, alignments: Array(2).fill("left"), shouldScroll: false },
+  { name: "wide table", index: 3, alignments: Array(14).fill("left"), shouldScroll: true },
 ];
 const mobileViewports = [
   { name: "320px mobile", width: 320, height: 720 },

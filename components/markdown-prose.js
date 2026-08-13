@@ -93,6 +93,59 @@ const SIZES = {
   },
 };
 
+const TABLE_CELL_HORIZONTAL_PADDING = 24;
+const TABLE_MINIMUM_COLUMN_WIDTH = 48;
+const TABLE_CHARACTER_WIDTH = 8;
+
+function markdownNodeText(node) {
+  if (!node || typeof node !== "object") return "";
+  if (typeof node.value === "string") return node.value;
+  if (typeof node.alt === "string") return node.alt;
+  return Array.isArray(node.children)
+    ? node.children.map(markdownNodeText).join("")
+    : "";
+}
+
+function tableContentMinWidth(tableNode) {
+  const tableChildren = Array.isArray(tableNode?.children)
+    ? tableNode.children
+    : [];
+  const rows = tableChildren.flatMap((child) => {
+    if (child.type === "tableRow" || child.tagName === "tr") return [child];
+    return Array.isArray(child.children)
+      ? child.children.filter(
+        (row) => row.type === "tableRow" || row.tagName === "tr",
+      )
+      : [];
+  });
+  const columnWidths = [];
+
+  rows.forEach((row) => {
+    const cells = Array.isArray(row.children)
+      ? row.children.filter(
+        (cell) => cell.type === "tableCell" || cell.tagName === "td" || cell.tagName === "th",
+      )
+      : [];
+    cells.forEach((cell, columnIndex) => {
+      const words = markdownNodeText(cell).match(/\S+/g) || [];
+      const longestWord = words.reduce(
+        (length, word) => Math.max(length, word.length),
+        0,
+      );
+      const readableWidth = Math.max(
+        TABLE_MINIMUM_COLUMN_WIDTH,
+        longestWord * TABLE_CHARACTER_WIDTH + TABLE_CELL_HORIZONTAL_PADDING,
+      );
+      columnWidths[columnIndex] = Math.max(
+        columnWidths[columnIndex] || 0,
+        readableWidth,
+      );
+    });
+  });
+
+  return columnWidths.reduce((total, width) => total + width, 0);
+}
+
 export default function MarkdownProse({ children, size = "article" }) {
   const bodyColor = useColorModeValue("gray.700", "gray.300");
   const headingColor = useColorModeValue("gray.800", "gray.100");
@@ -186,35 +239,40 @@ export default function MarkdownProse({ children, size = "article" }) {
     li: ({ children }) => (
       <ListItem lineHeight={lineHeight}>{children}</ListItem>
     ),
-    table: ({ children }) => (
-      <TableContainer
-        w="100%"
-        maxW="100%"
-        role="region"
-        aria-label="Markdown data table. Scroll horizontally on smaller screens."
-        tabIndex={0}
-        mb={paragraphMb}
-        overflowX="auto"
-        overflowY="hidden"
-        whiteSpace="normal"
-        borderWidth="1px"
-        borderColor={tableBorder}
-        borderRadius="md"
-        sx={{ WebkitOverflowScrolling: "touch" }}
-      >
-        <Table
-          aria-label="Markdown data table"
-          w="fit-content"
-          minW="100%"
-          size={size === "compact" ? "sm" : "md"}
-          variant="simple"
+    table: ({ children, node }) => {
+      const contentMinWidth = tableContentMinWidth(node);
+      const mobileMinWidth = Math.max(contentMinWidth, TABLE_MINIMUM_COLUMN_WIDTH);
+
+      return (
+        <TableContainer
+          w="100%"
+          maxW="100%"
+          role="region"
+          aria-label="Markdown data table. Scroll horizontally on smaller screens."
+          tabIndex={0}
+          mb={paragraphMb}
+          overflowX="auto"
+          overflowY="hidden"
           whiteSpace="normal"
-          sx={{ tableLayout: "auto" }}
+          borderWidth="1px"
+          borderColor={tableBorder}
+          borderRadius="md"
+          sx={{ WebkitOverflowScrolling: "touch" }}
         >
-          {children}
-        </Table>
-      </TableContainer>
-    ),
+          <Table
+            aria-label="Markdown data table"
+            w="fit-content"
+            minW={{ base: `max(100%, ${mobileMinWidth}px)`, md: "100%" }}
+            size={size === "compact" ? "sm" : "md"}
+            variant="simple"
+            whiteSpace="normal"
+            sx={{ tableLayout: "auto" }}
+          >
+            {children}
+          </Table>
+        </TableContainer>
+      );
+    },
     thead: ({ children }) => <Thead bg={tableHeaderBg}>{children}</Thead>,
     tbody: ({ children }) => (
       <Tbody sx={{ "tr:nth-of-type(even)": { bg: tableStripeBg } }}>
@@ -237,7 +295,8 @@ export default function MarkdownProse({ children, size = "article" }) {
         textTransform="none"
         letterSpacing="normal"
         textAlign={style?.textAlign}
-        whiteSpace="nowrap"
+        whiteSpace="normal"
+        wordBreak="break-word"
       >
         {children}
       </Th>
