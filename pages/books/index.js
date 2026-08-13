@@ -60,7 +60,8 @@ const sortByDate = (a, b, direction = "desc") => {
   const dateA = a.date ? new Date(a.date).getTime() : null;
   const dateB = b.date ? new Date(b.date).getTime() : null;
 
-  if (dateA && dateB) return direction === "desc" ? dateB - dateA : dateA - dateB;
+  if (dateA && dateB)
+    return direction === "desc" ? dateB - dateA : dateA - dateB;
   if (dateA) return direction === "desc" ? -1 : 1;
   if (dateB) return direction === "desc" ? 1 : -1;
   return 0;
@@ -128,26 +129,30 @@ const BooksPage = ({ books, error }) => {
 
     if (sortOption === "highest_rating") {
       currentBooks.sort((a, b) => {
-        if ((b.rating ?? 0) !== (a.rating ?? 0)) return (b.rating ?? 0) - (a.rating ?? 0);
+        if ((b.rating ?? 0) !== (a.rating ?? 0))
+          return (b.rating ?? 0) - (a.rating ?? 0);
         return sortByDate(a, b, "desc") || a.title.localeCompare(b.title);
       });
     } else if (sortOption === "lowest_rating") {
       currentBooks.sort((a, b) => {
-        if ((a.rating ?? 0) !== (b.rating ?? 0)) return (a.rating ?? 0) - (b.rating ?? 0);
+        if ((a.rating ?? 0) !== (b.rating ?? 0))
+          return (a.rating ?? 0) - (b.rating ?? 0);
         return sortByDate(a, b, "desc") || a.title.localeCompare(b.title);
       });
     } else if (sortOption === "newest") {
       currentBooks.sort((a, b) => {
         const byDate = sortByDate(a, b, "desc");
         if (byDate !== 0) return byDate;
-        if ((b.rating ?? 0) !== (a.rating ?? 0)) return (b.rating ?? 0) - (a.rating ?? 0);
+        if ((b.rating ?? 0) !== (a.rating ?? 0))
+          return (b.rating ?? 0) - (a.rating ?? 0);
         return a.title.localeCompare(b.title);
       });
     } else if (sortOption === "oldest") {
       currentBooks.sort((a, b) => {
         const byDate = sortByDate(a, b, "asc");
         if (byDate !== 0) return byDate;
-        if ((b.rating ?? 0) !== (a.rating ?? 0)) return (b.rating ?? 0) - (a.rating ?? 0);
+        if ((b.rating ?? 0) !== (a.rating ?? 0))
+          return (b.rating ?? 0) - (a.rating ?? 0);
         return a.title.localeCompare(b.title);
       });
     } else if (sortOption === "alphabetical") {
@@ -166,7 +171,13 @@ const BooksPage = ({ books, error }) => {
     return sortedBooks.filter((book) => {
       const matchesTag = selectedTag ? book.tags?.includes(selectedTag) : true;
       const matchesQuery = query
-        ? [book.title, book.author, book.lesson, book.notes, ...(book.tags || [])]
+        ? [
+            book.title,
+            book.author,
+            book.lesson,
+            book.notes,
+            ...(book.tags || []),
+          ]
             .join(" ")
             .toLowerCase()
             .includes(query)
@@ -185,7 +196,9 @@ const BooksPage = ({ books, error }) => {
     const datedBooks = normalizedBooks.filter((book) => book.date);
     if (datedBooks.length === 0) return null;
 
-    return [...datedBooks].sort((a, b) => new Date(b.date) - new Date(a.date))[0];
+    return [...datedBooks].sort(
+      (a, b) => new Date(b.date) - new Date(a.date),
+    )[0];
   }, [normalizedBooks]);
 
   const hasActiveFilters = Boolean(selectedTag || searchQuery.trim());
@@ -261,11 +274,17 @@ const BooksPage = ({ books, error }) => {
                   Reading library
                 </Badge>
                 <Box>
-                  <Heading as="h1" fontSize={{ base: "xl", md: "2xl" }} lineHeight="1.2" mb={2}>
+                  <Heading
+                    as="h1"
+                    fontSize={{ base: "xl", md: "2xl" }}
+                    lineHeight="1.2"
+                    mb={2}
+                  >
                     Books I&apos;ve read
                   </Heading>
                   <Text fontSize="sm" color={mutedText}>
-                    Notes on what stuck, what changed, and the occasional full breakdown.
+                    Notes on what stuck, what changed, and the occasional full
+                    breakdown.
                   </Text>
                 </Box>
                 {heroMetaItems.length > 0 && (
@@ -358,19 +377,21 @@ const BooksPage = ({ books, error }) => {
               >
                 <Stack direction={{ base: "column", xl: "row" }} spacing={4}>
                   <InputGroup flex={1}>
-                    <InputLeftElement pointerEvents="none">
+                    <InputLeftElement pointerEvents="none" h="44px">
                       <Icon as={IoSearchOutline} color="gray.400" />
                     </InputLeftElement>
                     <Input
                       placeholder="Search titles, authors, notes, or tags"
                       value={searchQuery}
                       onChange={(event) => setSearchQuery(event.target.value)}
+                      minH="44px"
                     />
                   </InputGroup>
                   <Select
                     value={sortOption}
                     onChange={(event) => setSortOption(event.target.value)}
                     maxW={{ base: "100%", xl: "220px" }}
+                    minH="44px"
                   >
                     <option value="highest_rating">Highest Rating</option>
                     <option value="lowest_rating">Lowest Rating</option>
@@ -384,6 +405,7 @@ const BooksPage = ({ books, error }) => {
                       variant="ghost"
                       colorScheme="orange"
                       onClick={resetFilters}
+                      minH="44px"
                     >
                       Clear filters
                     </Button>
@@ -394,6 +416,7 @@ const BooksPage = ({ books, error }) => {
                   <WrapItem>
                     <Button
                       size="sm"
+                      minH="44px"
                       colorScheme={!selectedTag ? "orange" : "gray"}
                       variant={!selectedTag ? "solid" : "outline"}
                       onClick={() => setSelectedTag(null)}
@@ -405,6 +428,7 @@ const BooksPage = ({ books, error }) => {
                     <WrapItem key={tag}>
                       <Button
                         size="sm"
+                        minH="44px"
                         colorScheme="orange"
                         variant={selectedTag === tag ? "solid" : "outline"}
                         onClick={() => setSelectedTag(tag)}
@@ -415,7 +439,13 @@ const BooksPage = ({ books, error }) => {
                   ))}
                 </Wrap>
 
-                <HStack mt={4} spacing={3} color={mutedText} fontSize="sm" flexWrap="wrap">
+                <HStack
+                  mt={4}
+                  spacing={3}
+                  color={mutedText}
+                  fontSize="sm"
+                  flexWrap="wrap"
+                >
                   <HStack spacing={1}>
                     <Icon as={IoStarOutline} />
                     <Text>{filteredBooks.length} selected</Text>
@@ -445,7 +475,12 @@ const BooksPage = ({ books, error }) => {
                   textAlign="center"
                   bg={accentSubtle}
                 >
-                  <Icon as={IoFlashOutline} boxSize={8} color="orange.400" mb={3} />
+                  <Icon
+                    as={IoFlashOutline}
+                    boxSize={8}
+                    color="orange.400"
+                    mb={3}
+                  />
                   <Heading as="h2" size="md" mb={2}>
                     No books found
                   </Heading>
@@ -458,7 +493,12 @@ const BooksPage = ({ books, error }) => {
                   {featuredBook && (
                     <Box>
                       <HStack spacing={3} mb={4} align="center" flexWrap="wrap">
-                        <Badge colorScheme="orange" px={3} py={1} borderRadius="full">
+                        <Badge
+                          colorScheme="orange"
+                          px={3}
+                          py={1}
+                          borderRadius="full"
+                        >
                           Featured result
                         </Badge>
                         <Text fontSize="sm" color={mutedText}>
@@ -471,7 +511,13 @@ const BooksPage = ({ books, error }) => {
 
                   {bookGrid.length > 0 && (
                     <Box>
-                      <Flex justify="space-between" mb={4} gap={3} wrap="wrap" align="center">
+                      <Flex
+                        justify="space-between"
+                        mb={4}
+                        gap={3}
+                        wrap="wrap"
+                        align="center"
+                      >
                         <Heading as="h2" size="md">
                           Explore more
                         </Heading>
@@ -479,7 +525,10 @@ const BooksPage = ({ books, error }) => {
                           {bookGrid.length} remaining books
                         </Text>
                       </Flex>
-                      <SimpleGrid columns={{ base: 1, md: 2, xl: 3 }} spacing={6}>
+                      <SimpleGrid
+                        columns={{ base: 1, md: 2, xl: 3 }}
+                        spacing={6}
+                      >
                         {bookGrid.map((book) => (
                           <BookCard
                             key={book.slug || `${book.title}-${book.author}`}

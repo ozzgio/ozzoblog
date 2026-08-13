@@ -71,6 +71,7 @@ const NewsletterSubscribe = (props) => {
           onChange={(event) => setEmail(event.target.value)}
           isDisabled={status === STATUS.LOADING}
           size="md"
+          minH="44px"
           maxW={{ base: "100%", sm: "320px" }}
         />
         <Button
@@ -78,6 +79,7 @@ const NewsletterSubscribe = (props) => {
           colorScheme="orange"
           isDisabled={status === STATUS.LOADING}
           size="md"
+          minH="44px"
           flexShrink={0}
         >
           {status === STATUS.LOADING ? "Subscribing…" : "Subscribe"}

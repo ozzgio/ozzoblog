@@ -25,7 +25,7 @@ const ErrorPage = () => {
         <Text>The page you&apos;re looking for was not found.</Text>
         <Divider my={6} />
         <Box my={6} align="center">
-          <Button as={NextLink} href="/" colorScheme="orange">
+          <Button as={NextLink} href="/" colorScheme="orange" minH="44px">
             Return to home
           </Button>
         </Box>

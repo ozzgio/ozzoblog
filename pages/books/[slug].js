@@ -6,9 +6,12 @@ import {
   Icon,
   Image,
   Link,
+  Stack,
   Tag,
   Text,
   VStack,
+  Wrap,
+  WrapItem,
   useColorModeValue,
   Divider,
 } from "@chakra-ui/react";
@@ -60,6 +63,15 @@ function iconForLabel(label) {
   return match ? match[1] : IoChatbubbleOutline;
 }
 
+function sectionId(label, index) {
+  const slug = String(label)
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+
+  return `reading-arc-${index}-${slug || "note"}`;
+}
+
 function ReadingArc({ sections }) {
   const railColor = useColorModeValue("orange.300", "orange.600");
   const markerBg = useColorModeValue("white", "#1a1a1e");
@@ -69,6 +81,7 @@ function ReadingArc({ sections }) {
 
   return (
     <Box
+      as="ol"
       borderLeftWidth="2px"
       borderLeftColor={railColor}
       ml={{ base: 2, md: 3 }}
@@ -80,8 +93,16 @@ function ReadingArc({ sections }) {
         const isDecision = /decision|decided/i.test(section.label);
         const isLast = index === sections.length - 1;
 
+        const headingId = sectionId(section.label, index);
+
         return (
-          <Box key={section.label} position="relative" pb={isLast ? 0 : 7}>
+          <Box
+            as="li"
+            key={`${section.label}-${index}`}
+            position="relative"
+            pb={isLast ? 0 : 8}
+            listStyleType="none"
+          >
             <Box
               position="absolute"
               left={{ base: "-37px", md: "-49px" }}
@@ -95,10 +116,16 @@ function ReadingArc({ sections }) {
               alignItems="center"
               justifyContent="center"
             >
-              <Icon as={iconForLabel(section.label)} boxSize={{ base: 3, md: 3.5 }} color={railColor} />
+              <Icon
+                as={iconForLabel(section.label)}
+                boxSize={{ base: 3, md: 3.5 }}
+                color={railColor}
+              />
             </Box>
 
-            <Text
+            <Heading
+              as="h3"
+              id={headingId}
               fontSize="xs"
               fontWeight="bold"
               textTransform="uppercase"
@@ -107,7 +134,7 @@ function ReadingArc({ sections }) {
               mb={2}
             >
               {section.label}
-            </Text>
+            </Heading>
 
             {isDecision ? (
               <Box
@@ -157,14 +184,18 @@ export default function BookDetailPage({ book }) {
     book.problem && { label: "Why I picked this up", body: book.problem },
     book.concept && { label: "What it teaches", body: book.concept },
     book.decision && { label: "What I decided", body: book.decision },
-    book.implementation && { label: "Implementation", body: book.implementation },
+    book.implementation && {
+      label: "Implementation",
+      body: book.implementation,
+    },
     book.effect && { label: "What changed", body: book.effect },
     book.trade_off && { label: "Critical reflection", body: book.trade_off },
   ].filter(Boolean);
 
-  const sections = structuredSections.length > 0
-    ? structuredSections
-    : parseBookNotesSections(book.notes);
+  const sections =
+    structuredSections.length > 0
+      ? structuredSections
+      : parseBookNotesSections(book.notes);
 
   const hasArc = sections.length > 0;
   const hasQuotes = book.quotes?.length > 0;
@@ -179,13 +210,24 @@ export default function BookDetailPage({ book }) {
         <link rel="canonical" href={canonicalUrl} />
       </Head>
 
-      <Container maxW="2xl" py={{ base: 6, md: 10 }}>
-        <VStack align="start" spacing={8}>
+      <Container maxW="3xl" py={{ base: 6, md: 12 }}>
+        <VStack
+          align="start"
+          spacing={{ base: 9, md: 12 }}
+          w="100%"
+          maxW="2xl"
+          mx="auto"
+        >
           <Link
             as={NextLink}
             href="/books"
             color={linkOrange}
             fontWeight="semibold"
+            minH="44px"
+            display="inline-flex"
+            alignItems="center"
+            px={2}
+            mx={-2}
           >
             <HStack spacing={1}>
               <Icon as={IoArrowBackOutline} />
@@ -193,59 +235,118 @@ export default function BookDetailPage({ book }) {
             </HStack>
           </Link>
 
-          <HStack align="start" spacing={{ base: 4, md: 6 }} w="100%" flexWrap="wrap">
-            {book.cover && (
-              <Image
-                src={book.cover}
-                alt={book.title}
-                flexShrink={0}
-                w={{ base: "92px", md: "120px" }}
-                borderRadius="md"
-                boxShadow="lg"
-                objectFit="cover"
-              />
-            )}
-            <VStack align="start" spacing={3} flex={1} minW="200px">
-              <Heading
-                as="h1"
-                size="lg"
-                lineHeight="1.2"
-                color={headingColor}
-                fontFamily={READING_FONT}
-              >
-                {book.title}
-              </Heading>
-              <HStack spacing={2} color={mutedText} fontSize="sm">
-                <Icon as={IoBookOutline} />
-                <Text fontWeight="medium">{book.author}</Text>
-                {book.date && (
-                  <>
-                    <Text aria-hidden="true">&middot;</Text>
-                    <Icon as={IoCalendarOutline} />
-                    <Text>Read {formatAbsoluteDate(book.date)}</Text>
-                  </>
-                )}
-              </HStack>
-              {book.rating > 0 && (
-                <HStack spacing={2}>
-                  <RatingStar rating={book.rating} />
-                  <Text color={linkOrange} fontWeight="bold" fontSize="sm">
-                    {book.rating}/5
-                  </Text>
-                </HStack>
+          <Box
+            w="100%"
+            borderWidth="1px"
+            borderColor={proseBorder}
+            borderRadius={{ base: "2xl", md: "3xl" }}
+            bg={quoteBg}
+            p={{ base: 5, md: 8 }}
+          >
+            <Stack
+              direction={{ base: "column", sm: "row" }}
+              align={{ base: "start", sm: "center" }}
+              spacing={{ base: 5, md: 8 }}
+            >
+              {book.cover && (
+                <Box
+                  w={{ base: "132px", md: "160px" }}
+                  flexShrink={0}
+                  alignSelf={{ base: "center", sm: "start" }}
+                >
+                  <Image
+                    src={book.cover}
+                    alt={`Cover of ${book.title}`}
+                    w="100%"
+                    borderRadius="lg"
+                    boxShadow="xl"
+                    objectFit="cover"
+                  />
+                </Box>
               )}
-              <HStack flexWrap="wrap" spacing={2}>
-                {book.tags?.map((tag) => (
-                  <Tag key={tag} colorScheme="orange" borderRadius="full" size="sm">
-                    {tag}
-                  </Tag>
-                ))}
-              </HStack>
-            </VStack>
-          </HStack>
+              <VStack align="start" spacing={4} flex={1} minW={0}>
+                <Text
+                  fontSize="xs"
+                  fontWeight="bold"
+                  textTransform="uppercase"
+                  letterSpacing="widest"
+                  color={linkOrange}
+                >
+                  Reading notes
+                </Text>
+                <Heading
+                  as="h1"
+                  fontSize={{ base: "3xl", md: "4xl" }}
+                  lineHeight="1.05"
+                  color={headingColor}
+                  fontFamily={READING_FONT}
+                >
+                  {book.title}
+                </Heading>
+                <Wrap spacingX={4} spacingY={2} color={mutedText} fontSize="sm">
+                  <WrapItem>
+                    <HStack spacing={2}>
+                      <Icon as={IoBookOutline} />
+                      <Text fontWeight="medium">{book.author}</Text>
+                    </HStack>
+                  </WrapItem>
+                  {book.date && (
+                    <WrapItem>
+                      <HStack spacing={2}>
+                        <Icon as={IoCalendarOutline} />
+                        <Text>Read {formatAbsoluteDate(book.date)}</Text>
+                      </HStack>
+                    </WrapItem>
+                  )}
+                </Wrap>
+                {book.rating > 0 && (
+                  <HStack spacing={2}>
+                    <RatingStar rating={book.rating} />
+                    <Text color={linkOrange} fontWeight="bold" fontSize="sm">
+                      {book.rating}/5
+                    </Text>
+                  </HStack>
+                )}
+                <HStack flexWrap="wrap" spacing={2}>
+                  {book.tags?.map((tag) => (
+                    <Tag
+                      key={tag}
+                      colorScheme="orange"
+                      borderRadius="full"
+                      size="sm"
+                    >
+                      {tag}
+                    </Tag>
+                  ))}
+                </HStack>
+              </VStack>
+            </Stack>
+          </Box>
 
           {book.lesson && (
-            <Box w="100%" borderLeftWidth="3px" borderLeftColor="orange.400" pl={4} py={1}>
+            <Box
+              as="section"
+              aria-labelledby="book-takeaway"
+              w="100%"
+              borderLeftWidth="3px"
+              borderLeftColor="orange.400"
+              bg={quoteBg}
+              borderRadius="0 xl xl 0"
+              pl={{ base: 5, md: 6 }}
+              pr={{ base: 4, md: 6 }}
+              py={{ base: 4, md: 5 }}
+            >
+              <Heading
+                as="h2"
+                id="book-takeaway"
+                fontSize="xs"
+                textTransform="uppercase"
+                letterSpacing="widest"
+                color={linkOrange}
+                mb={3}
+              >
+                The idea I kept
+              </Heading>
               <Text
                 fontStyle="italic"
                 color={bodyColor}
@@ -260,8 +361,14 @@ export default function BookDetailPage({ book }) {
 
           {hasArc && (
             <VStack align="start" spacing={4} w="100%">
-              <Heading as="h2" size="sm" color={mutedText} textTransform="uppercase" letterSpacing="wider">
-                My read
+              <Heading
+                as="h2"
+                size="sm"
+                color={mutedText}
+                textTransform="uppercase"
+                letterSpacing="wider"
+              >
+                Reading arc
               </Heading>
               <ReadingArc sections={sections} />
             </VStack>
@@ -273,7 +380,13 @@ export default function BookDetailPage({ book }) {
               <VStack align="start" spacing={4} w="100%">
                 <HStack spacing={2}>
                   <Icon as={IoChatbubbleOutline} color="orange.400" />
-                  <Heading as="h2" size="sm" color={mutedText} textTransform="uppercase" letterSpacing="wider">
+                  <Heading
+                    as="h2"
+                    size="sm"
+                    color={mutedText}
+                    textTransform="uppercase"
+                    letterSpacing="wider"
+                  >
                     Notable quotes
                   </Heading>
                 </HStack>
@@ -289,7 +402,12 @@ export default function BookDetailPage({ book }) {
                       bg={quoteBg}
                       borderRadius="sm"
                     >
-                      <Text fontSize="sm" fontStyle="italic" color={bodyColor} lineHeight="1.7">
+                      <Text
+                        fontSize="sm"
+                        fontStyle="italic"
+                        color={bodyColor}
+                        lineHeight="1.7"
+                      >
                         {quote}
                       </Text>
                     </Box>
@@ -318,8 +436,10 @@ export default function BookDetailPage({ book }) {
                   fontWeight="semibold"
                   isExternal
                   fontSize="sm"
+                  minH="44px"
                   mt={2}
-                  display="block"
+                  display="inline-flex"
+                  alignItems="center"
                 >
                   Open original link
                 </Link>

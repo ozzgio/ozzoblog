@@ -37,7 +37,13 @@ const NewsletterPending = () => (
             We sent you a confirmation link. Click it to activate your
             subscription and start receiving one field note each week.
           </Text>
-          <Button as={NextLink} href="/" colorScheme="orange" size="md">
+          <Button
+            as={NextLink}
+            href="/"
+            colorScheme="orange"
+            size="md"
+            minH="44px"
+          >
             Back to home
           </Button>
         </Box>
