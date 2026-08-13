@@ -13,6 +13,11 @@ const SHORT_TABLE_MARKDOWN = [
   "| :--- | ---: |",
   "| Short value | 1 |",
 ].join("\n");
+const COMPACT_THREE_COLUMN_TABLE_MARKDOWN = [
+  "| A | B | C |",
+  "| :--- | :--- | :--- |",
+  "| 1 | 2 | 3 |",
+].join("\n");
 const WIDE_TABLE_MARKDOWN = [
   "| One | Two | Three | Four | Five | Six | Seven | Eight | Nine | Ten | Eleven | Twelve | Thirteen | Fourteen |",
   "| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |",
@@ -28,6 +33,7 @@ const fixtureArticles = [{
     "# Markdown table fixture",
     "This verifies article prose.",
     SHORT_TABLE_MARKDOWN,
+    COMPACT_THREE_COLUMN_TABLE_MARKDOWN,
     WIDE_TABLE_MARKDOWN,
   ].join("\n\n"),
 }];
@@ -42,6 +48,7 @@ const fixtureBooks = [{
     "This verifies the compact prose path.",
     "**Implementation**",
     SHORT_TABLE_MARKDOWN,
+    COMPACT_THREE_COLUMN_TABLE_MARKDOWN,
     WIDE_TABLE_MARKDOWN,
   ].join("\n\n"),
 }];
@@ -224,9 +231,9 @@ function assertTablePresentation(metrics, context, tableFixture, mode) {
   assert.match(metrics.containerLabel || "", /scroll horizontally/i, label + ": scroll region needs instructions");
 }
 
-async function assertMobileLayout(page, context, tableFixture, mode) {
+async function assertMobileLayout(page, context, tableFixture, mode, viewportName) {
   const metrics = await tableMetrics(page, tableFixture);
-  assertTablePresentation(metrics, context, tableFixture, mode + " mobile");
+  assertTablePresentation(metrics, context, tableFixture, mode + " " + viewportName);
 
   const viewportMetrics = await page.evaluate(() => ({
     documentWidth: document.documentElement.scrollWidth,
@@ -235,23 +242,23 @@ async function assertMobileLayout(page, context, tableFixture, mode) {
 
   assert.ok(
     viewportMetrics.documentWidth <= viewportMetrics.viewportWidth,
-    context.name + " " + tableFixture.name + " " + mode + " mobile: the page must not overflow horizontally (" +
+    context.name + " " + tableFixture.name + " " + mode + " " + viewportName + ": the page must not overflow horizontally (" +
       viewportMetrics.documentWidth + "px > " + viewportMetrics.viewportWidth + "px; table " +
       metrics.containerClientWidth + "px / " + metrics.containerScrollWidth + "px)",
   );
   assert.ok(
     ["auto", "scroll"].includes(metrics.containerOverflowX),
-    context.name + " " + tableFixture.name + " " + mode + " mobile: the container must handle horizontal overflow",
+    context.name + " " + tableFixture.name + " " + mode + " " + viewportName + ": the container must handle horizontal overflow",
   );
   if (tableFixture.shouldScroll) {
     assert.ok(
       metrics.containerScrollWidth > metrics.containerClientWidth,
-      context.name + " " + tableFixture.name + " " + mode + " mobile: wide tables must scroll inside the container",
+      context.name + " " + tableFixture.name + " " + mode + " " + viewportName + ": wide tables must scroll inside the container",
     );
   } else {
     assert.ok(
       metrics.containerScrollWidth <= metrics.containerClientWidth + 1,
-      context.name + " " + tableFixture.name + " " + mode + " mobile: fitting tables must not force horizontal panning",
+      context.name + " " + tableFixture.name + " " + mode + " " + viewportName + ": fitting tables must not force horizontal panning",
     );
   }
 }
@@ -277,7 +284,12 @@ const contexts = [
 ];
 const tableFixtures = [
   { name: "short table", index: 0, alignments: ["left", "right"], shouldScroll: false },
-  { name: "wide table", index: 1, alignments: Array(14).fill("left"), shouldScroll: true },
+  { name: "compact three-column table", index: 1, alignments: Array(3).fill("left"), shouldScroll: false },
+  { name: "wide table", index: 2, alignments: Array(14).fill("left"), shouldScroll: true },
+];
+const mobileViewports = [
+  { name: "320px mobile", width: 320, height: 720 },
+  { name: "390px mobile", width: 390, height: 844 },
 ];
 
 const fixture = await createFixtureServer();
@@ -311,16 +323,18 @@ try {
       );
     }
 
-    await page.setViewportSize({ width: 390, height: 844 });
-    await page.reload({ waitUntil: "networkidle" });
-    await setColorMode(page, "dark");
-    for (const tableFixture of tableFixtures) {
-      await assertMobileLayout(page, proseContext, tableFixture, "dark");
-    }
+    for (const viewport of mobileViewports) {
+      await page.setViewportSize(viewport);
+      await page.reload({ waitUntil: "networkidle" });
+      await setColorMode(page, "dark");
+      for (const tableFixture of tableFixtures) {
+        await assertMobileLayout(page, proseContext, tableFixture, "dark", viewport.name);
+      }
 
-    await setColorMode(page, "light");
-    for (const tableFixture of tableFixtures) {
-      await assertMobileLayout(page, proseContext, tableFixture, "light");
+      await setColorMode(page, "light");
+      for (const tableFixture of tableFixtures) {
+        await assertMobileLayout(page, proseContext, tableFixture, "light", viewport.name);
+      }
     }
   }
 

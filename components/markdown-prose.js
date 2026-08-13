@@ -209,14 +209,7 @@ export default function MarkdownProse({ children, size = "article" }) {
           size={size === "compact" ? "sm" : "md"}
           variant="simple"
           whiteSpace="normal"
-          sx={{
-            tableLayout: "auto",
-            "@media screen and (max-width: 47.99em)": {
-              "&:has(th:nth-child(3))": {
-                minWidth: "36rem",
-              },
-            },
-          }}
+          sx={{ tableLayout: "auto" }}
         >
           {children}
         </Table>
@@ -244,8 +237,7 @@ export default function MarkdownProse({ children, size = "article" }) {
         textTransform="none"
         letterSpacing="normal"
         textAlign={style?.textAlign}
-        whiteSpace="normal"
-        wordBreak="break-word"
+        whiteSpace="nowrap"
       >
         {children}
       </Th>
