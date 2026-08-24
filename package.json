@@ -18,7 +18,7 @@
     "@emotion/styled": "^11.14.1",
     "@notionhq/client": "^2.3.0",
     "dotenv": "^16.5.0",
-    "framer-motion": "^11.2.10",
+    "framer-motion": "^13.1.1",
     "mermaid": "^11.16.1",
     "next": "^15.5.21",
     "react": "^18.3.1",
