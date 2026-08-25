@@ -129,6 +129,11 @@ const BrandIntro = ({ children }) => {
                       transition={CONVERGE_TRANSITION}
                       style={{ transformOrigin: "50px 50px" }}
                     />
+                    {/* Fixed-length segment (pathLength never animates) --
+                        only rotate moves: starts unrotated (the segment
+                        sitting on the right), does one full 360 revolution,
+                        and lands on the same -50deg rest position the
+                        static mark (moon-z-mark.js) already uses. */}
                     <motion.circle
                       cx="50"
                       cy="50"
@@ -137,10 +142,10 @@ const BrandIntro = ({ children }) => {
                       stroke="#c05621"
                       strokeWidth="6"
                       pathLength={1}
-                      initial={{ pathLength: 0 }}
-                      animate={{ pathLength: 0.25 }}
+                      initial={{ pathLength: 0.25, rotate: 0 }}
+                      animate={{ rotate: -410 }}
                       transition={CONVERGE_TRANSITION}
-                      style={{ rotate: -50, transformOrigin: "50px 50px" }}
+                      style={{ transformOrigin: "50px 50px" }}
                     />
                   </svg>
                 )}
