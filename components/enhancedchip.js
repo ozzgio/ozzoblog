@@ -10,8 +10,19 @@ const EnhancedChip = ({ tech, delay = 0 }) => {
   const hoverBg = useColorModeValue("gray.50", "gray.700");
   const [imgError, setImgError] = useState(false);
   
-  // Check if image is an external SVG or if it's a local file
-  const isExternalSVG = tech.image?.startsWith('http') && (tech.image?.endsWith('.svg') || tech.image?.includes('simpleicons.org'));
+  // Check if image is an external SVG or if it's a local file. Hostname is
+  // checked via URL parsing, not a substring match -- image?.includes(...)
+  // would also match "simpleicons.org.evil.example" or "?u=simpleicons.org".
+  const isFromSimpleIcons = (() => {
+    if (!tech.image?.startsWith('http')) return false;
+    try {
+      const hostname = new URL(tech.image).hostname;
+      return hostname === 'simpleicons.org' || hostname.endsWith('.simpleicons.org');
+    } catch {
+      return false;
+    }
+  })();
+  const isExternalSVG = tech.image?.startsWith('http') && (tech.image?.endsWith('.svg') || isFromSimpleIcons);
   const isLocalSVG = tech.image?.startsWith('/') && tech.image?.endsWith('.svg');
   const shouldUnoptimize = isExternalSVG || isLocalSVG;
 

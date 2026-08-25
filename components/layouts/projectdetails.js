@@ -40,7 +40,7 @@ const ProjectDetailsLayout = ({
       {title && (
         <Head>
           <title key="project-title-tag">
-            {`${title || ""} - Ozzo`.trim()}
+            {`${title} - Ozzo`}
           </title>
           <meta
             name="description"
