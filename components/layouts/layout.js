@@ -44,9 +44,9 @@ const Layout = ({
         <meta name="robots" content={robots} />
         {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-        <link rel="icon" type="image/png" sizes="512x512" href="/images/zicon.png" />
+        <link rel="icon" type="image/png" sizes="512x512" href="/images/moon-z-icon.png" />
         <link rel="icon" href="/favicon.ico" />
-        <link rel="apple-touch-icon" href="/images/zicon.png" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <link rel="manifest" href="/site.webmanifest" />
         <meta property="og:title" content={shareTitle} />
         <meta property="og:description" content={description} />

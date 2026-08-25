@@ -72,7 +72,8 @@ const NewsletterSubscribe = (props) => {
           isDisabled={status === STATUS.LOADING}
           size="md"
           minH="44px"
-          maxW={{ base: "100%", sm: "320px" }}
+          w="100%"
+          maxW="320px"
         />
         <Button
           type="submit"

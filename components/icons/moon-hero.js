@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { Box, useColorMode } from "@chakra-ui/react";
+import { Box, useColorMode, useColorModeValue } from "@chakra-ui/react";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { playfairDisplay } from "../fonts";
@@ -304,6 +304,7 @@ function createSprite(drawFn) {
 // --- Component ---
 const MoonHero = ({ size = 220 }) => {
   const mountRef = useRef(null);
+  const labelRef = useRef(null);
   const { colorMode } = useColorMode();
 
   useEffect(() => {
@@ -385,24 +386,26 @@ const MoonHero = ({ size = 220 }) => {
     const rings = [1.42, 1.72, 2.02].map((r) => createOrbitRing(r, ringColor, ringOpacity));
     rings.forEach((r) => systemGroup.add(r));
 
-    // Planets: [drawFn, radius, startAngle, speed rad/s]
-    // Inner orbits faster, outer slower — each at a distinct rate
+    // Planets: [drawFn, radius, startAngle, speed rad/s, label]
+    // Inner orbits faster, outer slower — each at a distinct rate. Labels
+    // are what the hover tooltip shows -- swap the strings freely, they
+    // don't touch anything else.
     const PI = Math.PI;
     const defs = [
-      [drawDumbbell, 1.42, 0.0,               0.9],
-      [drawTerminal, 1.42, PI,                0.72],
-      [drawBook,     1.72, 0.5,               0.55],
-      [drawPencil,   1.72, 0.5 + PI * 2 / 3, 0.68],
-      [drawHeart,    1.72, 0.5 + PI * 4 / 3, 0.46],
-      [drawRoundel, 2.02, 1.1,                0.32],
-      [drawCoffee,   2.02, 1.1 + PI,          0.40],
+      [drawDumbbell, 1.42, 0.0,               0.9,  "Training"],
+      [drawTerminal, 1.42, PI,                0.72, "Shipping code"],
+      [drawBook,     1.72, 0.5,               0.55, "Reading"],
+      [drawPencil,   1.72, 0.5 + PI * 2 / 3, 0.68, "Writing"],
+      [drawHeart,    1.72, 0.5 + PI * 4 / 3, 0.46, "Personal life"],
+      [drawRoundel, 2.02, 1.1,                0.32, "Cars"],
+      [drawCoffee,   2.02, 1.1 + PI,          0.40, "Coffee"],
     ];
 
-    const planetData = defs.map(([fn, rad, startAngle, speed]) => {
+    const planetData = defs.map(([fn, rad, startAngle, speed, label]) => {
       const { sprite, tex, mat } = createSprite(fn);
       sprite.position.set(Math.cos(startAngle) * rad, 0, Math.sin(startAngle) * rad);
       systemGroup.add(sprite);
-      return { sprite, tex, mat, rad, angle: startAngle, speed };
+      return { sprite, tex, mat, rad, angle: startAngle, speed, label };
     });
 
     const controls = new OrbitControls(camera, renderer.domElement);
@@ -420,6 +423,40 @@ const MoonHero = ({ size = 220 }) => {
     const onEnd = () => { isInteracting = false; };
     controls.addEventListener("start", onStart);
     controls.addEventListener("end", onEnd);
+
+    // Hover labels: raycast the pointer against the planet sprites on every
+    // move and show/hide a plain DOM tooltip imperatively (not React state)
+    // so this doesn't trigger a re-render on every mouse pixel.
+    const raycaster = new THREE.Raycaster();
+    const pointer = new THREE.Vector2();
+    const spriteList = planetData.map((p) => p.sprite);
+
+    const updateHover = (clientX, clientY) => {
+      const label = labelRef.current;
+      if (!label) return;
+      const rect = renderer.domElement.getBoundingClientRect();
+      pointer.x = ((clientX - rect.left) / rect.width) * 2 - 1;
+      pointer.y = -((clientY - rect.top) / rect.height) * 2 + 1;
+      raycaster.setFromCamera(pointer, camera);
+      const hit = raycaster.intersectObjects(spriteList)[0];
+      const match = hit && planetData.find((p) => p.sprite === hit.object);
+      if (match) {
+        label.textContent = match.label;
+        label.style.left = `${clientX - rect.left + 14}px`;
+        label.style.top = `${clientY - rect.top - 10}px`;
+        label.style.opacity = "1";
+        renderer.domElement.style.cursor = "pointer";
+      } else {
+        label.style.opacity = "0";
+        renderer.domElement.style.cursor = "grab";
+      }
+    };
+    const onPointerMove = (e) => updateHover(e.clientX, e.clientY);
+    const onPointerLeave = () => {
+      if (labelRef.current) labelRef.current.style.opacity = "0";
+    };
+    renderer.domElement.addEventListener("pointermove", onPointerMove);
+    renderer.domElement.addEventListener("pointerleave", onPointerLeave);
 
     const clock = new THREE.Clock();
     let elapsed = 0;
@@ -446,6 +483,8 @@ const MoonHero = ({ size = 220 }) => {
       cancelAnimationFrame(frameId);
       controls.removeEventListener("start", onStart);
       controls.removeEventListener("end", onEnd);
+      renderer.domElement.removeEventListener("pointermove", onPointerMove);
+      renderer.domElement.removeEventListener("pointerleave", onPointerLeave);
       controls.dispose();
       sphereGeo.dispose();
       sphereMat.dispose();
@@ -459,16 +498,38 @@ const MoonHero = ({ size = 220 }) => {
   }, [size, colorMode]);
 
   return (
-    <Box
-      ref={mountRef}
-      width={{ base: "280px", sm: "340px" }}
-      maxW="100%"
-      aspectRatio={1}
-      cursor="grab"
-      display="inline-block"
-      touchAction="none"
-      filter="drop-shadow(0 0 14px rgba(160,160,210,0.45))"
-    />
+    <Box position="relative" display="inline-block" maxW="100%">
+      <Box
+        ref={mountRef}
+        width={{ base: "280px", sm: "340px" }}
+        maxW="100%"
+        aspectRatio={1}
+        cursor="grab"
+        display="inline-block"
+        sx={{ touchAction: "none" }}
+        filter="drop-shadow(0 0 14px rgba(160,160,210,0.45))"
+      />
+      <Box
+        ref={labelRef}
+        data-testid="moon-hero-hover-label"
+        position="absolute"
+        top={0}
+        left={0}
+        opacity={0}
+        pointerEvents="none"
+        transition="opacity 120ms ease"
+        bg={useColorModeValue("white", "gray.800")}
+        color={useColorModeValue("gray.800", "whiteAlpha.900")}
+        fontSize="xs"
+        fontWeight="semibold"
+        px={2}
+        py={1}
+        borderRadius="md"
+        boxShadow="md"
+        whiteSpace="nowrap"
+        zIndex={1}
+      />
+    </Box>
   );
 };
 

@@ -1,4 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <circle cx="50" cy="50" r="50" fill="#14243c"/>
-  <text x="50" y="55" font-family="Arial, Helvetica, sans-serif" font-size="62" font-weight="bold" fill="white" text-anchor="middle" dominant-baseline="middle">Z</text>
+  <circle cx="50" cy="50" r="42" fill="#0d1f2d"/>
+  <circle cx="50" cy="50" r="42" fill="none" stroke="#c05621" stroke-width="6" stroke-dasharray="66 198" transform="rotate(-50 50 50)"/>
+  <text x="50" y="52" text-anchor="middle" dominant-baseline="central" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-weight="800" font-size="46" fill="#f7f5f2">Z</text>
 </svg>

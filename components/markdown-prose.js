@@ -1,6 +1,7 @@
 import dynamic from "next/dynamic";
 import NextLink from "next/link";
 import ReactMarkdown from "react-markdown";
+import { motion } from "framer-motion";
 import {
   Box,
   Heading,
@@ -165,10 +166,20 @@ export default function MarkdownProse({ children, size = "article" }) {
         {children}
       </Heading>
     ),
+    // Section breaks (## Thesis, ## Decision, ...) get a quick fade+rise as
+    // they scroll into view -- once only, no bounce, so it reads as the
+    // section settling in rather than a decoration repeating on rescroll.
     h2: ({ children }) => (
-      <Heading as="h2" size="md" color={headingColor} mt={headingMt.h2} mb={4} lineHeight="1.3" fontFamily={READING_FONT}>
-        {children}
-      </Heading>
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-80px" }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
+      >
+        <Heading as="h2" size="md" color={headingColor} mt={headingMt.h2} mb={4} lineHeight="1.3" fontFamily={READING_FONT}>
+          {children}
+        </Heading>
+      </motion.div>
     ),
     h3: ({ children }) => (
       <Heading as="h3" size="sm" color={headingColor} mt={headingMt.h3} mb={3} lineHeight="1.4" fontFamily={READING_FONT}>
