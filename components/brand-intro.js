@@ -13,11 +13,13 @@ const FLY_S = 0.9; // the flight itself: center-stage -> the nav slot
 const FLY_MS = FLY_S * 1000 + 150; // give the flight room to finish before the overlay unmounts
 export const FLY_TRANSITION = { duration: FLY_S, ease: CONVERGE_EASE };
 
+// Same family the mark's own "Z" is set in (components/icons/moon-z-mark.js)
+// -- so the word doesn't switch typeface partway through becoming the mark.
 const LETTER_FONT = {
-  fontFamily: "var(--font-raleway), sans-serif",
+  fontFamily: "var(--font-m-plus-rounded-1c), system-ui, sans-serif",
   fontWeight: 700,
   fontSize: "min(80px, 16vw)",
-  letterSpacing: "-0.04em",
+  letterSpacing: "-0.02em",
 };
 
 const CONVERGE_TRANSITION = { duration: CONVERGE_S, ease: CONVERGE_EASE };
