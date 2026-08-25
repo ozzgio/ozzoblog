@@ -466,7 +466,7 @@ const MoonHero = ({ size = 220 }) => {
       aspectRatio={1}
       cursor="grab"
       display="inline-block"
-      touchAction="none"
+      sx={{ touchAction: "none" }}
       filter="drop-shadow(0 0 14px rgba(160,160,210,0.45))"
     />
   );

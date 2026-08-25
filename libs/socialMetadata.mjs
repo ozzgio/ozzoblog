@@ -1,5 +1,5 @@
 export const SITE_URL = "https://ozzo.blog";
-export const DEFAULT_SOCIAL_IMAGE_URL = `${SITE_URL}/images/zicon.png`;
+export const DEFAULT_SOCIAL_IMAGE_URL = `${SITE_URL}/images/social-default.png`;
 
 const resolveSiteLocalUrl = (value) =>
   value.startsWith("/") ? `${SITE_URL}${value}` : value;
