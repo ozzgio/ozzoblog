@@ -1,15 +1,5 @@
 const nextConfig = {
   reactStrictMode: true,
-  webpack: (config, { dev, isServer }) => {
-    if (dev && !isServer) {
-      // Fix webpack hot-update.json 404 errors
-      config.optimization = {
-        ...config.optimization,
-        moduleIds: 'named',
-      };
-    }
-    return config;
-  },
   images: {
     remotePatterns: [
       {
