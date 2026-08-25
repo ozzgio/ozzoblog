@@ -45,10 +45,14 @@ const ArticleCard = ({
   const sourceLabel = (() => {
     if (isInternal) return "ozzo.blog";
     try {
-      const hostname = new URL(url).hostname.replace("www.", "");
-      if (hostname.includes("linkedin.com")) return "LinkedIn";
-      if (hostname.includes("medium.com")) return "Medium";
-      if (hostname.includes("dev.to")) return "dev.to";
+      const hostname = new URL(url).hostname.replace(/^www\./, "");
+      // Exact-or-subdomain match only -- hostname.includes("linkedin.com")
+      // would also match "linkedin.com.evil.example" or "notlinkedin.com".
+      const isHost = (domain) =>
+        hostname === domain || hostname.endsWith(`.${domain}`);
+      if (isHost("linkedin.com")) return "LinkedIn";
+      if (isHost("medium.com")) return "Medium";
+      if (isHost("dev.to")) return "dev.to";
       return hostname;
     } catch {
       return "External";

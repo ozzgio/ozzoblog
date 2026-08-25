@@ -210,9 +210,26 @@ try {
   fail(`Cannot read public/sitemap.xml: ${err.message}`);
 }
 
+const SITE_ORIGIN = new URL(SITE_URL).origin;
+
 for (const fullUrl of sitemapUrls) {
+  // Sitemap entries are expected to be same-origin (next-sitemap always
+  // writes absolute ozzo.blog URLs) -- parse and check the origin
+  // explicitly rather than trusting a regex strip, so a malformed or
+  // unexpected <loc> can never turn into a request to another host.
+  let parsed;
   try {
-    const path = fullUrl.replace(/^https?:\/\/[^/]+/, "");
+    parsed = new URL(fullUrl);
+  } catch {
+    fail(`sitemap URL ${fullUrl} is not a valid URL`);
+    continue;
+  }
+  if (parsed.origin !== SITE_ORIGIN) {
+    fail(`sitemap URL ${fullUrl} has an unexpected origin (expected ${SITE_ORIGIN})`);
+    continue;
+  }
+  const path = parsed.pathname + parsed.search;
+  try {
     const res = await get(path);
     if (res.status !== 200) {
       fail(`sitemap URL ${fullUrl} → HTTP ${res.status}`);
