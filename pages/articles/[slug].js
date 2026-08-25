@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import {
   Box,
   Container,
@@ -10,10 +11,12 @@ import {
   VStack,
   useColorModeValue,
 } from "@chakra-ui/react";
+import { motion } from "framer-motion";
 import Head from "next/head";
 import NextLink from "next/link";
 import MarkdownProse from "../../components/markdown-prose";
 import NewsletterSubscribe from "../../components/NewsletterSubscribe";
+import ReadingProgress from "../../components/reading-progress";
 import { IoArrowBackOutline, IoCalendarOutline } from "react-icons/io5";
 import Layout from "../../components/layouts/layout";
 import {
@@ -30,8 +33,10 @@ import {
 const READING_FONT = "var(--font-merriweather), Georgia, serif";
 
 export default function ArticleDetailPage({ article, fetchError, slug }) {
+  const contentRef = useRef(null);
   const mutedText = useColorModeValue("gray.600", "gray.400");
   const ruleColor = useColorModeValue("orange.400", "orange.500");
+  const progressColor = useColorModeValue("#dd6b20", "#ed8936");
   // orange.500 is 3.11:1 against the light page background -- fails AA.
   // orange.700 clears it (6.0:1) while orange.500 already clears the dark
   // background (5.12:1), so this needs to vary by mode, not be a single token.
@@ -87,6 +92,7 @@ export default function ArticleDetailPage({ article, fetchError, slug }) {
       image={article.thumbnail || undefined}
       ogType="article"
     >
+      <ReadingProgress targetRef={contentRef} color={progressColor} />
       {/* Measure tuned for long-form reading: ~70 characters per line at the
           body font size, rather than stretching to the same width used by
           card-grid pages. */}
@@ -99,6 +105,7 @@ export default function ArticleDetailPage({ article, fetchError, slug }) {
             </HStack>
           </Link>
 
+          <VStack ref={contentRef} align="start" spacing={8} w="100%">
           <VStack align="start" spacing={4} w="100%">
             <Heading as="h1" size="lg" lineHeight="1.25" fontFamily={READING_FONT}>
               {article.title}
@@ -154,48 +161,57 @@ export default function ArticleDetailPage({ article, fetchError, slug }) {
           </Box>
 
           {references.length > 0 && (
-            <Box
-              w="100%"
-              borderLeftWidth="3px"
-              borderLeftColor={ruleColor}
-              pl={4}
-              py={3}
-              borderRadius="sm"
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-80px" }}
+              transition={{ duration: 0.5, ease: "easeOut" }}
+              style={{ width: "100%" }}
             >
-              <Text
-                fontFamily={READING_FONT}
-                fontSize="xs"
-                fontWeight="semibold"
-                color={mutedText}
-                mb={2}
-                textTransform="uppercase"
-                letterSpacing="wider"
+              <Box
+                w="100%"
+                borderLeftWidth="3px"
+                borderLeftColor={ruleColor}
+                pl={4}
+                py={3}
+                borderRadius="sm"
               >
-                References
-              </Text>
-              <VStack align="start" spacing={1}>
-                {references.map((ref, index) => {
-                  const label = ref.label || ref.url;
-                  return ref.url ? (
-                    <Link
-                      key={index}
-                      href={ref.url}
-                      isExternal
-                      color={linkOrange}
-                      fontSize="sm"
-                      fontWeight="medium"
-                    >
-                      {label}
-                    </Link>
-                  ) : (
-                    <Text key={index} color={mutedText} fontSize="sm">
-                      {label}
-                    </Text>
-                  );
-                })}
-              </VStack>
-            </Box>
+                <Text
+                  fontFamily={READING_FONT}
+                  fontSize="xs"
+                  fontWeight="semibold"
+                  color={mutedText}
+                  mb={2}
+                  textTransform="uppercase"
+                  letterSpacing="wider"
+                >
+                  References
+                </Text>
+                <VStack align="start" spacing={1}>
+                  {references.map((ref, index) => {
+                    const label = ref.label || ref.url;
+                    return ref.url ? (
+                      <Link
+                        key={index}
+                        href={ref.url}
+                        isExternal
+                        color={linkOrange}
+                        fontSize="sm"
+                        fontWeight="medium"
+                      >
+                        {label}
+                      </Link>
+                    ) : (
+                      <Text key={index} color={mutedText} fontSize="sm">
+                        {label}
+                      </Text>
+                    );
+                  })}
+                </VStack>
+              </Box>
+            </motion.div>
           )}
+          </VStack>
 
           <NewsletterSubscribe w="100%" />
         </VStack>

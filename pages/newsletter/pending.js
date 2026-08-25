@@ -2,6 +2,7 @@ import NextLink from "next/link";
 import { Box, Button, Container, Heading, Text } from "@chakra-ui/react";
 import Layout from "../../components/layouts/layout";
 import Section from "../../components/section";
+import MoonZPulse from "../../components/icons/moon-z-pulse";
 
 const NewsletterPending = () => (
   <Layout
@@ -13,9 +14,7 @@ const NewsletterPending = () => (
     <Container maxW="container.sm">
       <Section delay={0.1}>
         <Box textAlign="center" py={16}>
-          <Text fontSize="4xl" mb={4}>
-            ✉️
-          </Text>
+          <MoonZPulse />
           <Heading
             as="h1"
             fontSize={{ base: "2xl", md: "3xl" }}
