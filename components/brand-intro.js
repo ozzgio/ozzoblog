@@ -6,7 +6,9 @@ import { BrandIntroContext } from "./brand-intro-context";
 const LETTERS = ["o", "z", "z", "o"];
 
 const HOLD_MS = 1400; // "ozzo" sits large and readable before converging
-const CONVERGE_S = 1; // everything below moves together, on one shared clock
+const CONVERGE_S = 0.85; // letters + disc merge together, on one shared clock
+const CRESCENT_S = 0.55; // the crescent's spin, as its own beat right after
+const CRESCENT_DELAY_S = CONVERGE_S; // -- doesn't start until the merge above is done
 const CONVERGE_EASE = [0.22, 0.61, 0.36, 1]; // one easing curve for every piece, so nothing drifts out of sync
 const MARK_HOLD_MS = 650; // formed mark sits center-stage before flying to the nav
 const FLY_S = 0.9; // the flight itself: center-stage -> the nav slot
@@ -34,6 +36,15 @@ const O_FADE_TRANSITION = {
     ease: CONVERGE_EASE,
   },
 };
+// The crescent doesn't start until the letters + disc above have actually
+// finished merging -- a distinct second beat instead of everything blurring
+// into one motion.
+const CRESCENT_TRANSITION = {
+  duration: CRESCENT_S,
+  delay: CRESCENT_DELAY_S,
+  ease: CONVERGE_EASE,
+};
+const CONVERGING_PHASE_S = CONVERGE_S + CRESCENT_S;
 
 // Full-page intro: "ozzo" forms large and centered. Then, on one shared
 // clock, both "o"s swell outward and dissolve (an echo of the disc forming
@@ -61,7 +72,7 @@ const BrandIntro = ({ children }) => {
 
   useEffect(() => {
     if (phase !== "converging") return;
-    const t = setTimeout(() => setPhase("mark"), CONVERGE_S * 1000);
+    const t = setTimeout(() => setPhase("mark"), CONVERGING_PHASE_S * 1000);
     return () => clearTimeout(t);
   }, [phase]);
 
@@ -144,7 +155,7 @@ const BrandIntro = ({ children }) => {
                       pathLength={1}
                       initial={{ pathLength: 0.25, rotate: 0 }}
                       animate={{ rotate: -410 }}
-                      transition={CONVERGE_TRANSITION}
+                      transition={CRESCENT_TRANSITION}
                       style={{ transformOrigin: "50px 50px" }}
                     />
                   </svg>
