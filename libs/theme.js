@@ -3,7 +3,12 @@ import { mode } from "@chakra-ui/theme-tools";
 
 const theme = extendTheme({
   config: {
-    initialColorMode: "dark",
+    // "system" (not "dark") so ColorModeScript's inline script reads
+    // prefers-color-scheme before first paint. With "dark" here the script
+    // pinned every visitor to dark and useSystemColorMode never got a
+    // chance, so the page-load intro overlay and the error pages rendered
+    // dark on a light OS.
+    initialColorMode: "system",
     useSystemColorMode: true,
   },
   styles: {
