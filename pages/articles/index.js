@@ -70,7 +70,7 @@ const formatDate = (dateStr) => {
       default:
         return `${diffDays} days ago`;
     }
-  } catch (error) {
+  } catch {
     return dateStr;
   }
 };
