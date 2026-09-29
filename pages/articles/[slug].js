@@ -235,8 +235,6 @@ function mapArticle(article) {
   };
 }
 
-const REVALIDATE_SECONDS = 60;
-
 const findInternalArticle = (articles, slug) =>
   Array.isArray(articles)
     ? articles.find(
@@ -247,59 +245,36 @@ const findInternalArticle = (articles, slug) =>
       )
     : null;
 
-export async function getStaticPaths() {
-  try {
-    const { articles } = await fetchArticles();
-    const paths = articles
-      .map((article) => String(article?.slug || "").trim())
-      .filter(Boolean)
-      .map((slug) => ({ params: { slug } }));
-
-    return { paths, fallback: "blocking" };
-  } catch {
-    return { paths: [], fallback: "blocking" };
-  }
-}
-
-export async function getStaticProps({ params }) {
+// Server-rendered, not ISR: Vercel's on-demand generation of slugs missing
+// from the last build 500s (every freshly published article, and every unknown
+// slug that should 404), while both render fine under `next start`. Dynamic
+// rendering is healthy on Vercel (rss.xml), so these pages render on demand
+// and s-maxage keeps ISR-equivalent edge caching for any slug, known or new.
+export async function getServerSideProps({ params, res }) {
   const slug = String(params?.slug || "").trim();
 
   try {
     const { ok, articles } = await fetchArticles();
 
     if (!ok) {
-      return {
-        props: {
-          article: null,
-          fetchError: true,
-          slug,
-        },
-        revalidate: REVALIDATE_SECONDS,
-      };
+      // Degraded upstream: don't pin the "temporarily unavailable" page at the edge.
+      res.setHeader("Cache-Control", "no-store");
+      return { props: { article: null, fetchError: true, slug } };
     }
 
     const article = findInternalArticle(articles, slug);
 
     if (!article) {
-      return { notFound: true, revalidate: REVALIDATE_SECONDS };
+      return { notFound: true };
     }
 
-    return {
-      props: {
-        article: mapArticle(article),
-        fetchError: false,
-        slug,
-      },
-      revalidate: REVALIDATE_SECONDS,
-    };
+    res.setHeader(
+      "Cache-Control",
+      "public, s-maxage=60, stale-while-revalidate=300"
+    );
+    return { props: { article: mapArticle(article), fetchError: false, slug } };
   } catch {
-    return {
-      props: {
-        article: null,
-        fetchError: true,
-        slug,
-      },
-      revalidate: REVALIDATE_SECONDS,
-    };
+    res.setHeader("Cache-Control", "no-store");
+    return { props: { article: null, fetchError: true, slug } };
   }
 }
