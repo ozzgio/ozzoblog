@@ -452,30 +452,24 @@ export default function BookDetailPage({ book }) {
   );
 }
 
-export async function getStaticPaths() {
-  const { books } = await fetchBooks();
-
-  const paths = Array.isArray(books)
-    ? books
-        .map((book) => getBookSlug(book))
-        .filter(Boolean)
-        .map((slug) => ({ params: { slug: String(slug) } }))
-    : [];
-
-  return { paths, fallback: "blocking" };
-}
-
-export async function getStaticProps({ params }) {
+// Server-rendered for the same reason as the article detail page: Vercel 500s
+// the on-demand ISR generation of any slug missing from the last build, so
+// s-maxage edge caching stands in for revalidate instead.
+export async function getServerSideProps({ params, res }) {
   try {
     const { ok, books } = await fetchBooks();
 
-    if (!ok) return { notFound: true, revalidate: 60 };
+    const book =
+      ok && Array.isArray(books)
+        ? books.find((entry) => getBookSlug(entry) === params?.slug)
+        : null;
 
-    const book = Array.isArray(books)
-      ? books.find((entry) => getBookSlug(entry) === params?.slug)
-      : null;
+    if (!book) return { notFound: true };
 
-    if (!book) return { notFound: true, revalidate: 60 };
+    res.setHeader(
+      "Cache-Control",
+      "public, s-maxage=60, stale-while-revalidate=300"
+    );
 
     return {
       props: {
@@ -504,9 +498,8 @@ export async function getStaticProps({ params }) {
           quotes: Array.isArray(book.quotes) ? book.quotes.filter(Boolean) : [],
         },
       },
-      revalidate: 60,
     };
   } catch {
-    return { notFound: true, revalidate: 60 };
+    return { notFound: true };
   }
 }
