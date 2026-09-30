@@ -467,46 +467,42 @@ export async function getStaticPaths() {
 }
 
 export async function getStaticProps({ params }) {
-  try {
-    const { ok, books } = await fetchBooks();
+  const { ok, books } = await fetchBooks();
+  if (!ok) throw new Error("Failed to fetch book content from portfolio-data");
 
-    const book =
-      ok && Array.isArray(books)
-        ? books.find((entry) => getBookSlug(entry) === params?.slug)
-        : null;
+  const book = Array.isArray(books)
+    ? books.find((entry) => getBookSlug(entry) === params?.slug)
+    : null;
 
-    if (!book) return { notFound: true, revalidate: 60 };
+  if (!book) return { notFound: true, revalidate: 60 };
 
-    return {
-      props: {
-        book: {
-          title: String(book.title || ""),
-          author: String(book.author || ""),
-          date: String(book.date || ""),
-          slug: getBookSlug(book),
-          notes: getBookNotes(book),
-          hasNotes: hasBookNotes(book),
-          lesson: String(book.lesson || ""),
-          rating: typeof book.rating === "number" ? book.rating : 0,
-          tags: Array.isArray(book.tags) ? book.tags.filter(Boolean) : [],
-          cover: resolvePortfolioAssetUrl(book.cover),
-          url: String(book.url || ""),
-          // Structured personal sections
-          problem: String(book.problem || ""),
-          concept: String(book.concept || ""),
-          decision: String(book.decision || ""),
-          implementation: String(book.implementation || ""),
-          effect: String(book.effect || ""),
-          trade_off: String(book.trade_off || ""),
-          // Deep dive from 08 Summaries
-          tldr: String(book.tldr || ""),
-          deep_dive: String(book.deep_dive || ""),
-          quotes: Array.isArray(book.quotes) ? book.quotes.filter(Boolean) : [],
-        },
+  return {
+    props: {
+      book: {
+        title: String(book.title || ""),
+        author: String(book.author || ""),
+        date: String(book.date || ""),
+        slug: getBookSlug(book),
+        notes: getBookNotes(book),
+        hasNotes: hasBookNotes(book),
+        lesson: String(book.lesson || ""),
+        rating: typeof book.rating === "number" ? book.rating : 0,
+        tags: Array.isArray(book.tags) ? book.tags.filter(Boolean) : [],
+        cover: resolvePortfolioAssetUrl(book.cover),
+        url: String(book.url || ""),
+        // Structured personal sections
+        problem: String(book.problem || ""),
+        concept: String(book.concept || ""),
+        decision: String(book.decision || ""),
+        implementation: String(book.implementation || ""),
+        effect: String(book.effect || ""),
+        trade_off: String(book.trade_off || ""),
+        // Deep dive from 08 Summaries
+        tldr: String(book.tldr || ""),
+        deep_dive: String(book.deep_dive || ""),
+        quotes: Array.isArray(book.quotes) ? book.quotes.filter(Boolean) : [],
       },
-      revalidate: 60,
-    };
-  } catch {
-    return { notFound: true, revalidate: 60 };
-  }
+    },
+    revalidate: 60,
+  };
 }

@@ -32,6 +32,9 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Verify detail generation rejects upstream failures
+        run: npm run verify:detail-generation
+
       - name: Start server
         run: npm start &
         env:

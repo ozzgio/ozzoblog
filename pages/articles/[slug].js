@@ -260,31 +260,20 @@ export async function getStaticPaths() {
 
 export async function getStaticProps({ params }) {
   const slug = String(params?.slug || "").trim();
+  const { ok, articles } = await fetchArticles();
 
-  try {
-    const { ok, articles } = await fetchArticles();
-
-    if (!ok) {
-      return {
-        props: { article: null, fetchError: true, slug },
-        revalidate: REVALIDATE_SECONDS,
-      };
-    }
-
-    const article = findInternalArticle(articles, slug);
-
-    if (!article) {
-      return { notFound: true, revalidate: REVALIDATE_SECONDS };
-    }
-
-    return {
-      props: { article: mapArticle(article), fetchError: false, slug },
-      revalidate: REVALIDATE_SECONDS,
-    };
-  } catch {
-    return {
-      props: { article: null, fetchError: true, slug },
-      revalidate: REVALIDATE_SECONDS,
-    };
+  if (!ok) {
+    throw new Error("Failed to fetch article content from portfolio-data");
   }
+
+  const article = findInternalArticle(articles, slug);
+
+  if (!article) {
+    return { notFound: true, revalidate: REVALIDATE_SECONDS };
+  }
+
+  return {
+    props: { article: mapArticle(article), fetchError: false, slug },
+    revalidate: REVALIDATE_SECONDS,
+  };
 }
