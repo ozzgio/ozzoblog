@@ -31,6 +31,7 @@ import {
 } from "../../libs/contentUtils";
 
 const READING_FONT = "var(--font-merriweather), Georgia, serif";
+const REVALIDATE_SECONDS = 60;
 
 export default function ArticleDetailPage({ article, fetchError, slug }) {
   const contentRef = useRef(null);
@@ -245,36 +246,49 @@ const findInternalArticle = (articles, slug) =>
       )
     : null;
 
-// Server-rendered, not ISR: Vercel's on-demand generation of slugs missing
-// from the last build 500s (every freshly published article, and every unknown
-// slug that should 404), while both render fine under `next start`. Dynamic
-// rendering is healthy on Vercel (rss.xml), so these pages render on demand
-// and s-maxage keeps ISR-equivalent edge caching for any slug, known or new.
-export async function getServerSideProps({ params, res }) {
+export async function getStaticPaths() {
+  try {
+    const { articles } = await fetchArticles();
+    const paths = articles
+      .map((article) => String(article?.slug || "").trim())
+      .filter(Boolean)
+      .map((slug) => ({ params: { slug } }));
+
+    // portfolio-data triggers a Vercel rebuild after every publish. Keep these
+    // paths static because Vercel's dynamic detail functions return 500 here.
+    return { paths, fallback: false };
+  } catch {
+    return { paths: [], fallback: false };
+  }
+}
+
+export async function getStaticProps({ params }) {
   const slug = String(params?.slug || "").trim();
 
   try {
     const { ok, articles } = await fetchArticles();
 
     if (!ok) {
-      // Degraded upstream: don't pin the "temporarily unavailable" page at the edge.
-      res.setHeader("Cache-Control", "no-store");
-      return { props: { article: null, fetchError: true, slug } };
+      return {
+        props: { article: null, fetchError: true, slug },
+        revalidate: REVALIDATE_SECONDS,
+      };
     }
 
     const article = findInternalArticle(articles, slug);
 
     if (!article) {
-      return { notFound: true };
+      return { notFound: true, revalidate: REVALIDATE_SECONDS };
     }
 
-    res.setHeader(
-      "Cache-Control",
-      "public, s-maxage=60, stale-while-revalidate=300"
-    );
-    return { props: { article: mapArticle(article), fetchError: false, slug } };
+    return {
+      props: { article: mapArticle(article), fetchError: false, slug },
+      revalidate: REVALIDATE_SECONDS,
+    };
   } catch {
-    res.setHeader("Cache-Control", "no-store");
-    return { props: { article: null, fetchError: true, slug } };
+    return {
+      props: { article: null, fetchError: true, slug },
+      revalidate: REVALIDATE_SECONDS,
+    };
   }
 }
