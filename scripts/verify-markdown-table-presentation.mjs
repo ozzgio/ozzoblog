@@ -1,7 +1,6 @@
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
 import { once } from "node:events";
-import { existsSync } from "node:fs";
 import { createServer } from "node:http";
 import { chromium } from "@playwright/test";
 
@@ -126,11 +125,33 @@ async function waitForSite(baseUrl, siteProcess, getOutput) {
   throw new Error("Timed out waiting for the fixture site:\n" + getOutput());
 }
 
-async function startFixtureSite(fixtureBaseUrl) {
-  if (!existsSync(".next/BUILD_ID")) {
-    throw new Error("A production build is required before this check. Run npm run build first.");
-  }
+async function buildFixtureSite(fixtureBaseUrl) {
+  let output = "";
+  const buildProcess = spawn(
+    process.execPath,
+    ["node_modules/next/dist/bin/next", "build"],
+    {
+      cwd: process.cwd(),
+      env: {
+        ...process.env,
+        PORTFOLIO_ARTICLES_URL: fixtureBaseUrl + "/articles.json",
+        PORTFOLIO_BOOKS_URL: fixtureBaseUrl + "/books.json",
+      },
+      stdio: ["ignore", "pipe", "pipe"],
+    },
+  );
 
+  const appendOutput = (chunk) => {
+    output = (output + String(chunk)).slice(-10_000);
+  };
+  buildProcess.stdout.on("data", appendOutput);
+  buildProcess.stderr.on("data", appendOutput);
+
+  const [exitCode] = await once(buildProcess, "exit");
+  assert.equal(exitCode, 0, "The fixture build failed:\n" + output);
+}
+
+async function startFixtureSite(fixtureBaseUrl) {
   const port = await findAvailablePort();
   let output = "";
   const siteProcess = spawn(
@@ -305,6 +326,7 @@ let site;
 let browser;
 
 try {
+  await buildFixtureSite(fixture.baseUrl);
   site = await startFixtureSite(fixture.baseUrl);
   browser = await chromium.launch({ headless: true });
   const context = await browser.newContext({ viewport: { width: 1280, height: 900 } });

@@ -255,7 +255,7 @@ export async function getStaticPaths() {
     .filter(Boolean)
     .map((slug) => ({ params: { slug } }));
 
-  return { paths, fallback: "blocking" };
+  return { paths, fallback: false };
 }
 
 export async function getStaticProps({ params }) {

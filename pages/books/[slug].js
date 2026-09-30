@@ -463,7 +463,7 @@ export async function getStaticPaths() {
         .map((slug) => ({ params: { slug: String(slug) } }))
     : [];
 
-  return { paths, fallback: "blocking" };
+  return { paths, fallback: false };
 }
 
 export async function getStaticProps({ params }) {
