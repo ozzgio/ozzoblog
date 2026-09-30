@@ -452,54 +452,57 @@ export default function BookDetailPage({ book }) {
   );
 }
 
-// Server-rendered for the same reason as the article detail page: Vercel 500s
-// the on-demand ISR generation of any slug missing from the last build, so
-// s-maxage edge caching stands in for revalidate instead.
-export async function getServerSideProps({ params, res }) {
-  try {
-    const { ok, books } = await fetchBooks();
+export async function getStaticPaths() {
+  const { ok, books } = await fetchBooks();
+  if (!ok) throw new Error("Failed to fetch book paths from portfolio-data");
 
-    const book =
-      ok && Array.isArray(books)
-        ? books.find((entry) => getBookSlug(entry) === params?.slug)
-        : null;
+  const paths = Array.isArray(books)
+    ? books
+        .map((book) => getBookSlug(book))
+        .filter(Boolean)
+        .map((slug) => ({ params: { slug: String(slug) } }))
+    : [];
 
-    if (!book) return { notFound: true };
+  return { paths, fallback: false };
+}
 
-    res.setHeader(
-      "Cache-Control",
-      "public, s-maxage=60, stale-while-revalidate=300"
-    );
+export async function getStaticProps({ params }) {
+  const { ok, books } = await fetchBooks();
+  if (!ok) throw new Error("Failed to fetch book content from portfolio-data");
 
-    return {
-      props: {
-        book: {
-          title: String(book.title || ""),
-          author: String(book.author || ""),
-          date: String(book.date || ""),
-          slug: getBookSlug(book),
-          notes: getBookNotes(book),
-          hasNotes: hasBookNotes(book),
-          lesson: String(book.lesson || ""),
-          rating: typeof book.rating === "number" ? book.rating : 0,
-          tags: Array.isArray(book.tags) ? book.tags.filter(Boolean) : [],
-          cover: resolvePortfolioAssetUrl(book.cover),
-          url: String(book.url || ""),
-          // Structured personal sections
-          problem: String(book.problem || ""),
-          concept: String(book.concept || ""),
-          decision: String(book.decision || ""),
-          implementation: String(book.implementation || ""),
-          effect: String(book.effect || ""),
-          trade_off: String(book.trade_off || ""),
-          // Deep dive from 08 Summaries
-          tldr: String(book.tldr || ""),
-          deep_dive: String(book.deep_dive || ""),
-          quotes: Array.isArray(book.quotes) ? book.quotes.filter(Boolean) : [],
-        },
+  const book = Array.isArray(books)
+    ? books.find((entry) => getBookSlug(entry) === params?.slug)
+    : null;
+
+  if (!book) return { notFound: true, revalidate: 60 };
+
+  return {
+    props: {
+      book: {
+        title: String(book.title || ""),
+        author: String(book.author || ""),
+        date: String(book.date || ""),
+        slug: getBookSlug(book),
+        notes: getBookNotes(book),
+        hasNotes: hasBookNotes(book),
+        lesson: String(book.lesson || ""),
+        rating: typeof book.rating === "number" ? book.rating : 0,
+        tags: Array.isArray(book.tags) ? book.tags.filter(Boolean) : [],
+        cover: resolvePortfolioAssetUrl(book.cover),
+        url: String(book.url || ""),
+        // Structured personal sections
+        problem: String(book.problem || ""),
+        concept: String(book.concept || ""),
+        decision: String(book.decision || ""),
+        implementation: String(book.implementation || ""),
+        effect: String(book.effect || ""),
+        trade_off: String(book.trade_off || ""),
+        // Deep dive from 08 Summaries
+        tldr: String(book.tldr || ""),
+        deep_dive: String(book.deep_dive || ""),
+        quotes: Array.isArray(book.quotes) ? book.quotes.filter(Boolean) : [],
       },
-    };
-  } catch {
-    return { notFound: true };
-  }
+    },
+    revalidate: 60,
+  };
 }

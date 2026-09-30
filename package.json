@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint .",
     "verify:native": "bash scripts/verify-native-fs.sh",
+    "verify:detail-generation": "node scripts/verify-detail-generation-failures.mjs",
     "verify:markdown": "node scripts/verify-markdown-rendering.mjs",
     "verify:markdown:presentation": "node scripts/verify-markdown-table-presentation.mjs"
   },

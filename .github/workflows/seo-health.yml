@@ -32,6 +32,9 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Verify detail generation rejects upstream failures
+        run: npm run verify:detail-generation
+
       - name: Start server
         run: npm start &
         env:
@@ -61,26 +64,16 @@ jobs:
       - name: Verify Markdown table presentation
         run: npm run verify:markdown:presentation
 
-      - name: Start server with portfolio-data articles unavailable
-        run: npm start -- --port 3001 &
-        env:
-          PORTFOLIO_ARTICLES_URL: http://127.0.0.1:9/articles.json
-
-      - name: Wait for outage server to be ready
+      - name: Reject builds when article discovery is unavailable
         run: |
-          for i in $(seq 1 20); do
-            if curl -sf http://localhost:3001/ > /dev/null 2>&1; then
-              echo "Outage server is ready"
-              exit 0
-            fi
-            echo "Waiting... ($i/20)"
-            sleep 2
-          done
-          echo "Outage server did not become ready in time"
-          exit 1
+          if PORTFOLIO_ARTICLES_URL=http://127.0.0.1:9/articles.json npx next build; then
+            echo "Build unexpectedly succeeded without the article catalog"
+            exit 1
+          fi
 
-      - name: Verify article fallback during upstream outage
-        run: node scripts/seo-health-check.mjs
-        env:
-          BASE_URL: http://localhost:3001
-          VERIFY_ARTICLE_OUTAGE: "1"
+      - name: Reject builds when book discovery is unavailable
+        run: |
+          if PORTFOLIO_BOOKS_URL=http://127.0.0.1:9/books.json npx next build; then
+            echo "Build unexpectedly succeeded without the book catalog"
+            exit 1
+          fi
