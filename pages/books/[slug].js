@@ -453,7 +453,9 @@ export default function BookDetailPage({ book }) {
 }
 
 export async function getStaticPaths() {
-  const { books } = await fetchBooks();
+  const { ok, books } = await fetchBooks();
+  if (!ok) throw new Error("Failed to fetch book paths from portfolio-data");
+
   const paths = Array.isArray(books)
     ? books
         .map((book) => getBookSlug(book))
@@ -461,8 +463,7 @@ export async function getStaticPaths() {
         .map((slug) => ({ params: { slug: String(slug) } }))
     : [];
 
-  // portfolio-data triggers the rebuild that refreshes this static path list.
-  return { paths, fallback: false };
+  return { paths, fallback: "blocking" };
 }
 
 export async function getStaticProps({ params }) {

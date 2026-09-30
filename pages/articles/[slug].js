@@ -247,19 +247,15 @@ const findInternalArticle = (articles, slug) =>
     : null;
 
 export async function getStaticPaths() {
-  try {
-    const { articles } = await fetchArticles();
-    const paths = articles
-      .map((article) => String(article?.slug || "").trim())
-      .filter(Boolean)
-      .map((slug) => ({ params: { slug } }));
+  const { ok, articles } = await fetchArticles();
+  if (!ok) throw new Error("Failed to fetch article paths from portfolio-data");
 
-    // portfolio-data triggers a Vercel rebuild after every publish. Keep these
-    // paths static because Vercel's dynamic detail functions return 500 here.
-    return { paths, fallback: false };
-  } catch {
-    return { paths: [], fallback: false };
-  }
+  const paths = articles
+    .map((article) => String(article?.slug || "").trim())
+    .filter(Boolean)
+    .map((slug) => ({ params: { slug } }));
+
+  return { paths, fallback: "blocking" };
 }
 
 export async function getStaticProps({ params }) {
