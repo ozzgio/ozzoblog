@@ -28,6 +28,7 @@ const ROOT = resolve(__dirname, "..");
 const BASE_URL = process.env.BASE_URL || "http://localhost:3000";
 const TIMEOUT_MS = 15_000;
 const PORTFOLIO_ARTICLES_URL =
+  process.env.PORTFOLIO_ARTICLES_URL ||
   "https://raw.githubusercontent.com/ozzgio/portfolio-data/main/articles.json";
 
 // Pages that must carry full SEO metadata.
@@ -96,12 +97,12 @@ function getArticleMetadataExpectation(articles) {
 
   const slug = article.slug.trim();
   const path = `/articles/${encodeURIComponent(slug)}`;
-  const thumbnail = resolvePortfolioAssetUrl(article.thumbnail);
+  const socialImage = resolvePortfolioAssetUrl(article.og_image || article.thumbnail);
 
   return {
     path,
     expectedCanonical: `${SITE_URL}${path}`,
-    expectedImage: resolveSocialImageUrl(thumbnail, DEFAULT_SOCIAL_IMAGE_URL),
+    expectedImage: resolveSocialImageUrl(socialImage, DEFAULT_SOCIAL_IMAGE_URL),
   };
 }
 
@@ -270,7 +271,7 @@ if (!expectation) {
           }
         }
         if (articleOk) {
-          pass(`${expectation.path} — article thumbnail and canonical metadata`);
+          pass(`${expectation.path} — article social image and canonical metadata`);
         }
       }
     }
