@@ -30,7 +30,15 @@ try {
     { notFound: true, revalidate: 60 },
   );
 
-  console.log("Detail generation rejects upstream failures and preserves genuine 404s.");
+  global.fetch = async () => ({ ok: true, json: async () => [{
+    slug: "separate-images", title: "Separate images", content: "Article body.",
+    thumbnail: "illustration.png", og_image: "title-card.png",
+  }] });
+  const { props } = await articlePage.getStaticProps({ params: { slug: "separate-images" } });
+  assert.match(props.article.thumbnail, /\/images\/illustration\.png$/);
+  assert.match(props.article.og_image, /\/images\/title-card\.png$/);
+
+  console.log("Detail generation rejects upstream failures, preserves genuine 404s and separates article images.");
 } finally {
   global.fetch = originalFetch;
 }
