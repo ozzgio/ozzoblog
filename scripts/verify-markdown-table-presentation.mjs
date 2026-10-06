@@ -38,6 +38,7 @@ const fixtureArticles = [{
   content: [
     "# Markdown table fixture",
     "This verifies article prose.",
+    '```mermaid\nflowchart LR\n  A["$$x^2$$"] --> B["Patched math renderer"]\n```',
     SHORT_TABLE_MARKDOWN,
     COMPACT_THREE_COLUMN_TABLE_MARKDOWN,
     VERBOSE_COMPACT_TABLE_MARKDOWN,
@@ -357,6 +358,10 @@ try {
   for (const proseContext of contexts) {
     await page.setViewportSize({ width: 1280, height: 900 });
     await page.goto(site.baseUrl + proseContext.path, { waitUntil: "networkidle" });
+
+    if (proseContext.path === ARTICLE_PATH) {
+      await page.locator("svg .katex").waitFor({ state: "visible", timeout: 15_000 });
+    }
 
     await setColorMode(page, "light");
     const lightMetrics = await Promise.all(tableFixtures.map((tableFixture) => tableMetrics(page, tableFixture)));
