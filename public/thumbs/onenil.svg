@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title description">
+  <title id="title">One Nil</title>
+  <desc id="description">A one–nil score set in a deep pitch-green field with a teletext-yellow halfway line.</desc>
+  <rect width="512" height="512" rx="92" fill="hsl(35, 100%, 92.94%)"/>
+  <rect x="36" y="36" width="440" height="440" rx="66" fill="hsl(155, 80%, 24%)"/>
+  <rect x="54" y="54" width="404" height="404" rx="51" fill="none" stroke="hsl(63, 100%, 47%)" stroke-width="5" opacity=".8"/>
+  <path d="M256 88v336" stroke="hsl(63, 100%, 47%)" stroke-width="4" opacity=".42"/>
+  <text x="149" y="326" fill="hsl(36, 100%, 97.06%)" font-family="Georgia, 'Times New Roman', serif" font-size="216" text-anchor="middle">1</text>
+  <text x="365" y="326" fill="hsl(36, 100%, 97.06%)" font-family="Georgia, 'Times New Roman', serif" font-size="216" text-anchor="middle">0</text>
+</svg>
