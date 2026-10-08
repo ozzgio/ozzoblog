@@ -27,3 +27,6 @@ brainstorm/
 
 # Articles/books data lives in portfolio-data repo; fetched at build time
 data/
+
+# Local vault preview assets (never deploy draft content).
+/public/preview-images

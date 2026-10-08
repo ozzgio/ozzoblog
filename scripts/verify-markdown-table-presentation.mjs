@@ -33,14 +33,22 @@ const fixtureArticles = [{
   description: "Stable renderer fixture",
   date: "2026-08-09",
   slug: "markdown-table-fixture",
+  thumbnail: "illustration.png",
+  og_image: "title-card.png",
   content: [
     "# Markdown table fixture",
     "This verifies article prose.",
+    '```mermaid\nflowchart LR\n  A["$$x^2$$"] --> B["Patched math renderer"]\n```',
     SHORT_TABLE_MARKDOWN,
     COMPACT_THREE_COLUMN_TABLE_MARKDOWN,
     VERBOSE_COMPACT_TABLE_MARKDOWN,
     WIDE_TABLE_MARKDOWN,
   ].join("\n\n"),
+}, {
+  title: "Thumbnail fallback fixture",
+  slug: "thumbnail-fallback-fixture",
+  content: "An article without a dedicated social card.",
+  thumbnail: "illustration.png",
 }];
 
 const fixtureBooks = [{
@@ -329,12 +337,31 @@ try {
   await buildFixtureSite(fixture.baseUrl);
   site = await startFixtureSite(fixture.baseUrl);
   browser = await chromium.launch({ headless: true });
+  const metadataContext = await browser.newContext({ javaScriptEnabled: false });
+  const metadataPage = await metadataContext.newPage();
+  for (const [path, image] of [
+    [ARTICLE_PATH, "title-card.png"],
+    ["/articles/thumbnail-fallback-fixture", "illustration.png"],
+  ]) {
+    const response = await metadataPage.goto(site.baseUrl + path);
+    assert.equal(response.status(), 200);
+    for (const selector of ['meta[property="og:image"]', 'meta[name="twitter:image"]']) {
+      assert.equal(await metadataPage.locator(selector).getAttribute("content"),
+        "https://cdn.jsdelivr.net/gh/ozzgio/portfolio-data@main/images/" + image,
+        path + ": server-rendered social metadata must prefer og_image and fall back to thumbnail");
+    }
+  }
+  await metadataContext.close();
   const context = await browser.newContext({ viewport: { width: 1280, height: 900 } });
   const page = await context.newPage();
 
   for (const proseContext of contexts) {
     await page.setViewportSize({ width: 1280, height: 900 });
     await page.goto(site.baseUrl + proseContext.path, { waitUntil: "networkidle" });
+
+    if (proseContext.path === ARTICLE_PATH) {
+      await page.locator("svg .katex").waitFor({ state: "visible", timeout: 15_000 });
+    }
 
     await setColorMode(page, "light");
     const lightMetrics = await Promise.all(tableFixtures.map((tableFixture) => tableMetrics(page, tableFixture)));

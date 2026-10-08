@@ -90,7 +90,7 @@ export default function ArticleDetailPage({ article, fetchError, slug }) {
       title={article.title}
       description={article.description || "Article on ozzo.blog"}
       path={`/articles/${article.slug}`}
-      image={article.thumbnail || undefined}
+      image={article.og_image || article.thumbnail || undefined}
       ogType="article"
     >
       <ReadingProgress targetRef={contentRef} color={progressColor} />
@@ -233,6 +233,7 @@ function mapArticle(article) {
     book_url: String(article.book_url || ""),
     references: getArticleReferences(article),
     thumbnail: article.thumbnail ? resolvePortfolioAssetUrl(article.thumbnail) : "",
+    og_image: article.og_image ? resolvePortfolioAssetUrl(article.og_image) : "",
   };
 }
 
