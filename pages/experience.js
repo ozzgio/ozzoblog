@@ -151,8 +151,8 @@ const Experience = () => {
           <Heading as="h2" variant="section-title" mb={4}>Projects</Heading>
           <VStack spacing={6} align="stretch">
             <ProjectEntry
-              title="Synergym.fit"
-              url="https://synergym.fit"
+              title="Synergym.app"
+              url="https://synergym.app"
               period="Oct 2025 – Ongoing"
               description="Gym management SaaS. Handles trainer and athlete workflows, workout program creation and assignment, progress tracking, background jobs via Sidekiq. Full E2E coverage with Playwright. Running in production."
               stack={["Rails 8", "PostgreSQL", "Redis", "Sidekiq", "Tailwind CSS", "Playwright"]}

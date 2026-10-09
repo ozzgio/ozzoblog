@@ -6,6 +6,22 @@
 // within each group by effort desc. See pages/projects.js.
 const projectData = [
   {
+    id: "onenil",
+    title: "One Nil",
+    description:
+      "Private football prediction game for small groups. Predict every matchweek score, invite friends with a link, results settle automatically on a 3-2-1-0 scoring rule. Rails 8.1, Hotwire, SQLite, installable PWA. Live in private beta, public launch staged next.",
+    thumbnail: "/thumbs/onenil.svg",
+    socialImage: "/thumbs/onenil-social.png",
+    stack: ["Ruby on Rails", "Hotwire", "SQLite", "Tailwind CSS", "Kamal"],
+    github: null,
+    demo: "https://onenil.org",
+    date: "2026-09",
+    tags: ["Full Stack", "Rails"],
+    effort: 4,
+    difficulty: 3,
+    focus: "now",
+  },
+  {
     id: "buildlog",
     title: "Buildlog",
     description:
@@ -23,13 +39,13 @@ const projectData = [
   },
   {
     id: "synergym",
-    title: "Synergym.fit",
+    title: "Synergym.app",
     description:
       "Gym management SaaS for trainers and athletes. Program creation, exercise library, athlete tracking, role-based access. Rails 8, PostgreSQL, Sidekiq, Playwright. In production since late 2025. No active users yet. Distribution is still the unsolved half.",
     thumbnail: "/thumbs/synergym.png",
     stack: ["Ruby on Rails", "PostgreSQL", "Redis", "Sidekiq", "Tailwind CSS"],
     github: null,
-    demo: "https://synergym.fit",
+    demo: "https://synergym.app",
     date: "2025-10",
     tags: ["Full Stack", "Rails"],
     effort: 5,

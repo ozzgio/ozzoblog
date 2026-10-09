@@ -41,7 +41,7 @@ const Project = ({ project }) => {
           <ListItem display="flex" alignItems="center" mb={2}>
             <Link href={demo} target="_blank">
               <Meta>Live</Meta>
-              synergym.fit
+              synergym.app
               <ExternalLinkIcon mx="2px" />
             </Link>
           </ListItem>
