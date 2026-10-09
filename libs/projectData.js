@@ -11,6 +11,7 @@ const projectData = [
     description:
       "Private football prediction game for small groups. Predict every matchweek score, invite friends with a link, results settle automatically on a 3-2-1-0 scoring rule. Rails 8.1, Hotwire, SQLite, installable PWA. Live in private beta, public launch staged next.",
     thumbnail: "/thumbs/onenil.svg",
+    socialImage: "/thumbs/onenil-social.png",
     stack: ["Ruby on Rails", "Hotwire", "SQLite", "Tailwind CSS", "Kamal"],
     github: null,
     demo: "https://onenil.org",
