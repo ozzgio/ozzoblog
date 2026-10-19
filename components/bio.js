@@ -1,12 +1,27 @@
-import { Box } from "@chakra-ui/react";
-import styled from "@emotion/styled";
+import { Box, Text } from "@chakra-ui/react";
 
-export const BioSection = styled(Box)`
-  padding-left: 3.4em;
-  text-indent: -3.4em;
-`;
-
-export const BioYear = styled.span`
-  font-weight: bold;
-  margin-right: 1em;
-`;
+export const BioSection = ({ year, children }) => (
+  <Box
+    display="grid"
+    gridTemplateColumns={{
+      base: "minmax(0, 1fr)",
+      sm: "8.5rem minmax(0, 1fr)",
+    }}
+    gap={{ base: 1, sm: 4 }}
+    py={3}
+    borderTopWidth="1px"
+    borderColor="border"
+  >
+    <Text fontSize="sm" fontWeight="semibold" color="fg.muted">
+      {year}
+    </Text>
+    <Box
+      minW={0}
+      fontSize="sm"
+      lineHeight="1.8"
+      css={{ "& a": { display: "inline", verticalAlign: "baseline" } }}
+    >
+      {children}
+    </Box>
+  </Box>
+);

@@ -1,10 +1,11 @@
-import { Link, List, ListItem, Center } from "@chakra-ui/react";
-import { ExternalLinkIcon } from "@chakra-ui/icons";
+import { projectReferralUrl } from "../../libs/projectReferral.mjs";
+import { Link, List, Center, Icon } from "@chakra-ui/react";
 import { Meta } from "../../components/project";
 import P from "../../components/paragraph";
 import ProjectDetailsLayout from "../../components/layouts/projectdetails";
 import TechStack from "../../components/techstack";
 import projectData from "../../libs/projectData";
+import { LuExternalLink } from "react-icons/lu";
 
 const Project = ({ project }) => {
   if (!project) {
@@ -26,34 +27,38 @@ const Project = ({ project }) => {
       dateInfo={{ display: true, value: "April 2022 - March 2024" }}
     >
       <P>{description}</P>
-      <List ml={4} my={4}>
-        <ListItem display="flex" alignItems="center" mb={2}>
+      <List.Root ml={4} my={4}>
+        <List.Item display="flex" alignItems="center" mb={2}>
           <Meta>Platform</Meta>
           <span>Cross-platform</span>
-        </ListItem>
-        <ListItem display="flex" alignItems="center" mb={2}>
+        </List.Item>
+        <List.Item display="flex" alignItems="center" mb={2}>
           <Meta>Stack</Meta>
           <TechStack stack={stack} />
-        </ListItem>
+        </List.Item>
         {github && !demo && (
-          <ListItem display="flex" alignItems="center" mb={2}>
-            <Link href={github} target="_blank">
+          <List.Item display="flex" alignItems="center" mb={2}>
+            <Link href={projectReferralUrl(github, project.id, "project-source")} target="_blank" rel="noopener noreferrer">
               <Meta>GitHub</Meta>
               Source Code
-              <ExternalLinkIcon mx="2px" />
+              <Icon mx="2px" asChild>
+                <LuExternalLink />
+              </Icon>
             </Link>
-          </ListItem>
+          </List.Item>
         )}
         {demo && (
-          <ListItem display="flex" alignItems="center" mb={2}>
-            <Link href={demo} target="_blank">
+          <List.Item display="flex" alignItems="center" mb={2}>
+            <Link href={projectReferralUrl(demo, project.id, "project-detail")} target="_blank" rel="noopener noreferrer">
               <Meta>Demo</Meta>
               View Live Site
-              <ExternalLinkIcon mx="2px" />
+              <Icon mx="2px" asChild>
+                <LuExternalLink />
+              </Icon>
             </Link>
-          </ListItem>
+          </List.Item>
         )}
-      </List>
+      </List.Root>
     </ProjectDetailsLayout>
   );
 };

@@ -7,7 +7,7 @@ import MoonZPulse from "../../components/icons/moon-z-pulse";
 const NewsletterPending = () => (
   <Layout
     title="Check your email"
-    description="Confirm your subscription to Ozzo's weekly field notes on building toward independent work."
+    description="Check your inbox to confirm your subscription to Ozzo's weekly newsletter."
     robots="noindex,nofollow"
     path="/newsletter/pending"
   >
@@ -19,9 +19,7 @@ const NewsletterPending = () => (
             as="h1"
             fontSize={{ base: "2xl", md: "3xl" }}
             mb={4}
-            bgGradient="linear(to-r, orange.400, orange.600)"
-            _dark={{ bgGradient: "linear(to-r, orange.300, orange.500)" }}
-            bgClip="text"
+            color="fg"
           >
             Check your inbox
           </Heading>
@@ -33,17 +31,11 @@ const NewsletterPending = () => (
             maxW="sm"
             mx="auto"
           >
-            We sent you a confirmation link. Click it to activate your
-            subscription and start receiving one field note each week.
+            Open the confirmation email and follow the link to subscribe. Check
+            your spam folder if you don&apos;t see it.
           </Text>
-          <Button
-            as={NextLink}
-            href="/"
-            colorScheme="orange"
-            size="md"
-            minH="44px"
-          >
-            Back to home
+          <Button colorPalette="orange" size="md" minH="44px" asChild>
+            <NextLink href="/">Back to home</NextLink>
           </Button>
         </Box>
       </Section>

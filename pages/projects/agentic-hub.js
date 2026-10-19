@@ -1,4 +1,4 @@
-import { List, ListItem, Center } from "@chakra-ui/react";
+import { List, Center } from "@chakra-ui/react";
 import { Meta } from "../../components/project";
 import P from "../../components/paragraph";
 import ProjectDetailsLayout from "../../components/layouts/projectdetails";
@@ -29,32 +29,37 @@ const Project = ({ project }) => {
       dateInfo={{ display: true, value: "2026 - Present" }}
     >
       <P>{description}</P>
-      <List ml={4} my={4}>
-        <ListItem display="flex" alignItems="center" mb={2}>
+      <List.Root ml={4} my={4}>
+        <List.Item display="flex" alignItems="center" mb={2}>
           <Meta>Platform</Meta>
           <span>Web, Docker, port 8787 on NUC</span>
-        </ListItem>
-        <ListItem display="flex" alignItems="center" mb={2}>
+        </List.Item>
+        <List.Item display="flex" alignItems="center" mb={2}>
           <Meta>Stack</Meta>
           <TechStack stack={stack} />
-        </ListItem>
-        <ListItem display="flex" alignItems="center" mb={2}>
+        </List.Item>
+        <List.Item display="flex" alignItems="center" mb={2}>
           <Meta>Sections</Meta>
-          <span>Chat, Tasks, Fleet, Topics, Sessions, Wiki, Terminal, Sprint</span>
-        </ListItem>
-        <ListItem display="flex" alignItems="center" mb={2}>
+          <span>
+            Chat, Tasks, Fleet, Topics, Sessions, Wiki, Terminal, Sprint
+          </span>
+        </List.Item>
+        <List.Item display="flex" alignItems="center" mb={2}>
           <Meta>Integrates</Meta>
-          <span>Hermes (open-source AI gateway) via OpenAI-compatible API: chat, health, scheduled jobs</span>
-        </ListItem>
-        <ListItem display="flex" alignItems="center" mb={2}>
+          <span>
+            Hermes (open-source AI gateway) via OpenAI-compatible API: chat,
+            health, scheduled jobs
+          </span>
+        </List.Item>
+        <List.Item display="flex" alignItems="center" mb={2}>
           <Meta>Tests</Meta>
           <span>Playwright E2E for tasks board and fleet view</span>
-        </ListItem>
-        <ListItem display="flex" alignItems="center" mb={2}>
+        </List.Item>
+        <List.Item display="flex" alignItems="center" mb={2}>
           <Meta>Repo</Meta>
           <span>Private, self-hosted on Gitea by design</span>
-        </ListItem>
-      </List>
+        </List.Item>
+      </List.Root>
     </ProjectDetailsLayout>
   );
 };

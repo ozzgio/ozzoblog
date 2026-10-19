@@ -1,11 +1,4 @@
-import {
-  HStack,
-  Text,
-  Heading,
-  Box,
-  Icon,
-  useColorModeValue,
-} from "@chakra-ui/react";
+import { HStack, Text, Heading, Box, Icon } from "@chakra-ui/react";
 import {
   createContext,
   useCallback,
@@ -80,9 +73,9 @@ const TechnologyRow = ({
   const isDraggingRef = useRef(false);
   const [isDragging, setIsDragging] = useState(false);
 
-  const headerText = useColorModeValue("gray.800", "whiteAlpha.900");
-  const headerSubtle = useColorModeValue("gray.500", "whiteAlpha.700");
-  const headerIconColor = useColorModeValue("orange.500", "orange.300");
+  const headerText = "fg";
+  const headerSubtle = "fg.muted";
+  const headerIconColor = "accent.link";
 
   let animationDuration = category.technologies.length * 0.9;
   switch (category.title) {
@@ -143,7 +136,12 @@ const TechnologyRow = ({
     return () => {
       animationContext.unregister(update);
     };
-  }, [propEnableAnimation, animationDuration, animationContext, containerReady]);
+  }, [
+    propEnableAnimation,
+    animationDuration,
+    animationContext,
+    containerReady,
+  ]);
 
   useEffect(() => {
     if (!propEnableAnimation || !containerReady || !animationContext) return;
@@ -252,12 +250,7 @@ const TechnologyRow = ({
 
   return (
     <Box minW={0} w="100%">
-      <HStack
-        spacing={3}
-        align="center"
-        mb={3}
-        justify="flex-start"
-      >
+      <HStack gap={3} align="center" mb={3} justify="flex-start">
         <Icon fontSize="2xl" color={headerIconColor}>
           {category.icon}
         </Icon>
@@ -285,7 +278,7 @@ const TechnologyRow = ({
           propEnableAnimation ? (isDragging ? "grabbing" : "grab") : undefined
         }
         userSelect={isDragging ? "none" : undefined}
-        sx={
+        css={
           propEnableAnimation
             ? {
                 "&::-webkit-scrollbar": { display: "none" },

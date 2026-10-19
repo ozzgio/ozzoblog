@@ -11,13 +11,15 @@
     "verify:detail-generation": "node scripts/verify-detail-generation-failures.mjs",
     "verify:markdown": "node scripts/verify-markdown-rendering.mjs",
     "verify:markdown:presentation": "node scripts/verify-markdown-table-presentation.mjs",
-    "verify:dependency-compat": "node scripts/verify-dependency-compat.mjs"
+    "verify:dependency-compat": "node scripts/verify-dependency-compat.mjs",
+    "verify:ui": "node scripts/verify-ui.mjs",
+    "verify:intro": "node scripts/verify-brand-intro.mjs",
+    "verify:players": "node scripts/verify-project-players.mjs",
+    "verify:project-referrals": "node scripts/verify-project-referrals.mjs"
   },
   "dependencies": {
-    "@chakra-ui/icons": "^2.1.1",
-    "@chakra-ui/react": "^2.8.2",
+    "@chakra-ui/react": "^3.37.0",
     "@emotion/react": "^11.11.4",
-    "@emotion/styled": "^11.14.1",
     "dotenv": "^16.5.0",
     "framer-motion": "^13.1.1",
     "mermaid": "^11.17.2",
@@ -28,7 +30,8 @@
     "react-markdown": "^10.1.0",
     "react-syntax-highlighter": "^16.1.1",
     "remark-gfm": "^4.0.1",
-    "three": "^0.185.1"
+    "three": "^0.185.1",
+    "next-themes": "^0.4.6"
   },
   "devDependencies": {
     "@playwright/test": "^1.62.1",

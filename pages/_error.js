@@ -1,5 +1,12 @@
 import NextLink from "next/link";
-import { Box, Button, Container, Divider, Heading, Text } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Container,
+  Heading,
+  Text,
+  Separator,
+} from "@chakra-ui/react";
 import Layout from "../components/layouts/layout";
 
 // Next's built-in error page renders outside the Chakra tree, so a 500 came
@@ -9,7 +16,11 @@ const ErrorPage = ({ statusCode }) => {
   const heading = statusCode ? `Error ${statusCode}` : "Something went wrong";
 
   return (
-    <Layout title={heading} description="This page could not be loaded." robots="noindex,nofollow">
+    <Layout
+      title={heading}
+      description="This page could not be loaded."
+      robots="noindex,nofollow"
+    >
       <Container maxW="2xl" py={{ base: 10, md: 16 }} textAlign="center">
         <Heading as="h1" size="lg">
           {heading}
@@ -17,10 +28,10 @@ const ErrorPage = ({ statusCode }) => {
         <Text mt={4}>
           This page could not be loaded. Try again in a moment.
         </Text>
-        <Divider my={6} />
+        <Separator my={6} />
         <Box my={6}>
-          <Button as={NextLink} href="/" colorScheme="orange" minH="44px">
-            Return to home
+          <Button colorPalette="orange" minH="44px" asChild>
+            <NextLink href="/">Return to home</NextLink>
           </Button>
         </Box>
       </Container>

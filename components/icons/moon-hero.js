@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
-import { Box, useColorMode, useColorModeValue } from "@chakra-ui/react";
+import { Box } from "@chakra-ui/react";
+import { useColorMode, useColorModeValue } from "../ui/color-mode";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { playfairDisplay } from "../fonts";
@@ -506,7 +507,7 @@ const MoonHero = ({ size = 220 }) => {
         aspectRatio={1}
         cursor="grab"
         display="inline-block"
-        sx={{ touchAction: "none" }}
+        css={{ touchAction: "none" }}
         filter="drop-shadow(0 0 14px rgba(160,160,210,0.45))"
       />
       <Box

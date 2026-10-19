@@ -1,4 +1,5 @@
 import dynamic from "next/dynamic";
+import { useColorModeValue } from "./ui/color-mode";
 import NextLink from "next/link";
 import ReactMarkdown from "react-markdown";
 import { motion } from "framer-motion";
@@ -6,20 +7,11 @@ import {
   Box,
   Heading,
   Text,
-  UnorderedList,
-  OrderedList,
-  ListItem,
-  Divider,
   Code,
   Link,
   Table,
-  TableContainer,
-  Thead,
-  Tbody,
-  Tr,
-  Th,
-  Td,
-  useColorModeValue,
+  Separator,
+  List,
 } from "@chakra-ui/react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import {
@@ -29,7 +21,9 @@ import {
 import YoutubeEmbed, { parseYouTubeId } from "./youtube-embed";
 import { remarkPlugins } from "../libs/markdown-plugins.mjs";
 
-const MermaidDiagram = dynamic(() => import("./mermaid-diagram"), { ssr: false });
+const MermaidDiagram = dynamic(() => import("./mermaid-diagram"), {
+  ssr: false,
+});
 
 const READING_FONT = "var(--font-merriweather), Georgia, serif";
 
@@ -115,8 +109,8 @@ function tableContentMinWidth(tableNode) {
     if (child.type === "tableRow" || child.tagName === "tr") return [child];
     return Array.isArray(child.children)
       ? child.children.filter(
-        (row) => row.type === "tableRow" || row.tagName === "tr",
-      )
+          (row) => row.type === "tableRow" || row.tagName === "tr",
+        )
       : [];
   });
   const columnWidths = [];
@@ -124,8 +118,11 @@ function tableContentMinWidth(tableNode) {
   rows.forEach((row) => {
     const cells = Array.isArray(row.children)
       ? row.children.filter(
-        (cell) => cell.type === "tableCell" || cell.tagName === "td" || cell.tagName === "th",
-      )
+          (cell) =>
+            cell.type === "tableCell" ||
+            cell.tagName === "td" ||
+            cell.tagName === "th",
+        )
       : [];
     cells.forEach((cell, columnIndex) => {
       const words = markdownNodeText(cell).match(/\S+/g) || [];
@@ -148,21 +145,37 @@ function tableContentMinWidth(tableNode) {
 }
 
 export default function MarkdownProse({ children, size = "article" }) {
-  const bodyColor = useColorModeValue("gray.700", "gray.300");
-  const headingColor = useColorModeValue("gray.800", "gray.100");
-  const quoteBorder = useColorModeValue("orange.300", "orange.600");
-  const quoteBg = useColorModeValue("orange.50", "whiteAlpha.50");
-  const codeBg = useColorModeValue("gray.100", "whiteAlpha.200");
-  const codeBorder = useColorModeValue("gray.200", "whiteAlpha.300");
-  const tableBorder = useColorModeValue("gray.200", "whiteAlpha.300");
-  const tableHeaderBg = useColorModeValue("gray.100", "whiteAlpha.100");
-  const tableStripeBg = useColorModeValue("gray.50", "whiteAlpha.50");
+  const bodyColor = "fg";
+  const headingColor = "fg";
+  const quoteBorder = "accent.link";
+  const quoteBg = "accent.subtle";
+  const codeBg = "bg.subtle";
+  const codeBorder = "border";
+  const tableBorder = "border";
+  const tableHeaderBg = "bg.subtle";
+  const tableStripeBg = "bg.panel";
   const syntaxTheme = useColorModeValue(accessibleOneLight, accessibleOneDark);
-  const { fontSize, lineHeight, listFontSize, tableFontSize, paragraphMb, listSpacing, headingMt } = SIZES[size] || SIZES.article;
+  const {
+    fontSize,
+    lineHeight,
+    listFontSize,
+    tableFontSize,
+    paragraphMb,
+    listSpacing,
+    headingMt,
+  } = SIZES[size] || SIZES.article;
 
   const components = {
     h1: ({ children }) => (
-      <Heading as="h1" size="lg" color={headingColor} mt={headingMt.h1} mb={4} lineHeight="1.3" fontFamily={READING_FONT}>
+      <Heading
+        as="h1"
+        size="lg"
+        color={headingColor}
+        mt={headingMt.h1}
+        mb={4}
+        lineHeight="1.3"
+        fontFamily={READING_FONT}
+      >
         {children}
       </Heading>
     ),
@@ -176,34 +189,65 @@ export default function MarkdownProse({ children, size = "article" }) {
         viewport={{ once: true, margin: "-80px" }}
         transition={{ duration: 0.5, ease: "easeOut" }}
       >
-        <Heading as="h2" size="md" color={headingColor} mt={headingMt.h2} mb={4} lineHeight="1.3" fontFamily={READING_FONT}>
+        <Heading
+          as="h2"
+          size="md"
+          color={headingColor}
+          mt={headingMt.h2}
+          mb={4}
+          lineHeight="1.3"
+          fontFamily={READING_FONT}
+        >
           {children}
         </Heading>
       </motion.div>
     ),
     h3: ({ children }) => (
-      <Heading as="h3" size="sm" color={headingColor} mt={headingMt.h3} mb={3} lineHeight="1.4" fontFamily={READING_FONT}>
+      <Heading
+        as="h3"
+        size="sm"
+        color={headingColor}
+        mt={headingMt.h3}
+        mb={3}
+        lineHeight="1.4"
+        fontFamily={READING_FONT}
+      >
         {children}
       </Heading>
     ),
     h4: ({ children }) => (
-      <Heading as="h4" size="xs" color={headingColor} mt={headingMt.h4} mb={2} textTransform="uppercase" letterSpacing="wider" fontFamily={READING_FONT}>
+      <Heading
+        as="h4"
+        size="xs"
+        color={headingColor}
+        mt={headingMt.h4}
+        mb={2}
+        textTransform="uppercase"
+        letterSpacing="wider"
+        fontFamily={READING_FONT}
+      >
         {children}
       </Heading>
     ),
     p: ({ children }) => (
-      <Text color={bodyColor} fontSize={fontSize} lineHeight={lineHeight} fontFamily={READING_FONT} mb={paragraphMb}>
+      <Text
+        color={bodyColor}
+        fontSize={fontSize}
+        lineHeight={lineHeight}
+        fontFamily={READING_FONT}
+        mb={paragraphMb}
+      >
         {children}
       </Text>
     ),
     strong: ({ children }) => (
-      <Box as="strong" fontWeight="semibold" color={headingColor}>
-        {children}
+      <Box fontWeight="semibold" color={headingColor} asChild>
+        <strong>{children}</strong>
       </Box>
     ),
     em: ({ children }) => (
-      <Box as="em" fontStyle="italic">
-        {children}
+      <Box fontStyle="italic" asChild>
+        <em>{children}</em>
       </Box>
     ),
     a: ({ href, children }) => {
@@ -215,11 +259,20 @@ export default function MarkdownProse({ children, size = "article" }) {
         wordBreak: "break-word",
       };
       if (isExternal) {
-        return <Link href={href} isExternal {...linkProps}>{children}</Link>;
+        return (
+          <Link
+            href={href}
+            {...linkProps}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {children}
+          </Link>
+        );
       }
       return (
-        <Link as={NextLink} href={href} {...linkProps}>
-          {children}
+        <Link {...linkProps} asChild>
+          <NextLink href={href}>{children}</NextLink>
         </Link>
       );
     },
@@ -238,24 +291,44 @@ export default function MarkdownProse({ children, size = "article" }) {
       </Box>
     ),
     ul: ({ children }) => (
-      <UnorderedList spacing={listSpacing} mb={paragraphMb} pl={2} color={bodyColor} fontSize={listFontSize} fontFamily={READING_FONT}>
+      <List.Root
+        as="ul"
+        gap={listSpacing}
+        mb={paragraphMb}
+        pl={5}
+        color={bodyColor}
+        fontSize={listFontSize}
+        fontFamily={READING_FONT}
+      >
         {children}
-      </UnorderedList>
+      </List.Root>
     ),
     ol: ({ children }) => (
-      <OrderedList spacing={listSpacing} mb={paragraphMb} pl={2} color={bodyColor} fontSize={listFontSize} fontFamily={READING_FONT}>
+      <List.Root
+        as="ol"
+        listStyleType="decimal"
+        gap={listSpacing}
+        mb={paragraphMb}
+        pl={5}
+        color={bodyColor}
+        fontSize={listFontSize}
+        fontFamily={READING_FONT}
+      >
         {children}
-      </OrderedList>
+      </List.Root>
     ),
     li: ({ children }) => (
-      <ListItem lineHeight={lineHeight}>{children}</ListItem>
+      <List.Item lineHeight={lineHeight}>{children}</List.Item>
     ),
     table: ({ children, node }) => {
       const contentMinWidth = tableContentMinWidth(node);
-      const mobileMinWidth = Math.max(contentMinWidth, TABLE_MINIMUM_COLUMN_WIDTH);
+      const mobileMinWidth = Math.max(
+        contentMinWidth,
+        TABLE_MINIMUM_COLUMN_WIDTH,
+      );
 
       return (
-        <TableContainer
+        <Table.ScrollArea
           w="100%"
           maxW="100%"
           role="region"
@@ -268,31 +341,41 @@ export default function MarkdownProse({ children, size = "article" }) {
           borderWidth="1px"
           borderColor={tableBorder}
           borderRadius="md"
-          sx={{ WebkitOverflowScrolling: "touch" }}
+          css={{
+            WebkitOverflowScrolling: "touch",
+          }}
         >
-          <Table
+          <Table.Root
             aria-label="Markdown data table"
             w="fit-content"
             minW={{ base: `max(100%, ${mobileMinWidth}px)`, md: "100%" }}
             size={size === "compact" ? "sm" : "md"}
-            variant="simple"
+            variant="line"
             whiteSpace="normal"
-            sx={{ tableLayout: "auto" }}
+            css={{
+              tableLayout: "auto",
+            }}
           >
             {children}
-          </Table>
-        </TableContainer>
+          </Table.Root>
+        </Table.ScrollArea>
       );
     },
-    thead: ({ children }) => <Thead bg={tableHeaderBg}>{children}</Thead>,
-    tbody: ({ children }) => (
-      <Tbody sx={{ "tr:nth-of-type(even)": { bg: tableStripeBg } }}>
-        {children}
-      </Tbody>
+    thead: ({ children }) => (
+      <Table.Header bg={tableHeaderBg}>{children}</Table.Header>
     ),
-    tr: ({ children }) => <Tr>{children}</Tr>,
+    tbody: ({ children }) => (
+      <Table.Body
+        css={{
+          "& tr:nth-of-type(even)": { bg: tableStripeBg },
+        }}
+      >
+        {children}
+      </Table.Body>
+    ),
+    tr: ({ children }) => <Table.Row>{children}</Table.Row>,
     th: ({ children, style }) => (
-      <Th
+      <Table.ColumnHeader
         scope="col"
         px={{ base: 3, md: 4 }}
         py={3}
@@ -310,10 +393,10 @@ export default function MarkdownProse({ children, size = "article" }) {
         wordBreak="break-word"
       >
         {children}
-      </Th>
+      </Table.ColumnHeader>
     ),
     td: ({ children, style }) => (
-      <Td
+      <Table.Cell
         px={{ base: 3, md: 4 }}
         py={3}
         color={bodyColor}
@@ -328,9 +411,9 @@ export default function MarkdownProse({ children, size = "article" }) {
         wordBreak="break-word"
       >
         {children}
-      </Td>
+      </Table.Cell>
     ),
-    hr: () => <Divider my={6} />,
+    hr: () => <Separator my={6} />,
     pre: ({ children }) => {
       const child = Array.isArray(children) ? children[0] : children;
       const className = child?.props?.className || "";
@@ -345,7 +428,14 @@ export default function MarkdownProse({ children, size = "article" }) {
         const chart = codeText.trim();
         if (!chart) {
           return (
-            <Box as="pre" bg={codeBg} p={4} borderRadius="md" overflowX="auto" mb={paragraphMb}>
+            <Box
+              as="pre"
+              bg={codeBg}
+              p={4}
+              borderRadius="md"
+              overflowX="auto"
+              mb={paragraphMb}
+            >
               {children}
             </Box>
           );
@@ -361,7 +451,14 @@ export default function MarkdownProse({ children, size = "article" }) {
         // No recognizable URL: render the raw fence as a plain code block so
         // a malformed embed is visible, not silently dropped.
         return (
-          <Box as="pre" bg={codeBg} p={4} borderRadius="md" overflowX="auto" mb={paragraphMb}>
+          <Box
+            as="pre"
+            bg={codeBg}
+            p={4}
+            borderRadius="md"
+            overflowX="auto"
+            mb={paragraphMb}
+          >
             {children}
           </Box>
         );

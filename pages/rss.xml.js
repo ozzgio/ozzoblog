@@ -13,7 +13,9 @@ function generateRSSFeed(articles) {
 
   const rssItems = articles
     .map((article) => {
-      const pubDate = article.date ? new Date(article.date).toUTCString() : currentDate;
+      const pubDate = article.date
+        ? new Date(article.date).toUTCString()
+        : currentDate;
       const description = article.description
         ? `<description><![CDATA[${article.description}]]></description>`
         : "";
@@ -40,9 +42,9 @@ function generateRSSFeed(articles) {
   return `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
-    <title>Ozzo's Field Notes</title>
+    <title>Ozzo's notebook</title>
     <link>${siteUrl}</link>
-    <description>Field notes on finding demand, shipping useful software, earning attention, and building toward independent work.</description>
+    <description>Notes on building software, reading books, and learning to work independently.</description>
     <language>en-us</language>
     <lastBuildDate>${currentDate}</lastBuildDate>
     <atom:link href="${siteUrl}/rss.xml" rel="self" type="application/rss+xml"/>
@@ -92,7 +94,10 @@ export async function getServerSideProps({ res }) {
     const rssFeed = generateRSSFeed(articles);
 
     res.setHeader("Content-Type", "text/xml; charset=utf-8");
-    res.setHeader("Cache-Control", "public, s-maxage=600, stale-while-revalidate=300");
+    res.setHeader(
+      "Cache-Control",
+      "public, s-maxage=600, stale-while-revalidate=300",
+    );
     res.write(rssFeed);
     res.end();
 

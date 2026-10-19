@@ -23,18 +23,11 @@ const MoonZMark = ({ size = 30, ...props }) => (
       strokeDasharray="66 198"
       transform="rotate(-50 50 50)"
     />
-    <text
-      x="50"
-      y="52"
-      textAnchor="middle"
-      dominantBaseline="central"
-      fontFamily="var(--font-m-plus-rounded-1c), system-ui, sans-serif"
-      fontWeight="700"
-      fontSize="46"
+    <path
+      data-brand-glyph="z"
+      d="M32 31H68V38L43 62H68V70H31V63L56 39H32Z"
       fill="#f7f5f2"
-    >
-      Z
-    </text>
+    />
   </svg>
 );
 

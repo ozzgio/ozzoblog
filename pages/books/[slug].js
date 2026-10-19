@@ -12,8 +12,7 @@ import {
   VStack,
   Wrap,
   WrapItem,
-  useColorModeValue,
-  Divider,
+  Separator,
 } from "@chakra-ui/react";
 import Head from "next/head";
 import NextLink from "next/link";
@@ -73,85 +72,82 @@ function sectionId(label, index) {
 }
 
 function ReadingArc({ sections }) {
-  const railColor = useColorModeValue("orange.300", "orange.600");
-  const markerBg = useColorModeValue("white", "#1a1a1e");
-  const labelColor = useColorModeValue("orange.700", "orange.300");
-  const decisionBg = useColorModeValue("orange.50", "orange.900");
-  const decisionBorder = useColorModeValue("orange.300", "orange.600");
-
   return (
-    <Box
-      as="ol"
-      borderLeftWidth="2px"
-      borderLeftColor={railColor}
-      ml={{ base: 2, md: 3 }}
-      pl={{ base: 6, md: 8 }}
-      alignSelf="stretch"
-      minW={0}
-    >
+    <Box as="ol" alignSelf="stretch" minW={0}>
       {sections.map((section, index) => {
         const isDecision = /decision|decided/i.test(section.label);
         const isLast = index === sections.length - 1;
-
         const headingId = sectionId(section.label, index);
 
         return (
           <Box
             as="li"
             key={`${section.label}-${index}`}
+            data-reading-step=""
             position="relative"
-            pb={isLast ? 0 : 8}
+            display="grid"
+            gridTemplateColumns="32px minmax(0, 1fr)"
+            gap={4}
+            pb={isLast ? 0 : 6}
             listStyleType="none"
+            _before={
+              isLast
+                ? undefined
+                : {
+                    content: '""',
+                    position: "absolute",
+                    left: "16px",
+                    top: "16px",
+                    bottom: "-16px",
+                    width: "1px",
+                    bg: "border",
+                    transform: "translateX(-50%)",
+                  }
+            }
           >
             <Box
-              position="absolute"
-              left={{ base: "-37px", md: "-49px" }}
-              top="0"
-              boxSize={{ base: "26px", md: "30px" }}
+              data-reading-marker=""
+              position="relative"
+              zIndex={1}
+              boxSize="32px"
               borderRadius="full"
-              bg={markerBg}
-              borderWidth="2px"
-              borderColor={railColor}
+              bg="accent.subtle"
+              borderWidth="1px"
+              borderColor="accent.link"
               display="flex"
               alignItems="center"
               justifyContent="center"
             >
               <Icon
                 as={iconForLabel(section.label)}
-                boxSize={{ base: 3, md: 3.5 }}
-                color={railColor}
+                boxSize={4}
+                color="accent.link"
               />
             </Box>
-
-            <Heading
-              as="h3"
-              id={headingId}
-              fontSize="xs"
-              fontWeight="bold"
-              textTransform="uppercase"
-              letterSpacing="wider"
-              color={labelColor}
-              mb={2}
-            >
-              {section.label}
-            </Heading>
-
-            {isDecision ? (
+            <Box minW={0}>
+              <Heading
+                as="h3"
+                id={headingId}
+                minH="32px"
+                display="flex"
+                alignItems="center"
+                fontSize="sm"
+                fontWeight="semibold"
+                mb={2}
+              >
+                {section.label}
+              </Heading>
               <Box
-                bg={decisionBg}
-                borderWidth="1px"
-                borderColor={decisionBorder}
+                bg={isDecision ? "accent.subtle" : undefined}
+                borderWidth={isDecision ? "1px" : undefined}
+                borderColor="border"
                 borderRadius="lg"
-                p={{ base: 4, md: 5 }}
-                sx={{ "& p:last-of-type": { mb: 0 } }}
+                p={isDecision ? 4 : undefined}
+                css={{ "& p:last-of-type": { mb: 0 } }}
               >
                 <MarkdownProse size="compact">{section.body}</MarkdownProse>
               </Box>
-            ) : (
-              <Box sx={{ "& p:last-of-type": { mb: 0 } }}>
-                <MarkdownProse size="compact">{section.body}</MarkdownProse>
-              </Box>
-            )}
+            </Box>
           </Box>
         );
       })}
@@ -160,16 +156,13 @@ function ReadingArc({ sections }) {
 }
 
 export default function BookDetailPage({ book }) {
-  const mutedText = useColorModeValue("gray.600", "gray.400");
-  const headingColor = useColorModeValue("gray.800", "gray.100");
-  const bodyColor = useColorModeValue("gray.700", "gray.300");
-  const proseBorder = useColorModeValue("blackAlpha.100", "whiteAlpha.200");
-  // orange.500 is 3.11:1 against the light page background -- fails AA.
-  // orange.700 clears it (6.0:1) while orange.500 already clears the dark
-  // background (5.12:1), so this needs to vary by mode, not be a single token.
-  const linkOrange = useColorModeValue("orange.700", "orange.500");
-  const quoteBg = useColorModeValue("orange.50", "whiteAlpha.50");
-  const quoteBorder = useColorModeValue("orange.300", "orange.600");
+  const mutedText = "fg.muted";
+  const headingColor = "fg";
+  const bodyColor = "fg";
+  const proseBorder = "border";
+  const linkOrange = "accent.link";
+  const quoteBg = "accent.subtle";
+  const quoteBorder = "accent.link";
 
   if (!book) return null;
 
@@ -210,10 +203,10 @@ export default function BookDetailPage({ book }) {
         <link rel="canonical" href={canonicalUrl} />
       </Head>
 
-      <Container maxW="3xl" py={{ base: 6, md: 12 }}>
+      <Container maxW="3xl" py={{ base: 4, md: 6 }}>
         <VStack
           align="start"
-          spacing={{ base: 9, md: 12 }}
+          gap={{ base: 6, md: 8 }}
           w="100%"
           maxW="2xl"
           mx="auto"
@@ -229,7 +222,7 @@ export default function BookDetailPage({ book }) {
             px={2}
             mx={-2}
           >
-            <HStack spacing={1}>
+            <HStack gap={1}>
               <Icon as={IoArrowBackOutline} />
               <Text>Back to books</Text>
             </HStack>
@@ -246,7 +239,7 @@ export default function BookDetailPage({ book }) {
             <Stack
               direction={{ base: "column", sm: "row" }}
               align={{ base: "start", sm: "center" }}
-              spacing={{ base: 5, md: 8 }}
+              gap={{ base: 5, md: 8 }}
             >
               {book.cover && (
                 <Box
@@ -264,7 +257,7 @@ export default function BookDetailPage({ book }) {
                   />
                 </Box>
               )}
-              <VStack align="start" spacing={4} flex={1} minW={0}>
+              <VStack align="start" gap={4} flex={1} minW={0}>
                 <Text
                   fontSize="xs"
                   fontWeight="bold"
@@ -283,16 +276,16 @@ export default function BookDetailPage({ book }) {
                 >
                   {book.title}
                 </Heading>
-                <Wrap spacingX={4} spacingY={2} color={mutedText} fontSize="sm">
+                <Wrap columnGap={4} rowGap={2} color={mutedText} fontSize="sm">
                   <WrapItem>
-                    <HStack spacing={2}>
+                    <HStack gap={2}>
                       <Icon as={IoBookOutline} />
                       <Text fontWeight="medium">{book.author}</Text>
                     </HStack>
                   </WrapItem>
                   {book.date && (
                     <WrapItem>
-                      <HStack spacing={2}>
+                      <HStack gap={2}>
                         <Icon as={IoCalendarOutline} />
                         <Text>Read {formatAbsoluteDate(book.date)}</Text>
                       </HStack>
@@ -300,23 +293,23 @@ export default function BookDetailPage({ book }) {
                   )}
                 </Wrap>
                 {book.rating > 0 && (
-                  <HStack spacing={2}>
+                  <HStack gap={2}>
                     <RatingStar rating={book.rating} />
                     <Text color={linkOrange} fontWeight="bold" fontSize="sm">
                       {book.rating}/5
                     </Text>
                   </HStack>
                 )}
-                <HStack flexWrap="wrap" spacing={2}>
+                <HStack flexWrap="wrap" gap={2}>
                   {book.tags?.map((tag) => (
-                    <Tag
+                    <Tag.Root
                       key={tag}
-                      colorScheme="orange"
+                      colorPalette="orange"
                       borderRadius="full"
                       size="sm"
                     >
                       {tag}
-                    </Tag>
+                    </Tag.Root>
                   ))}
                 </HStack>
               </VStack>
@@ -360,7 +353,7 @@ export default function BookDetailPage({ book }) {
           )}
 
           {hasArc && (
-            <VStack align="start" spacing={4} w="100%">
+            <VStack align="start" gap={4} w="100%">
               <Heading
                 as="h2"
                 size="sm"
@@ -376,9 +369,9 @@ export default function BookDetailPage({ book }) {
 
           {hasQuotes && (
             <>
-              <Divider />
-              <VStack align="start" spacing={4} w="100%">
-                <HStack spacing={2}>
+              <Separator />
+              <VStack align="start" gap={4} w="100%">
+                <HStack gap={2}>
                   <Icon as={IoChatbubbleOutline} color="orange.400" />
                   <Heading
                     as="h2"
@@ -390,7 +383,7 @@ export default function BookDetailPage({ book }) {
                     Notable quotes
                   </Heading>
                 </HStack>
-                <VStack spacing={3} w="100%" align="start">
+                <VStack gap={3} w="100%" align="start">
                   {book.quotes.map((quote, i) => (
                     <Box
                       key={i}
@@ -434,12 +427,13 @@ export default function BookDetailPage({ book }) {
                   href={book.url}
                   color={linkOrange}
                   fontWeight="semibold"
-                  isExternal
                   fontSize="sm"
                   minH="44px"
                   mt={2}
                   display="inline-flex"
                   alignItems="center"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
                   Open original link
                 </Link>

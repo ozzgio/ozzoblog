@@ -1,5 +1,12 @@
 import NextLink from "next/link";
-import { Box, Button, Container, Divider, Heading, Text } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Container,
+  Heading,
+  Text,
+  Separator,
+} from "@chakra-ui/react";
 import Layout from "../components/layouts/layout";
 
 // Wrapped in Layout so a missing page keeps the navbar, footer and the
@@ -15,10 +22,10 @@ const NotFoundPage = () => (
         Not found
       </Heading>
       <Text mt={4}>The page you&apos;re looking for was not found.</Text>
-      <Divider my={6} />
+      <Separator my={6} />
       <Box my={6}>
-        <Button as={NextLink} href="/" colorScheme="orange" minH="44px">
-          Return to home
+        <Button colorPalette="orange" minH="44px" asChild>
+          <NextLink href="/">Return to home</NextLink>
         </Button>
       </Box>
     </Container>

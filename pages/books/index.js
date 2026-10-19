@@ -1,5 +1,4 @@
 import {
-  Badge,
   Box,
   Button,
   Flex,
@@ -8,12 +7,10 @@ import {
   Icon,
   Input,
   InputGroup,
-  InputLeftElement,
-  Select,
+  NativeSelect,
   SimpleGrid,
   Stack,
   Text,
-  useColorModeValue,
   VStack,
   Wrap,
   WrapItem,
@@ -21,11 +18,8 @@ import {
 import { useMemo, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import {
-  IoBookOutline,
   IoCloseCircleOutline,
-  IoDocumentTextOutline,
   IoFlashOutline,
-  IoPricetagOutline,
   IoSearchOutline,
   IoStarOutline,
 } from "react-icons/io5";
@@ -73,15 +67,10 @@ const BooksPage = ({ books, error }) => {
   const [sortOption, setSortOption] = useState("highest_rating");
   const [searchQuery, setSearchQuery] = useState("");
 
-  const heroBg = useColorModeValue(
-    "linear(to-br, orange.50, white 40%, orange.100)",
-    "linear(to-br, gray.900, orange.900, gray.900)",
-  );
-  const heroBorder = useColorModeValue("orange.200", "orange.700");
-  const mutedText = useColorModeValue("gray.600", "gray.400");
-  const panelBg = useColorModeValue("whiteAlpha.900", "whiteAlpha.100");
-  const panelBorder = useColorModeValue("blackAlpha.100", "whiteAlpha.200");
-  const accentSubtle = useColorModeValue("orange.50", "orange.900");
+  const heroBorder = "border";
+  const mutedText = "fg.muted";
+  const panelBorder = "border";
+  const accentSubtle = "accent.subtle";
 
   const normalizedBooks = useMemo(
     () =>
@@ -210,215 +199,123 @@ const BooksPage = ({ books, error }) => {
   const featuredBook = filteredBooks[0] || null;
   const bookGrid = featuredBook ? filteredBooks.slice(1) : [];
 
-  const heroMetaItems = [];
-  if (latestFinishedBook?.absoluteDate) {
-    heroMetaItems.push(`Latest: ${latestFinishedBook.absoluteDate}`);
-  }
-  if (noteBackedBooks > 0) {
-    heroMetaItems.push(`Note-backed entries: ${noteBackedBooks}`);
-  }
-
   return (
     <Layout
-      title="Books and Reading Notes for Builders"
-      description="A curated library of books read by Ozzo, with short notes and lessons on software, product building, and personal growth."
+      title="Books and reading notes"
+      description="Books Ozzo has read, with ratings and notes on software, work, and life."
       keywords="developer reading list, software engineering books, indie builder books, startup books, personal knowledge base"
       path="/books"
     >
       <MotionBox
-        initial={shouldReduceMotion ? false : { opacity: 0, y: 18 }}
+        initial={{ opacity: 0, y: 18 }}
         animate={{ opacity: 1, y: 0 }}
         transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.55 }}
       >
-        <VStack spacing={8} align="stretch">
-          <Box
-            bgGradient={heroBg}
-            borderWidth="1px"
-            borderColor={heroBorder}
-            borderRadius="3xl"
-            px={{ base: 5, md: 8 }}
-            py={{ base: 6, md: 8 }}
-            boxShadow="xl"
-            position="relative"
-            overflow="hidden"
-            _before={{
-              content: '""',
-              position: "absolute",
-              width: "320px",
-              height: "320px",
-              right: "-120px",
-              top: "-140px",
-              borderRadius: "full",
-              bg: "orange.300",
-              opacity: 0.15,
-              filter: "blur(6px)",
-            }}
-          >
-            <Stack
-              direction={{ base: "column", lg: "row" }}
-              align={{ base: "stretch", lg: "start" }}
-              justify="space-between"
-              spacing={8}
-              position="relative"
-              zIndex={1}
+        <VStack gap={5} align="stretch">
+          <Box as="header" pb={4} borderBottomWidth="1px" borderColor="border">
+            <Text
+              fontSize="xs"
+              fontWeight="bold"
+              letterSpacing="0.04em"
+              color="accent.link"
+              mb={3}
             >
-              <VStack align="start" spacing={5} maxW="2xl">
-                <Badge
-                  colorScheme="orange"
-                  px={3}
-                  py={1}
-                  borderRadius="full"
-                  fontSize="xs"
-                  textTransform="uppercase"
-                >
-                  Reading library
-                </Badge>
-                <Box>
-                  <Heading
-                    as="h1"
-                    fontSize={{ base: "xl", md: "2xl" }}
-                    lineHeight="1.2"
-                    mb={2}
-                  >
-                    Books I&apos;ve read
-                  </Heading>
-                  <Text fontSize="sm" color={mutedText}>
-                    Notes on what stuck, what changed, and the occasional full
-                    breakdown.
-                  </Text>
-                </Box>
-                {heroMetaItems.length > 0 && (
-                  <HStack spacing={3} flexWrap="wrap">
-                    {heroMetaItems.map((item, index) => (
-                      <Box key={item} display="contents">
-                        {index > 0 && <Text color={mutedText}>/</Text>}
-                        <Text fontSize="sm" color={mutedText}>
-                          {item}
-                        </Text>
-                      </Box>
-                    ))}
-                  </HStack>
-                )}
-              </VStack>
-
-              <SimpleGrid
-                columns={{ base: 1, sm: 3 }}
-                spacing={3}
-                minW={{ base: "100%", lg: "380px" }}
-                maxW="540px"
-                alignSelf={{ base: "stretch", lg: "start" }}
-              >
-                <Box
-                  bg={panelBg}
-                  borderWidth="1px"
-                  borderColor={panelBorder}
-                  borderRadius="2xl"
-                  p={4}
-                >
-                  <HStack mb={2}>
-                    <Icon as={IoBookOutline} color="orange.400" />
-                    <Text fontSize="sm" color={mutedText}>
-                      Books
-                    </Text>
-                  </HStack>
-                  <Text fontSize="2xl" fontWeight="bold">
-                    {sortedBooks.length}
-                  </Text>
-                </Box>
-                <Box
-                  bg={panelBg}
-                  borderWidth="1px"
-                  borderColor={panelBorder}
-                  borderRadius="2xl"
-                  p={4}
-                >
-                  <HStack mb={2}>
-                    <Icon as={IoPricetagOutline} color="orange.400" />
-                    <Text fontSize="sm" color={mutedText}>
-                      Tags
-                    </Text>
-                  </HStack>
-                  <Text fontSize="2xl" fontWeight="bold">
-                    {allTags.length}
-                  </Text>
-                </Box>
-                <Box
-                  bg={panelBg}
-                  borderWidth="1px"
-                  borderColor={panelBorder}
-                  borderRadius="2xl"
-                  p={4}
-                >
-                  <HStack mb={2}>
-                    <Icon as={IoDocumentTextOutline} color="orange.400" />
-                    <Text fontSize="sm" color={mutedText}>
-                      Notes
-                    </Text>
-                  </HStack>
-                  <Text fontSize="2xl" fontWeight="bold">
-                    {noteBackedBooks}
-                  </Text>
-                </Box>
-              </SimpleGrid>
-            </Stack>
+              Reading notes
+            </Text>
+            <Heading
+              as="h1"
+              id="books-heading"
+              fontSize={{ base: "3xl", md: "4xl" }}
+              lineHeight="1.05"
+              mb={3}
+            >
+              The bookshelf
+            </Heading>
+            <Text fontSize="md" color="fg.muted" maxW="38rem">
+              Books I&apos;ve read, what I took from them, and the ideas I want
+              to put into practice.
+            </Text>
+            <HStack
+              gap={5}
+              flexWrap="wrap"
+              fontSize="sm"
+              color="fg.muted"
+              mt={3}
+            >
+              <Text>{sortedBooks.length} books</Text>
+              <Text>{allTags.length} topics</Text>
+              <Text>{noteBackedBooks} with notes</Text>
+            </HStack>
+            {latestFinishedBook?.absoluteDate && (
+              <Text fontSize="sm" color="fg.muted" mt={2}>
+                Last read: {latestFinishedBook.absoluteDate}
+              </Text>
+            )}
           </Box>
 
           {error ? (
             <Text color="status.error">{error}</Text>
           ) : (
-            <VStack spacing={6} align="stretch">
+            <VStack gap={6} align="stretch">
               <Box
                 borderWidth="1px"
                 borderColor={panelBorder}
-                borderRadius="3xl"
-                p={{ base: 4, md: 5 }}
-                bg={panelBg}
-                backdropFilter="blur(12px)"
+                borderRadius="xl"
+                p={{ base: 3, md: 4 }}
+                bg="bg.panel"
               >
-                <Stack direction={{ base: "column", xl: "row" }} spacing={4}>
-                  <InputGroup flex={1}>
-                    <InputLeftElement pointerEvents="none" h="44px">
-                      <Icon as={IoSearchOutline} color="gray.400" />
-                    </InputLeftElement>
+                <Stack direction={{ base: "column", md: "row" }} gap={4}>
+                  <InputGroup
+                    flex={1}
+                    startElement={
+                      <Icon as={IoSearchOutline} color="fg.muted" />
+                    }
+                  >
                     <Input
+                      aria-label="Search books"
                       placeholder="Search titles, authors, notes, or tags"
                       value={searchQuery}
                       onChange={(event) => setSearchQuery(event.target.value)}
                       minH="44px"
                     />
                   </InputGroup>
-                  <Select
-                    value={sortOption}
-                    onChange={(event) => setSortOption(event.target.value)}
-                    maxW={{ base: "100%", xl: "220px" }}
-                    minH="44px"
-                  >
-                    <option value="highest_rating">Highest Rating</option>
-                    <option value="lowest_rating">Lowest Rating</option>
-                    <option value="newest">Newest First</option>
-                    <option value="oldest">Oldest First</option>
-                    <option value="alphabetical">Alphabetical</option>
-                  </Select>
+                  <NativeSelect.Root maxW={{ base: "100%", md: "220px" }}>
+                    <NativeSelect.Field
+                      aria-label="Sort books"
+                      value={sortOption}
+                      onChange={(event) => setSortOption(event.target.value)}
+                      maxW={{ base: "100%", xl: "220px" }}
+                      minH="44px"
+                    >
+                      <option value="highest_rating">Highest Rating</option>
+                      <option value="lowest_rating">Lowest Rating</option>
+                      <option value="newest">Newest First</option>
+                      <option value="oldest">Oldest First</option>
+                      <option value="alphabetical">Alphabetical</option>
+                    </NativeSelect.Field>
+                    <NativeSelect.Indicator />
+                  </NativeSelect.Root>
                   {hasActiveFilters && (
                     <Button
-                      leftIcon={<IoCloseCircleOutline />}
                       variant="ghost"
-                      colorScheme="orange"
+                      colorPalette="gray"
                       onClick={resetFilters}
                       minH="44px"
                     >
+                      <IoCloseCircleOutline />
                       Clear filters
                     </Button>
                   )}
                 </Stack>
 
-                <Wrap mt={4} spacing={3}>
+                <Wrap mt={3} gap={1}>
                   <WrapItem>
                     <Button
                       size="sm"
                       minH="44px"
-                      colorScheme={!selectedTag ? "orange" : "gray"}
+                      colorPalette="gray"
                       variant={!selectedTag ? "solid" : "outline"}
+                      aria-pressed={!selectedTag}
                       onClick={() => setSelectedTag(null)}
                     >
                       All ({sortedBooks.length})
@@ -429,8 +326,9 @@ const BooksPage = ({ books, error }) => {
                       <Button
                         size="sm"
                         minH="44px"
-                        colorScheme="orange"
-                        variant={selectedTag === tag ? "solid" : "outline"}
+                        colorPalette="gray"
+                        variant={selectedTag === tag ? "solid" : "ghost"}
+                        aria-pressed={selectedTag === tag}
                         onClick={() => setSelectedTag(tag)}
                       >
                         {tag} ({count})
@@ -441,13 +339,15 @@ const BooksPage = ({ books, error }) => {
 
                 <HStack
                   mt={4}
-                  spacing={3}
+                  gap={3}
                   color={mutedText}
                   fontSize="sm"
                   flexWrap="wrap"
                 >
-                  <HStack spacing={1}>
-                    <Icon as={IoStarOutline} />
+                  <HStack gap={1}>
+                    <Icon asChild>
+                      <IoStarOutline />
+                    </Icon>
                     <Text>{filteredBooks.length} selected</Text>
                   </HStack>
                   <Text>•</Text>
@@ -470,17 +370,14 @@ const BooksPage = ({ books, error }) => {
                   borderWidth="1px"
                   borderStyle="dashed"
                   borderColor={heroBorder}
-                  borderRadius="3xl"
+                  borderRadius="xl"
                   p={8}
                   textAlign="center"
                   bg={accentSubtle}
                 >
-                  <Icon
-                    as={IoFlashOutline}
-                    boxSize={8}
-                    color="orange.400"
-                    mb={3}
-                  />
+                  <Icon boxSize={8} color="orange.400" mb={3} asChild>
+                    <IoFlashOutline />
+                  </Icon>
                   <Heading as="h2" size="md" mb={2}>
                     No books found
                   </Heading>
@@ -489,22 +386,9 @@ const BooksPage = ({ books, error }) => {
                   </Text>
                 </Box>
               ) : (
-                <VStack spacing={8} align="stretch">
+                <VStack gap={5} align="stretch">
                   {featuredBook && (
                     <Box>
-                      <HStack spacing={3} mb={4} align="center" flexWrap="wrap">
-                        <Badge
-                          colorScheme="orange"
-                          px={3}
-                          py={1}
-                          borderRadius="full"
-                        >
-                          Featured result
-                        </Badge>
-                        <Text fontSize="sm" color={mutedText}>
-                          Top result from your current selection
-                        </Text>
-                      </HStack>
                       <BookCard {...featuredBook} featured />
                     </Box>
                   )}
@@ -513,22 +397,19 @@ const BooksPage = ({ books, error }) => {
                     <Box>
                       <Flex
                         justify="space-between"
-                        mb={4}
+                        mb={3}
                         gap={3}
                         wrap="wrap"
                         align="center"
                       >
                         <Heading as="h2" size="md">
-                          Explore more
+                          More books
                         </Heading>
                         <Text fontSize="sm" color={mutedText}>
                           {bookGrid.length} remaining books
                         </Text>
                       </Flex>
-                      <SimpleGrid
-                        columns={{ base: 1, md: 2, xl: 3 }}
-                        spacing={6}
-                      >
+                      <SimpleGrid columns={{ base: 1, md: 2 }} gap={4}>
                         {bookGrid.map((book) => (
                           <BookCard
                             key={book.slug || `${book.title}-${book.author}`}

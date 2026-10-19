@@ -1,4 +1,5 @@
 import { useRef } from "react";
+import { useColorModeValue } from "../../components/ui/color-mode";
 import {
   Box,
   Container,
@@ -9,7 +10,6 @@ import {
   Tag,
   Text,
   VStack,
-  useColorModeValue,
 } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import Head from "next/head";
@@ -35,13 +35,10 @@ const REVALIDATE_SECONDS = 60;
 
 export default function ArticleDetailPage({ article, fetchError, slug }) {
   const contentRef = useRef(null);
-  const mutedText = useColorModeValue("gray.600", "gray.400");
+  const mutedText = "fg.muted";
   const ruleColor = useColorModeValue("orange.400", "orange.500");
   const progressColor = useColorModeValue("#dd6b20", "#ed8936");
-  // orange.500 is 3.11:1 against the light page background -- fails AA.
-  // orange.700 clears it (6.0:1) while orange.500 already clears the dark
-  // background (5.12:1), so this needs to vary by mode, not be a single token.
-  const linkOrange = useColorModeValue("orange.700", "orange.500");
+  const linkOrange = "accent.link";
 
   if (fetchError || !article) {
     return (
@@ -51,23 +48,34 @@ export default function ArticleDetailPage({ article, fetchError, slug }) {
           <meta name="robots" content="noindex" />
         </Head>
 
-        <Container maxW="2xl" py={{ base: 6, md: 10 }}>
-          <VStack align="start" spacing={6}>
-            <Link as={NextLink} href="/articles" color={linkOrange} fontWeight="semibold">
-              <HStack spacing={2}>
+        <Container maxW="2xl" py={{ base: 4, md: 6 }}>
+          <VStack align="start" gap={6}>
+            <Link
+              as={NextLink}
+              href="/articles"
+              color={linkOrange}
+              fontWeight="semibold"
+            >
+              <HStack gap={2}>
                 <Icon as={IoArrowBackOutline} />
                 <Text>Back to articles</Text>
               </HStack>
             </Link>
 
-            <VStack align="start" spacing={3} w="100%">
-              <Heading as="h1" size="lg" lineHeight="1.25" fontFamily={READING_FONT}>
+            <VStack align="start" gap={3} w="100%">
+              <Heading
+                as="h1"
+                size="lg"
+                lineHeight="1.25"
+                fontFamily={READING_FONT}
+              >
                 Article temporarily unavailable
               </Heading>
               <Text color={mutedText} lineHeight="1.7">
-                We could not refresh this article from the upstream content source right now.
-                Please try again in a moment; if the page was already published, the cached
-                version will continue serving once it is available again.
+                We could not refresh this article from the upstream content
+                source right now. Please try again in a moment; if the page was
+                already published, the cached version will continue serving once
+                it is available again.
               </Text>
               {slug && (
                 <Text color={mutedText} fontSize="sm">
@@ -83,7 +91,9 @@ export default function ArticleDetailPage({ article, fetchError, slug }) {
 
   const bookReference = getArticleBookReference(article);
   const bookUrl = getArticleBookUrl(article);
-  const references = Array.isArray(article.references) ? article.references : [];
+  const references = Array.isArray(article.references)
+    ? article.references
+    : [];
 
   return (
     <Layout
@@ -97,121 +107,143 @@ export default function ArticleDetailPage({ article, fetchError, slug }) {
       {/* Measure tuned for long-form reading: ~70 characters per line at the
           body font size, rather than stretching to the same width used by
           card-grid pages. */}
-      <Container maxW="2xl" py={{ base: 6, md: 10 }}>
-        <VStack align="start" spacing={8}>
-          <Link as={NextLink} href="/articles" color={linkOrange} fontWeight="semibold">
-            <HStack spacing={2}>
+      <Container maxW="2xl" py={{ base: 4, md: 6 }}>
+        <VStack align="start" gap={8}>
+          <Link
+            as={NextLink}
+            href="/articles"
+            color={linkOrange}
+            fontWeight="semibold"
+          >
+            <HStack gap={2}>
               <Icon as={IoArrowBackOutline} />
               <Text>Back to articles</Text>
             </HStack>
           </Link>
 
-          <VStack ref={contentRef} align="start" spacing={8} w="100%">
-          <VStack align="start" spacing={4} w="100%">
-            <Heading as="h1" size="lg" lineHeight="1.25" fontFamily={READING_FONT}>
-              {article.title}
-            </Heading>
-            <HStack spacing={3} flexWrap="wrap" color={mutedText} fontSize="sm">
-              <HStack spacing={1}>
-                <Icon as={IoCalendarOutline} />
-                <Text>{formatAbsoluteDate(article.date)}</Text>
-              </HStack>
-              {article.tags?.map((tag) => (
-                <Tag key={tag} colorScheme="orange" borderRadius="full" size="sm">
-                  {tag}
-                </Tag>
-              ))}
-            </HStack>
-            {article.description && (
-              <Text color={mutedText} fontSize="md" lineHeight="1.7">
-                {article.description}
-              </Text>
-            )}
-            {bookReference && (
-              <HStack
-                w="100%"
-                borderLeftWidth="3px"
-                borderLeftColor={ruleColor}
-                pl={3}
-                py={1}
-                spacing={2}
-                fontSize="sm"
+          <VStack ref={contentRef} align="start" gap={8} w="100%">
+            <VStack align="start" gap={4} w="100%">
+              <Heading
+                as="h1"
+                size="lg"
+                lineHeight="1.25"
+                fontFamily={READING_FONT}
               >
-                <Text color={mutedText}>Referenced book:</Text>
-                {bookUrl ? (
-                  <Link
-                    as={bookUrl.startsWith("http") ? "a" : NextLink}
-                    href={bookUrl}
-                    color="orange.700"
-                    _dark={{ color: "orange.300" }}
-                    fontWeight="semibold"
+                {article.title}
+              </Heading>
+              <HStack gap={3} flexWrap="wrap" color={mutedText} fontSize="sm">
+                <HStack gap={1}>
+                  <Icon as={IoCalendarOutline} />
+                  <Text>{formatAbsoluteDate(article.date)}</Text>
+                </HStack>
+                {article.tags?.map((tag) => (
+                  <Tag.Root
+                    key={tag}
+                    colorPalette="orange"
+                    borderRadius="full"
+                    size="sm"
                   >
-                    {bookReference}
-                  </Link>
-                ) : (
-                  <Text fontWeight="semibold">{bookReference}</Text>
-                )}
+                    {tag}
+                  </Tag.Root>
+                ))}
               </HStack>
-            )}
-          </VStack>
-
-          <Box w="100%" h="2px" bg={ruleColor} opacity={0.6} borderRadius="full" />
-
-          <Box w="100%">
-            <MarkdownProse>{article.content}</MarkdownProse>
-          </Box>
-
-          {references.length > 0 && (
-            <motion.div
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-80px" }}
-              transition={{ duration: 0.5, ease: "easeOut" }}
-              style={{ width: "100%" }}
-            >
-              <Box
-                w="100%"
-                borderLeftWidth="3px"
-                borderLeftColor={ruleColor}
-                pl={4}
-                py={3}
-                borderRadius="sm"
-              >
-                <Text
-                  fontFamily={READING_FONT}
-                  fontSize="xs"
-                  fontWeight="semibold"
-                  color={mutedText}
-                  mb={2}
-                  textTransform="uppercase"
-                  letterSpacing="wider"
-                >
-                  References
+              {article.description && (
+                <Text color={mutedText} fontSize="md" lineHeight="1.7">
+                  {article.description}
                 </Text>
-                <VStack align="start" spacing={1}>
-                  {references.map((ref, index) => {
-                    const label = ref.label || ref.url;
-                    return ref.url ? (
-                      <Link
-                        key={index}
-                        href={ref.url}
-                        isExternal
-                        color={linkOrange}
-                        fontSize="sm"
-                        fontWeight="medium"
-                      >
-                        {label}
-                      </Link>
-                    ) : (
-                      <Text key={index} color={mutedText} fontSize="sm">
-                        {label}
-                      </Text>
-                    );
-                  })}
-                </VStack>
-              </Box>
-            </motion.div>
-          )}
+              )}
+              {bookReference && (
+                <HStack
+                  w="100%"
+                  borderLeftWidth="3px"
+                  borderLeftColor={ruleColor}
+                  pl={3}
+                  py={1}
+                  gap={2}
+                  fontSize="sm"
+                >
+                  <Text color={mutedText}>Referenced book:</Text>
+                  {bookUrl ? (
+                    <Link
+                      as={bookUrl.startsWith("http") ? "a" : NextLink}
+                      href={bookUrl}
+                      color="orange.700"
+                      _dark={{ color: "orange.300" }}
+                      fontWeight="semibold"
+                    >
+                      {bookReference}
+                    </Link>
+                  ) : (
+                    <Text fontWeight="semibold">{bookReference}</Text>
+                  )}
+                </HStack>
+              )}
+            </VStack>
+
+            <Box
+              w="100%"
+              h="2px"
+              bg={ruleColor}
+              opacity={0.6}
+              borderRadius="full"
+            />
+
+            <Box w="100%">
+              <MarkdownProse>{article.content}</MarkdownProse>
+            </Box>
+
+            {references.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-80px" }}
+                transition={{ duration: 0.5, ease: "easeOut" }}
+                style={{ width: "100%" }}
+              >
+                <Box
+                  w="100%"
+                  borderLeftWidth="3px"
+                  borderLeftColor={ruleColor}
+                  pl={4}
+                  py={3}
+                  borderRadius="sm"
+                >
+                  <Text
+                    fontFamily={READING_FONT}
+                    fontSize="xs"
+                    fontWeight="semibold"
+                    color={mutedText}
+                    mb={2}
+                    textTransform="uppercase"
+                    letterSpacing="wider"
+                  >
+                    References
+                  </Text>
+                  <VStack align="start" gap={1}>
+                    {references.map((ref, index) => {
+                      const label = ref.label || ref.url;
+                      return ref.url ? (
+                        <Link
+                          key={index}
+                          href={ref.url}
+                          color={linkOrange}
+                          fontSize="sm"
+                          fontWeight="medium"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {label}
+                        </Link>
+                      ) : (
+                        <Text key={index} color={mutedText} fontSize="sm">
+                          {label}
+                        </Text>
+                      );
+                    })}
+                  </VStack>
+                </Box>
+              </motion.div>
+            )}
           </VStack>
 
           <NewsletterSubscribe w="100%" />
@@ -232,8 +264,12 @@ function mapArticle(article) {
     book: String(article.book || ""),
     book_url: String(article.book_url || ""),
     references: getArticleReferences(article),
-    thumbnail: article.thumbnail ? resolvePortfolioAssetUrl(article.thumbnail) : "",
-    og_image: article.og_image ? resolvePortfolioAssetUrl(article.og_image) : "",
+    thumbnail: article.thumbnail
+      ? resolvePortfolioAssetUrl(article.thumbnail)
+      : "",
+    og_image: article.og_image
+      ? resolvePortfolioAssetUrl(article.og_image)
+      : "",
   };
 }
 

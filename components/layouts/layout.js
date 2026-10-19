@@ -6,9 +6,9 @@ import {
   resolveSocialImageUrl,
 } from "../../libs/socialMetadata.mjs";
 
-const DEFAULT_TITLE = "Ozzo | From developer to independent operator";
+const DEFAULT_TITLE = "Ozzo | Software, books, and writing";
 const DEFAULT_DESCRIPTION =
-  "Field notes for experienced developers learning to find demand, ship useful software, earn attention, and build toward independent work.";
+  "Notes by Ozzo on building software, reading books, and learning to work independently.";
 const DEFAULT_KEYWORDS =
   "independent developer, product validation, software distribution, build in public, Ruby on Rails, solo developer, personal brand";
 
@@ -34,17 +34,19 @@ const Layout = ({
     <Flex direction="column">
       <Head>
         <title key="title-tag">{pageTitle}</title>
-        <meta
-          name="viewport"
-          content="width=device-width, initial-scale=1"
-        />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="description" content={description} />
         <meta name="author" content="Ozzo" />
         <meta name="keywords" content={keywords} />
         <meta name="robots" content={robots} />
         {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-        <link rel="icon" type="image/png" sizes="512x512" href="/images/moon-z-icon.png" />
+        <link
+          rel="icon"
+          type="image/png"
+          sizes="512x512"
+          href="/images/moon-z-icon.png"
+        />
         <link rel="icon" href="/favicon.ico" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <link rel="manifest" href="/site.webmanifest" />

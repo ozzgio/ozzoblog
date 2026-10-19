@@ -1,12 +1,4 @@
-import {
-  Box,
-  Text,
-  Tag,
-  Wrap,
-  WrapItem,
-  useColorModeValue,
-  useTheme,
-} from "@chakra-ui/react";
+import { Box, Text, Tag, Wrap, WrapItem } from "@chakra-ui/react";
 import NextLink from "next/link";
 import BaseCard from "../basecard";
 import Image from "next/image";
@@ -18,20 +10,21 @@ function formatDate(dateString) {
   return date.toLocaleString("default", { month: "short", year: "numeric" });
 }
 
-const ProjectCard = ({ children, id, title, thumbnail, stack, date, compact = false }) => {
-  const tagBgColor = useColorModeValue("tagBg.default", "tagBg._dark");
-  const tagTextColor = useColorModeValue("tagText.default", "tagText._dark");
-  const { colors } = useTheme();
-  const headingTextColor = useColorModeValue(
-    colors.headingText.default,
-    colors.headingText._dark
-  );
-  const bodyTextColor = useColorModeValue(
-    colors.bodyText.default,
-    colors.bodyText._dark
-  );
-  const dateColor = useColorModeValue("gray.500", "gray.400");
-  const thumbBg = useColorModeValue("gray.50", "gray.700");
+const ProjectCard = ({
+  children,
+  id,
+  title,
+  thumbnail,
+  stack,
+  date,
+  compact = false,
+}) => {
+  const tagBgColor = "accent.subtle";
+  const tagTextColor = "accent.link";
+  const headingTextColor = "fg";
+  const bodyTextColor = "fg.muted";
+  const dateColor = "fg.muted";
+  const thumbBg = "bg.subtle";
 
   return (
     <NextLink href={`/projects/${id}`} passHref scroll={false}>
@@ -42,7 +35,6 @@ const ProjectCard = ({ children, id, title, thumbnail, stack, date, compact = fa
         alignItems="stretch"
         textAlign="center"
         role="group"
-        tabIndex={0}
         h="100%"
       >
         <Box
@@ -77,7 +69,12 @@ const ProjectCard = ({ children, id, title, thumbnail, stack, date, compact = fa
             {title}
           </Text>
           {date && (
-            <Text fontSize="xs" color={dateColor} mb={compact ? 2 : 3} fontWeight="medium">
+            <Text
+              fontSize="xs"
+              color={dateColor}
+              mb={compact ? 2 : 3}
+              fontWeight="medium"
+            >
               {formatDate(date)}
             </Text>
           )}
@@ -88,17 +85,17 @@ const ProjectCard = ({ children, id, title, thumbnail, stack, date, compact = fa
             textAlign="left"
             flex={1}
             lineHeight="tall"
-            noOfLines={compact ? 3 : undefined}
+            lineClamp={compact ? 3 : undefined}
           >
             {children}
           </Text>
           {stack && stack.length > 0 && (
-            <Wrap spacing={1} mt="auto" justify="flex-start">
+            <Wrap gap={1} mt="auto" justify="flex-start">
               {(compact ? stack.slice(0, 3) : stack).map((tag, idx) => (
                 <WrapItem key={idx}>
-                  <Tag
+                  <Tag.Root
                     size="sm"
-                    colorScheme="orange"
+                    colorPalette="orange"
                     bg={tagBgColor}
                     color={tagTextColor}
                     borderRadius="full"
@@ -108,7 +105,7 @@ const ProjectCard = ({ children, id, title, thumbnail, stack, date, compact = fa
                     fontSize={compact ? "10px" : undefined}
                   >
                     {tag}
-                  </Tag>
+                  </Tag.Root>
                 </WrapItem>
               ))}
               {compact && stack.length > 3 && (

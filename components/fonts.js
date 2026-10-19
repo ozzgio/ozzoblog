@@ -1,5 +1,4 @@
 import {
-  Raleway,
   M_PLUS_Rounded_1c,
   Bricolage_Grotesque,
   Merriweather,
@@ -9,15 +8,7 @@ import {
 // Self-hosted via next/font instead of a render-blocking @import to
 // fonts.googleapis.com — removes the extra network round-trip and the
 // associated FOUC/CLS risk on first paint.
-export const raleway = Raleway({
-  subsets: ["latin"],
-  weight: ["300", "700"],
-  variable: "--font-raleway",
-  display: "swap",
-});
-
-// Chakra theme's heading font (libs/theme.js) — was never actually loaded
-// anywhere, so headings silently fell back to the system sans-serif.
+// Rounded lettering is reserved for the orbital brand mark.
 export const mPlusRounded1c = M_PLUS_Rounded_1c({
   subsets: ["latin"],
   weight: ["400", "700", "800"],
@@ -33,6 +24,7 @@ export const bricolageGrotesque = Bricolage_Grotesque({
 });
 
 export const merriweather = Merriweather({
+  preload: false,
   subsets: ["latin"],
   weight: ["300", "400", "700"],
   style: ["normal", "italic"],
@@ -41,6 +33,7 @@ export const merriweather = Merriweather({
 });
 
 export const playfairDisplay = Playfair_Display({
+  preload: false,
   subsets: ["latin"],
   weight: ["700", "900"],
   variable: "--font-playfair-display",
@@ -48,7 +41,6 @@ export const playfairDisplay = Playfair_Display({
 });
 
 export const fontVariables = [
-  raleway.variable,
   mPlusRounded1c.variable,
   bricolageGrotesque.variable,
   merriweather.variable,

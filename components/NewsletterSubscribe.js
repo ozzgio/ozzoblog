@@ -1,13 +1,6 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
-import {
-  Box,
-  Button,
-  Input,
-  Stack,
-  Text,
-  useColorModeValue,
-} from "@chakra-ui/react";
+import { Box, Button, Input, Stack, Text } from "@chakra-ui/react";
 
 const STATUS = {
   IDLE: "idle",
@@ -20,12 +13,9 @@ const NewsletterSubscribe = (props) => {
   const [status, setStatus] = useState(STATUS.IDLE);
   const router = useRouter();
 
-  const mutedText = useColorModeValue("gray.600", "gray.400");
-  const borderColor = useColorModeValue("gray.200", "whiteAlpha.200");
-  // red.500 is 3.79:1 against the light page bg and 4.21:1 against the dark
-  // bg -- both fail WCAG AA (4.5:1). Same fix pattern already used for
-  // orange.500 in pages/articles/[slug].js.
-  const errorColor = useColorModeValue("red.600", "red.300");
+  const mutedText = "fg.muted";
+  const borderColor = "border";
+  const errorColor = "status.error";
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -50,47 +40,58 @@ const NewsletterSubscribe = (props) => {
 
   return (
     <Box
-      as="form"
-      onSubmit={handleSubmit}
       borderTopWidth="1px"
       borderTopColor={borderColor}
       pt={8}
       mt={8}
+      containerType="inline-size"
       {...props}
+      asChild
     >
-      <Text fontSize="sm" color={mutedText} mb={3}>
-        One field note each week on finding demand, shipping useful software,
-        earning attention, and building toward independent work.
-      </Text>
-      <Stack direction={{ base: "column", sm: "row" }} spacing={3}>
-        <Input
-          type="email"
-          required
-          placeholder="you@example.com"
-          value={email}
-          onChange={(event) => setEmail(event.target.value)}
-          isDisabled={status === STATUS.LOADING}
-          size="md"
-          minH="44px"
-          w="100%"
-          maxW="320px"
-        />
-        <Button
-          type="submit"
-          colorScheme="orange"
-          isDisabled={status === STATUS.LOADING}
-          size="md"
-          minH="44px"
-          flexShrink={0}
-        >
-          {status === STATUS.LOADING ? "Subscribing…" : "Subscribe"}
-        </Button>
-      </Stack>
-      {status === STATUS.ERROR && (
-        <Text fontSize="sm" color={errorColor} mt={2}>
-          Something went wrong. Try again.
+      <form onSubmit={handleSubmit}>
+        <Text fontSize="sm" color={mutedText} mb={3}>
+          A weekly note on what I&apos;m building, reading, and learning.
         </Text>
-      )}
+        <Stack
+          display="grid"
+          gridTemplateColumns="minmax(0, 1fr)"
+          gap={3}
+          css={{
+            "@container (min-width: 28rem)": {
+              gridTemplateColumns: "minmax(0, 1fr) auto",
+            },
+          }}
+        >
+          <Input
+            aria-label="Email address"
+            type="email"
+            required
+            placeholder="you@example.com"
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+            disabled={status === STATUS.LOADING}
+            size="md"
+            minH="44px"
+            w="100%"
+            minW={0}
+          />
+          <Button
+            type="submit"
+            colorPalette="gray"
+            disabled={status === STATUS.LOADING}
+            size="md"
+            minH="44px"
+            flexShrink={0}
+          >
+            {status === STATUS.LOADING ? "Subscribing…" : "Subscribe"}
+          </Button>
+        </Stack>
+        {status === STATUS.ERROR && (
+          <Text role="alert" fontSize="sm" color={errorColor} mt={2}>
+            Something went wrong. Try again.
+          </Text>
+        )}
+      </form>
     </Box>
   );
 };

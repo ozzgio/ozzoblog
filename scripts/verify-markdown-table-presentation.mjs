@@ -301,7 +301,7 @@ async function assertMobileLayout(page, context, tableFixture, mode, viewportNam
 
 async function setColorMode(page, expectedMode) {
   const currentMode = await page.evaluate(() => (
-    document.body.classList.contains("chakra-ui-dark") ? "dark" : "light"
+    document.documentElement.classList.contains("dark") ? "dark" : "light"
   ));
 
   if (currentMode !== expectedMode) {
@@ -309,7 +309,7 @@ async function setColorMode(page, expectedMode) {
   }
 
   const resolvedMode = await page.evaluate(() => (
-    document.body.classList.contains("chakra-ui-dark") ? "dark" : "light"
+    document.documentElement.classList.contains("dark") ? "dark" : "light"
   ));
   assert.equal(resolvedMode, expectedMode, "Expected " + expectedMode + " color mode");
 }
@@ -336,7 +336,7 @@ let browser;
 try {
   await buildFixtureSite(fixture.baseUrl);
   site = await startFixtureSite(fixture.baseUrl);
-  browser = await chromium.launch({ headless: true });
+  browser = await chromium.launch({ headless: true, executablePath: process.env.BROWSER_EXECUTABLE_PATH || undefined });
   const metadataContext = await browser.newContext({ javaScriptEnabled: false });
   const metadataPage = await metadataContext.newPage();
   for (const [path, image] of [

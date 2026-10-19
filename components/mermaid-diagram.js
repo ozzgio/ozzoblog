@@ -1,5 +1,6 @@
 import { useEffect, useRef, useId } from "react";
-import { Box, useColorModeValue } from "@chakra-ui/react";
+import { useColorModeValue } from "./ui/color-mode";
+import { Box } from "@chakra-ui/react";
 
 // Renders a Mermaid diagram client-side. Safe for Next.js SSR — no output on server.
 // Colors match the blog's brand palette from libs/theme.js.
@@ -97,7 +98,9 @@ export default function MermaidDiagram({ chart }) {
         });
     });
 
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [arrowColor, chart, edgeLabelBg, id, isDark, textColor]);
 
   return (

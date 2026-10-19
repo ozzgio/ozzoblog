@@ -1,25 +1,24 @@
 import NextLink from "next/link";
 import { Heading, Box, Image, Link, Badge, Text } from "@chakra-ui/react";
-import { ChevronRightIcon } from "@chakra-ui/icons";
+import { LuChevronRight } from "react-icons/lu";
 
 export const Title = ({ children }) => {
   // Use theme token for heading color
   return (
     <Box>
-      <Link as={NextLink} href="/projects">
-        Projects
+      <Link asChild>
+        <NextLink href="/projects">Projects</NextLink>
       </Link>
-      <span>
+      <Box as="span" display="inline-flex" alignItems="center" mx={2}>
         {" "}
-        <ChevronRightIcon />{" "}
-      </span>
+        <LuChevronRight />{" "}
+      </Box>
       <Heading
         display="inline-block"
         as="h1"
         fontSize={["xl", 24]}
         mb={4}
-        color="headingText.default"
-        _dark={{ color: "headingText._dark" }}
+        color="fg"
         fontWeight="extrabold"
       >
         {children}
@@ -27,6 +26,16 @@ export const Title = ({ children }) => {
     </Box>
   );
 };
+
+function applyImageFallback(image) {
+  if (
+    image?.complete &&
+    image.naturalWidth === 0 &&
+    !image.src.endsWith("/thumbs/portfolio.png")
+  ) {
+    image.src = "/thumbs/portfolio.png";
+  }
+}
 
 export const WorkImage = ({
   src,
@@ -52,14 +61,15 @@ export const WorkImage = ({
       objectFit={fit}
       src={src}
       alt={alt}
+      ref={applyImageFallback}
+      onError={(event) => applyImageFallback(event.currentTarget)}
       mb={0}
-      fallbackSrc="/thumbs/portfolio.png"
     />
   </Box>
 );
 
 export const Meta = ({ children }) => (
-  <Badge colorScheme="green" mr={2}>
+  <Badge colorPalette="green" mr={2}>
     <Text display="inline" fontWeight="bold">
       {children}
     </Text>

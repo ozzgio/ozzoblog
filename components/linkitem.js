@@ -1,29 +1,24 @@
 import NextLink from "next/link";
-import { useColorModeValue } from "@chakra-ui/react";
 import { Link } from "@chakra-ui/react";
 
 const LinkItem = ({ href, path, target, children, ...props }) => {
-  const active = path === href;
-  const inactiveColor = useColorModeValue("gray.600", "gray.400");
-  const activeColor = useColorModeValue("gray.900", "white");
+  const currentPath = path.split(/[?#]/)[0];
+  const active = currentPath === href || currentPath.startsWith(`${href}/`);
 
   return (
     <Link
-      as={NextLink}
-      href={href}
-      scroll={false}
       p={2}
       px={3}
       minH="44px"
       display="inline-flex"
       alignItems="center"
       borderRadius="md"
-      color={active ? activeColor : inactiveColor}
-      target={target}
+      color={active ? "fg" : "fg.muted"}
       position="relative"
-      sx={{
+      css={{
         fontWeight: active ? "semibold" : "medium",
         transition: "color 0.15s ease-in-out, transform 0.15s ease-in-out",
+
         ...(active
           ? {
               _before: {
@@ -41,7 +36,7 @@ const LinkItem = ({ href, path, target, children, ...props }) => {
           : {}),
       }}
       _hover={{
-        color: activeColor,
+        color: "fg",
         textDecoration: "none",
         transform: "translateY(-1px)",
       }}
@@ -49,8 +44,17 @@ const LinkItem = ({ href, path, target, children, ...props }) => {
         transform: "translateY(0)",
       }}
       {...props}
+      asChild
     >
-      {children}
+      <NextLink
+        href={href}
+        scroll={false}
+        target={target}
+        rel={target === "_blank" ? "noopener noreferrer" : undefined}
+        aria-current={active ? "page" : undefined}
+      >
+        {children}
+      </NextLink>
     </Link>
   );
 };

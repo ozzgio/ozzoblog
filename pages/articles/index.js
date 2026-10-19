@@ -1,5 +1,4 @@
 import {
-  Badge,
   Box,
   Button,
   Heading,
@@ -7,13 +6,10 @@ import {
   Icon,
   Input,
   InputGroup,
-  InputLeftElement,
   Link,
-  Select,
-  SimpleGrid,
+  NativeSelect,
   Stack,
   Text,
-  useColorModeValue,
   VStack,
   Wrap,
   WrapItem,
@@ -21,11 +17,8 @@ import {
 import { useMemo, useState, useEffect } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import {
-  IoCalendarOutline,
   IoCloseCircleOutline,
-  IoDocumentText,
   IoFlashOutline,
-  IoPricetagOutline,
   IoSearchOutline,
   IoTimeOutline,
 } from "react-icons/io5";
@@ -82,15 +75,10 @@ const ArticlesPage = ({ articles, error }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isMounted, setIsMounted] = useState(false);
 
-  const heroBg = useColorModeValue(
-    "linear(to-br, orange.50, white 40%, orange.100)",
-    "linear(to-br, gray.900, orange.900, gray.900)",
-  );
-  const heroBorder = useColorModeValue("orange.200", "orange.700");
-  const mutedText = useColorModeValue("gray.600", "gray.400");
-  const panelBg = useColorModeValue("whiteAlpha.900", "whiteAlpha.100");
-  const panelBorder = useColorModeValue("blackAlpha.100", "whiteAlpha.200");
-  const accentSubtle = useColorModeValue("orange.50", "orange.900");
+  const heroBorder = "border";
+  const mutedText = "fg.muted";
+  const panelBorder = "border";
+  const accentSubtle = "accent.subtle";
 
   useEffect(() => {
     setIsMounted(true);
@@ -195,206 +183,134 @@ const ArticlesPage = ({ articles, error }) => {
   return (
     <Layout
       title="Articles"
-      description="Field notes for experienced developers learning to find demand, ship useful software, earn attention, and build toward independent work."
+      description="Essays by Ozzo on building software, finding users, and learning to work independently."
       path="/articles"
     >
       <MotionBox
-        initial={shouldReduceMotion ? false : { opacity: 0, y: 18 }}
+        initial={{ opacity: 0, y: 18 }}
         animate={{ opacity: 1, y: 0 }}
         transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.55 }}
       >
-        <VStack spacing={8} align="stretch">
-          <Box
-            bgGradient={heroBg}
-            borderWidth="1px"
-            borderColor={heroBorder}
-            borderRadius="3xl"
-            px={{ base: 5, md: 8 }}
-            py={{ base: 6, md: 8 }}
-            boxShadow="xl"
-            position="relative"
-            overflow="hidden"
-            _before={{
-              content: '""',
-              position: "absolute",
-              width: "320px",
-              height: "320px",
-              right: "-120px",
-              top: "-140px",
-              borderRadius: "full",
-              bg: "orange.300",
-              opacity: 0.15,
-              filter: "blur(6px)",
-            }}
-          >
-            <Stack
-              direction={{ base: "column", lg: "row" }}
-              align={{ base: "stretch", lg: "start" }}
-              justify="space-between"
-              spacing={8}
-              position="relative"
-              zIndex={1}
+        <VStack gap={5} align="stretch">
+          <Box as="header" pb={4} borderBottomWidth="1px" borderColor="border">
+            <Text
+              fontSize="xs"
+              fontWeight="bold"
+              letterSpacing="0.04em"
+              color="accent.link"
+              mb={3}
             >
-              <VStack align="start" spacing={5} maxW="2xl">
-                <Badge
-                  colorScheme="orange"
-                  px={3}
-                  py={1}
-                  borderRadius="full"
-                  fontSize="xs"
-                  textTransform="uppercase"
-                >
-                  Field notes
-                </Badge>
-                <Box>
-                  <Heading
-                    as="h1"
-                    id="articles-heading"
-                    fontSize={{ base: "xl", md: "2xl" }}
-                    lineHeight="1.2"
-                    mb={2}
-                  >
-                    Beyond the code
-                  </Heading>
-                  <Text fontSize="sm" color={mutedText}>
-                    Real experiments in demand, delivery, distribution, and
-                    business while building toward independent work.
-                  </Text>
-                </Box>
-                <HStack spacing={3} flexWrap="wrap">
-                  <Link
-                    href="/rss.xml"
-                    fontSize="sm"
-                    color="accent.link"
-                    fontWeight="semibold"
-                    target="_blank"
-                    _hover={{ textDecoration: "underline" }}
-                  >
-                    RSS Feed
-                  </Link>
-                  <Text color={mutedText}>/</Text>
-                  <Text fontSize="sm" color={mutedText}>
-                    Latest: {latestArticle ? latestArticle.absoluteDate : "N/A"}
-                  </Text>
-                </HStack>
-              </VStack>
-
-              <SimpleGrid
-                columns={{ base: 1, sm: 3 }}
-                spacing={3}
-                minW={{ base: "100%", lg: "380px" }}
-                maxW="540px"
-                alignSelf={{ base: "stretch", lg: "start" }}
+              The archive
+            </Text>
+            <Heading
+              as="h1"
+              id="articles-heading"
+              fontSize={{ base: "3xl", md: "4xl" }}
+              lineHeight="1.05"
+              mb={3}
+            >
+              Writing
+            </Heading>
+            <Text fontSize="md" color="fg.muted" maxW="38rem">
+              What I&apos;m building, how I find people who need it, and what I
+              learn when things don&apos;t go to plan.
+            </Text>
+            <HStack
+              gap={5}
+              flexWrap="wrap"
+              fontSize="sm"
+              color="fg.muted"
+              mt={3}
+            >
+              <Text>{sortedArticles.length} articles</Text>
+              <Text>{allTags.length} topics</Text>
+              <Text>
+                {uniqueYears.length}{" "}
+                {uniqueYears.length === 1 ? "year" : "years"}
+              </Text>
+            </HStack>
+            <HStack
+              gap={3}
+              flexWrap="wrap"
+              fontSize="sm"
+              color="fg.muted"
+              mt={3}
+            >
+              <Link
+                href="/rss.xml"
+                target="_blank"
+                rel="noopener noreferrer"
+                minH="44px"
               >
-                <Box
-                  bg={panelBg}
-                  borderWidth="1px"
-                  borderColor={panelBorder}
-                  borderRadius="2xl"
-                  p={4}
-                >
-                  <HStack mb={2}>
-                    <Icon as={IoDocumentText} color="orange.400" />
-                    <Text fontSize="sm" color={mutedText}>
-                      Articles
-                    </Text>
-                  </HStack>
-                  <Text fontSize="2xl" fontWeight="bold">
-                    {sortedArticles.length}
-                  </Text>
-                </Box>
-                <Box
-                  bg={panelBg}
-                  borderWidth="1px"
-                  borderColor={panelBorder}
-                  borderRadius="2xl"
-                  p={4}
-                >
-                  <HStack mb={2}>
-                    <Icon as={IoPricetagOutline} color="orange.400" />
-                    <Text fontSize="sm" color={mutedText}>
-                      Tags
-                    </Text>
-                  </HStack>
-                  <Text fontSize="2xl" fontWeight="bold">
-                    {allTags.length}
-                  </Text>
-                </Box>
-                <Box
-                  bg={panelBg}
-                  borderWidth="1px"
-                  borderColor={panelBorder}
-                  borderRadius="2xl"
-                  p={4}
-                >
-                  <HStack mb={2}>
-                    <Icon as={IoCalendarOutline} color="orange.400" />
-                    <Text fontSize="sm" color={mutedText}>
-                      Years
-                    </Text>
-                  </HStack>
-                  <Text fontSize="2xl" fontWeight="bold">
-                    {uniqueYears.length}
-                  </Text>
-                </Box>
-              </SimpleGrid>
-            </Stack>
+                RSS Feed ↗
+              </Link>
+              <Text>
+                Latest: {latestArticle ? latestArticle.absoluteDate : "N/A"}
+              </Text>
+            </HStack>
           </Box>
 
           {error ? (
             <Text color="status.error">{error}</Text>
           ) : (
-            <VStack spacing={6} align="stretch">
+            <VStack gap={6} align="stretch">
               <Box
                 borderWidth="1px"
                 borderColor={panelBorder}
-                borderRadius="3xl"
-                p={{ base: 4, md: 5 }}
-                bg={panelBg}
-                backdropFilter="blur(12px)"
+                borderRadius="xl"
+                p={{ base: 3, md: 4 }}
+                bg="bg.panel"
               >
-                <Stack direction={{ base: "column", xl: "row" }} spacing={4}>
-                  <InputGroup flex={1}>
-                    <InputLeftElement pointerEvents="none" h="44px">
-                      <Icon as={IoSearchOutline} color="gray.400" />
-                    </InputLeftElement>
+                <Stack direction={{ base: "column", md: "row" }} gap={4}>
+                  <InputGroup
+                    flex={1}
+                    startElement={
+                      <Icon as={IoSearchOutline} color="fg.muted" />
+                    }
+                  >
                     <Input
+                      aria-label="Search articles"
                       placeholder="Search titles, summaries, notes, or tags"
                       value={searchQuery}
                       onChange={(event) => setSearchQuery(event.target.value)}
                       minH="44px"
                     />
                   </InputGroup>
-                  <Select
-                    value={sortOption}
-                    onChange={(event) => setSortOption(event.target.value)}
-                    maxW={{ base: "100%", xl: "220px" }}
-                    minH="44px"
-                  >
-                    <option value="newest">Newest First</option>
-                    <option value="oldest">Oldest First</option>
-                    <option value="alphabetical">Alphabetical</option>
-                  </Select>
+                  <NativeSelect.Root maxW={{ base: "100%", md: "220px" }}>
+                    <NativeSelect.Field
+                      aria-label="Sort articles"
+                      value={sortOption}
+                      onChange={(event) => setSortOption(event.target.value)}
+                      maxW={{ base: "100%", xl: "220px" }}
+                      minH="44px"
+                    >
+                      <option value="newest">Newest First</option>
+                      <option value="oldest">Oldest First</option>
+                      <option value="alphabetical">Alphabetical</option>
+                    </NativeSelect.Field>
+                    <NativeSelect.Indicator />
+                  </NativeSelect.Root>
                   {hasActiveFilters && (
                     <Button
-                      leftIcon={<IoCloseCircleOutline />}
                       variant="ghost"
-                      colorScheme="orange"
+                      colorPalette="gray"
                       onClick={resetFilters}
                       minH="44px"
                     >
+                      <IoCloseCircleOutline />
                       Clear filters
                     </Button>
                   )}
                 </Stack>
 
-                <Wrap mt={4} spacing={3}>
+                <Wrap mt={3} gap={1}>
                   <WrapItem>
                     <Button
                       size="sm"
                       minH="44px"
-                      colorScheme={!selectedTag ? "orange" : "gray"}
+                      colorPalette="gray"
                       variant={!selectedTag ? "solid" : "outline"}
+                      aria-pressed={!selectedTag}
                       onClick={() => setSelectedTag(null)}
                     >
                       All ({sortedArticles.length})
@@ -405,8 +321,9 @@ const ArticlesPage = ({ articles, error }) => {
                       <Button
                         size="sm"
                         minH="44px"
-                        colorScheme="orange"
-                        variant={selectedTag === tag ? "solid" : "outline"}
+                        colorPalette="gray"
+                        variant={selectedTag === tag ? "solid" : "ghost"}
+                        aria-pressed={selectedTag === tag}
                         onClick={() => setSelectedTag(tag)}
                       >
                         {tag} ({count})
@@ -417,13 +334,15 @@ const ArticlesPage = ({ articles, error }) => {
 
                 <HStack
                   mt={4}
-                  spacing={3}
+                  gap={3}
                   color={mutedText}
                   fontSize="sm"
                   flexWrap="wrap"
                 >
-                  <HStack spacing={1}>
-                    <Icon as={IoTimeOutline} />
+                  <HStack gap={1}>
+                    <Icon asChild>
+                      <IoTimeOutline />
+                    </Icon>
                     <Text>{filteredArticles.length} selected</Text>
                   </HStack>
                   <Text>•</Text>
@@ -447,12 +366,9 @@ const ArticlesPage = ({ articles, error }) => {
                   textAlign="center"
                   bg={accentSubtle}
                 >
-                  <Icon
-                    as={IoFlashOutline}
-                    boxSize={8}
-                    color="orange.400"
-                    mb={3}
-                  />
+                  <Icon boxSize={8} color="orange.400" mb={3} asChild>
+                    <IoFlashOutline />
+                  </Icon>
                   <Heading as="h2" size="md" mb={2}>
                     No articles found
                   </Heading>
@@ -461,14 +377,20 @@ const ArticlesPage = ({ articles, error }) => {
                   </Text>
                 </Box>
               ) : (
-                <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
+                <Box
+                  bg="bg.panel"
+                  borderWidth="1px"
+                  borderColor="border"
+                  borderRadius="xl"
+                  overflow="hidden"
+                >
                   {filteredArticles.map((article) => (
                     <ArticleCard
                       key={article.slug || article.url}
                       {...article}
                     />
                   ))}
-                </SimpleGrid>
+                </Box>
               )}
             </VStack>
           )}

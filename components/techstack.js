@@ -1,16 +1,9 @@
-import {
-  Tag,
-  Wrap,
-  WrapItem,
-  useColorModeValue,
-  Image,
-  Box,
-} from "@chakra-ui/react";
+import { Tag, Wrap, WrapItem, Image, Box } from "@chakra-ui/react";
 import technologyData from "../libs/technologyData";
 
 const TechStack = ({ stack }) => {
-  const tagBgColor = useColorModeValue("tagBg.default", "tagBg._dark");
-  const tagTextColor = useColorModeValue("tagText.default", "tagText._dark");
+  const tagBgColor = "accent.subtle";
+  const tagTextColor = "accent.link";
 
   if (!stack || stack.length === 0) {
     return null;
@@ -18,18 +11,18 @@ const TechStack = ({ stack }) => {
 
   // Flatten all technologies from technologyData into a single array for easier lookup
   const allTechnologies = Object.values(technologyData).flatMap(
-    (category) => category.technologies
+    (category) => category.technologies,
   );
 
   return (
-    <Wrap spacing={1} justify="flex-start">
+    <Wrap gap={1} justify="flex-start">
       {stack.map((techName, idx) => {
         const tech = allTechnologies.find((t) => t.name === techName);
         return (
           <WrapItem key={idx}>
-            <Tag
+            <Tag.Root
               size="md"
-              colorScheme="orange"
+              colorPalette="orange"
               bg={tagBgColor}
               color={tagTextColor}
               borderRadius="full"
@@ -43,7 +36,7 @@ const TechStack = ({ stack }) => {
                 </Box>
               )}
               {techName}
-            </Tag>
+            </Tag.Root>
           </WrapItem>
         );
       })}

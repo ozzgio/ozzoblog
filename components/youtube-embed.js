@@ -27,7 +27,9 @@ export function parseYouTubeId(value) {
     const v = parsed.searchParams.get("v");
     if (v && idPattern.test(v)) return v;
 
-    const match = parsed.pathname.match(/\/(?:embed|shorts|live)\/([A-Za-z0-9_-]+)/);
+    const match = parsed.pathname.match(
+      /\/(?:embed|shorts|live)\/([A-Za-z0-9_-]+)/,
+    );
     if (match) return match[1];
   } catch {
     return "";
@@ -63,24 +65,24 @@ export default function YoutubeEmbed({ url, title }) {
     >
       {activated ? (
         <Box
-          as="iframe"
           position="absolute"
           top="0"
           left="0"
-          width="100%"
-          height="100%"
           border="0"
-          src={`https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0`}
           title={label}
-          loading="lazy"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-          allowFullScreen
-        />
+          asChild
+        >
+          <iframe
+            width="100%"
+            height="100%"
+            src={`https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0`}
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowFullScreen
+          />
+        </Box>
       ) : (
         <Box
-          as="button"
-          type="button"
-          onClick={() => setActivated(true)}
           position="absolute"
           top="0"
           left="0"
@@ -93,36 +95,42 @@ export default function YoutubeEmbed({ url, title }) {
           cursor="pointer"
           aria-label={`Play ${label}`}
           _focusVisible={{ outline: "3px solid white", outlineOffset: "-3px" }}
+          asChild
         >
-          {/* hqdefault carries black bars on some videos; object-fit: cover
-              crops them. Plain <img> (not next/image) keeps next.config.js
-              untouched and avoids adding i.ytimg.com to the image optimizer. */}
-          <Box
-            as="img"
-            src={thumbnailUrl(id)}
-            alt=""
-            loading="lazy"
-            decoding="async"
-            position="absolute"
-            top="0"
-            left="0"
-            width="100%"
-            height="100%"
-            objectFit="cover"
-            opacity="0.94"
-          />
-          <Box
-            aria-hidden="true"
-            position="absolute"
-            top="50%"
-            left="50%"
-            transform="translate(-50%, -50%)"
-            color="white"
-            fontSize={{ base: "56px", md: "72px" }}
-            filter="drop-shadow(0 2px 8px rgba(0,0,0,0.7))"
-          >
-            <IoPlayCircle />
-          </Box>
+          <button type="button" onClick={() => setActivated(true)}>
+            {/* hqdefault carries black bars on some videos; object-fit: cover
+                crops them. Plain <img> (not next/image) keeps next.config.js
+                untouched and avoids adding i.ytimg.com to the image optimizer. */}
+            <Box
+              position="absolute"
+              top="0"
+              left="0"
+              objectFit="cover"
+              opacity="0.94"
+              asChild
+            >
+              <img
+                src={thumbnailUrl(id)}
+                alt=""
+                loading="lazy"
+                decoding="async"
+                width="100%"
+                height="100%"
+              />
+            </Box>
+            <Box
+              aria-hidden="true"
+              position="absolute"
+              top="50%"
+              left="50%"
+              transform="translate(-50%, -50%)"
+              color="white"
+              fontSize={{ base: "56px", md: "72px" }}
+              filter="drop-shadow(0 2px 8px rgba(0,0,0,0.7))"
+            >
+              <IoPlayCircle />
+            </Box>
+          </button>
         </Box>
       )}
     </Box>

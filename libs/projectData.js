@@ -1,15 +1,59 @@
-// Each project carries three manual signals (not git-derived):
-//   effort     1-5  how much total work went in
-//   difficulty 1-5  how technically hard it was
-//   focus      "now" | "shipped" | "earlier"  how current the focus is
-// The /projects page groups by `focus` (NOW -> SHIPPED -> EARLIER) and sorts
-// within each group by effort desc. See pages/projects.js.
+// Featured products lead the catalog; focus records building/shipped/earlier status.
 const projectData = [
+  {
+    id: "synergym",
+    title: "Synergym",
+    shareText:
+      "For personal trainers: Synergym brings workout programs, an exercise library, and athlete tracking together. Explore the product:",
+    description:
+      "A coaching workspace for personal trainers. Build a program, give it to an athlete, and see how training is going. Less administration between the sessions that matter.",
+    thumbnail: "/thumbs/synergym.png",
+    stack: ["Ruby on Rails", "PostgreSQL", "Redis", "Sidekiq", "Tailwind CSS"],
+    github: null,
+    demo: "https://synergym.app",
+    date: "2025-10",
+    tags: ["Full Stack", "Rails"],
+    effort: 5,
+    difficulty: 5,
+    focus: "shipped",
+    featured: true,
+    audience: "For personal trainers",
+    status: "Free beta",
+    contact: "hello@synergym.app",
+    lesson:
+      "The workflow is built. My next job is to put it in front of trainers and learn which parts deserve to stay.",
+  },
+  {
+    id: "onenil",
+    title: "One Nil",
+    description:
+      "Call the score before kickoff. Invite friends to a private group, make your matchweek picks, and compare the results. A football prediction game in private beta.",
+    thumbnail: "/thumbs/onenil.svg",
+    socialImage: "/thumbs/onenil-social.png",
+    stack: ["Ruby on Rails", "Hotwire", "SQLite", "Tailwind CSS", "Kamal"],
+    github: null,
+    demo: "https://onenil.org",
+    date: "2026-09",
+    tags: ["Full Stack", "Rails"],
+    effort: 4,
+    difficulty: 3,
+    focus: "now",
+    shareText:
+      "Call the score before kickoff. One Nil is a private football prediction game for friends: invite your group, make your picks, and compare the results.",
+    featured: true,
+    audience: "For football groups",
+    status: "Private beta",
+    contact: "hello@onenil.org",
+    lesson:
+      "A smaller bet with a clearer audience. Inviting the next player is part of the product, because a game needs people as much as code.",
+  },
   {
     id: "buildlog",
     title: "Buildlog",
+    shareText:
+      "Shipping solo? Buildlog is the tiny public dev journal I use to keep a daily shipping habit. See what I'm building:",
     description:
-      "My build-in-public dev journal. A tiny Rails app where I post what I ship each day. Not a product, a forcing function for daily shipping and raw material for the weekly field notes.",
+      "A small public journal for the day-to-day work. I leave a note about what changed, what shipped, and what I want to try next. It keeps the work from disappearing between longer articles.",
     thumbnail: "/thumbs/buildlog.svg",
     socialImage: "/thumbs/buildlog-social.png",
     stack: ["Ruby on Rails", "SQLite", "Kamal", "DaisyUI"],
@@ -19,28 +63,15 @@ const projectData = [
     tags: ["Full Stack", "Rails"],
     effort: 3,
     difficulty: 2,
-    focus: "now",
-  },
-  {
-    id: "synergym",
-    title: "Synergym.fit",
-    description:
-      "Gym management SaaS for trainers and athletes. Program creation, exercise library, athlete tracking, role-based access. Rails 8, PostgreSQL, Sidekiq, Playwright. In production since late 2025. No active users yet. Distribution is still the unsolved half.",
-    thumbnail: "/thumbs/synergym.png",
-    stack: ["Ruby on Rails", "PostgreSQL", "Redis", "Sidekiq", "Tailwind CSS"],
-    github: null,
-    demo: "https://synergym.fit",
-    date: "2025-10",
-    tags: ["Full Stack", "Rails"],
-    effort: 5,
-    difficulty: 5,
     focus: "shipped",
   },
   {
     id: "homelab",
     title: "NUC Homelab",
+    shareText:
+      "A self-hosting setup on an Intel NUC: Docker, local AI, and automation. Here's what runs it and how it fits together:",
     description:
-      "Intel NUC14 running Linux and 25+ Docker services. Self-hosted git and CI with Gitea, local inference with Ollama, n8n for automation, ChromaDB for vectors, Faster-Whisper for speech-to-text. A custom MCP server connects the Obsidian vault to AI agents. Private repos, self-hosted on Gitea. Infrastructure for personal autonomy, not meant as a demo.",
+      "The infrastructure behind the projects: local tools, containers, and automation on an Intel NUC. Useful to me every day; private and self-hosted.",
     thumbnail: "/thumbs/homelab.svg",
     socialImage: "/thumbs/homelab-social.png",
     stack: ["Docker", "Linux", "Gitea", "n8n", "Ollama"],
@@ -55,8 +86,10 @@ const projectData = [
   {
     id: "agentic-hub",
     title: "Agentic Hub",
+    shareText:
+      "A look inside my personal ops dashboard for chat, tasks, cron jobs, and a terminal. Private and self-hosted; the project story is public:",
     description:
-      "Personal ops dashboard running on the NUC. Chat, tasks board, fleet view for cron jobs, Telegram topics, wiki, terminal. Built against the Hermes open-source gateway API. Next.js 15, Tailwind, shadcn/ui.",
+      "A private dashboard for the work around the work: conversations, tasks, scheduled jobs, and a terminal. One place to see what is running on the home server.",
     thumbnail: "/thumbs/agentic-hub.svg",
     socialImage: "/thumbs/agentic-hub-social.png",
     stack: ["Next.js", "Tailwind CSS", "TypeScript", "shadcn/ui"],
@@ -71,8 +104,10 @@ const projectData = [
   {
     id: "portfolio",
     title: "This Site",
+    shareText:
+      "How I built this site: a Next.js frontend, a public content pipeline, and a few interface experiments. Code and build details:",
     description:
-      "Next.js 15, Chakra UI, Framer Motion. Articles and book notes sync from Obsidian via a Python script and GitHub Actions pipeline. Still being improved; this is where the writing and the UI experiments live.",
+      "The public notebook you are reading. Articles, book notes, and interface experiments share one home; the writing comes from a separate publishing pipeline.",
     thumbnail: "/thumbs/portfolio.png",
     stack: ["Next.js", "Chakra UI", "Framer Motion", "GitHub Actions"],
     github: "https://github.com/ozzgio/ozzoblog",
@@ -86,8 +121,10 @@ const projectData = [
   {
     id: "rubychess",
     title: "Ruby Chess",
+    shareText:
+      "A full chess game in the terminal, written in Ruby. Castling, en passant, promotion, and PGN export. Explore the code:",
     description:
-      "Full chess in the terminal, written in pure Ruby. OOP design, RSpec coverage, castling, en passant, pawn promotion, PGN export. Built as the final project for the Odin Project Ruby curriculum.",
+      "A full game of chess in the terminal. Building the rules in Ruby taught me more about modelling a problem than another screen of forms would have.",
     thumbnail: "/thumbs/rubychess.png",
     stack: ["Ruby"],
     github: "https://github.com/ozzgio/ruby_chess",
@@ -101,8 +138,10 @@ const projectData = [
   {
     id: "meteomapbot",
     title: "MeteoMap Bot",
+    shareText:
+      "Need the weather in Italy? MeteoMap is a Telegram bot with location sharing and forecasts. Try it or explore the build:",
     description:
-      "Telegram bot for Italian weather. Node.js, OpenWeatherMap API, SQL Server for regions and city data. Interactive keyboards, location sharing. Still running.",
+      "A quick weather check inside Telegram. Share a location or choose a city and get the forecast. A small Node.js project that is still running.",
     thumbnail: "/thumbs/meteomapbot.png",
     stack: ["Node.js", "JavaScript", "Telegram API"],
     github: "https://gist.github.com/ozzgio/2a1f1d2cff1a9134a50ad5c94c451e35",
@@ -116,8 +155,10 @@ const projectData = [
   {
     id: "kellyspub",
     title: "Kelly's Pub",
+    shareText:
+      "A WordPress site built for a local pub. The site is live, and the project page covers the stack:",
     description:
-      "WordPress site for a local pub. Content, plugins, custom styling. Still live.",
+      "A website for a local pub. WordPress, custom styling, and the practical work of keeping a small business online.",
     thumbnail: "/thumbs/kellyspub.png",
     stack: ["WordPress", "PHP", "MySQL"],
     github: null,
@@ -131,8 +172,10 @@ const projectData = [
   {
     id: "fbetsui",
     title: "FootballBets UI",
+    shareText:
+      "An Angular interface for tracking football bets. This project is paused; the source and build details are public:",
     description:
-      "Angular frontend for a football betting tracker. TypeScript, SCSS. On hold; stopped to reposition, might come back as a local-only version.",
+      "An earlier attempt at a football-bet tracker, built in Angular. I paused it to work out whether the problem needed a smaller, local tool.",
     thumbnail: "/thumbs/fbetsui.png",
     stack: ["Angular", "TypeScript", "SCSS"],
     github: "https://github.com/ozzgio/FootballBetsUI",
@@ -146,8 +189,10 @@ const projectData = [
   {
     id: "fbetsapi",
     title: "FootballBets API",
+    shareText:
+      "The C# API behind my football-bet tracker: SQLite, Docker, and a small REST backend. Paused project, open source:",
     description:
-      "C# REST API backing the football betting tracker. SQLite, Docker. Paused alongside the frontend.",
+      "The C# service behind the football-bet tracker. SQLite and Docker kept the backend small. Paused alongside the frontend.",
     thumbnail: "/thumbs/fbetsapi.png",
     stack: ["C#", "SQLite", "Docker"],
     github: "https://github.com/ozzgio/FootballBetsAPI",

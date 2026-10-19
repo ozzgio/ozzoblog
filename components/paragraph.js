@@ -1,9 +1,9 @@
-import styled from "@emotion/styled";
+import { Text } from "@chakra-ui/react";
 
-const Paragraph = styled.p`
-  text-align: left;
-  font-size: 1.125rem;
-  line-height: 1.7;
-`;
+const Paragraph = ({ children, ...props }) => (
+  <Text textAlign="left" fontSize="1.125rem" lineHeight="1.7" {...props}>
+    {children}
+  </Text>
+);
 
 export default Paragraph;

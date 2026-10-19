@@ -1,36 +1,43 @@
-import { Box, VStack, Text, useColorModeValue } from "@chakra-ui/react";
+import { Box, VStack, Text } from "@chakra-ui/react";
 import { motion, useReducedMotion } from "framer-motion";
 import Image from "next/image";
 import { useState } from "react";
 
 const EnhancedChip = ({ tech, delay = 0 }) => {
   const shouldReduceMotion = useReducedMotion();
-  const bg = useColorModeValue("white", "gray.800");
-  const borderColor = useColorModeValue("gray.200", "gray.600");
-  const hoverBg = useColorModeValue("gray.50", "gray.700");
+  const bg = "bg.panel";
+  const borderColor = "border";
+  const hoverBg = "bg.subtle";
   const [imgError, setImgError] = useState(false);
-  
+
   // Check if image is an external SVG or if it's a local file. Hostname is
   // checked via URL parsing, not a substring match -- image?.includes(...)
   // would also match "simpleicons.org.evil.example" or "?u=simpleicons.org".
   const isFromSimpleIcons = (() => {
-    if (!tech.image?.startsWith('http')) return false;
+    if (!tech.image?.startsWith("http")) return false;
     try {
       const hostname = new URL(tech.image).hostname;
-      return hostname === 'simpleicons.org' || hostname.endsWith('.simpleicons.org');
+      return (
+        hostname === "simpleicons.org" || hostname.endsWith(".simpleicons.org")
+      );
     } catch {
       return false;
     }
   })();
-  const isExternalSVG = tech.image?.startsWith('http') && (tech.image?.endsWith('.svg') || isFromSimpleIcons);
-  const isLocalSVG = tech.image?.startsWith('/') && tech.image?.endsWith('.svg');
+  const isExternalSVG =
+    tech.image?.startsWith("http") &&
+    (tech.image?.endsWith(".svg") || isFromSimpleIcons);
+  const isLocalSVG =
+    tech.image?.startsWith("/") && tech.image?.endsWith(".svg");
   const shouldUnoptimize = isExternalSVG || isLocalSVG;
 
   return (
     <motion.div
-      initial={shouldReduceMotion ? false : { opacity: 0, y: 30 }}
+      initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.6, delay }}
+      transition={
+        shouldReduceMotion ? { duration: 0 } : { duration: 0.6, delay }
+      }
     >
       <Box
         bg={bg}
@@ -53,7 +60,7 @@ const EnhancedChip = ({ tech, delay = 0 }) => {
         }}
         cursor="pointer"
       >
-        <VStack spacing={2} flex={1} justify="center">
+        <VStack gap={2} flex={1} justify="center">
           <Box
             position="relative"
             width="100%"
@@ -73,14 +80,9 @@ const EnhancedChip = ({ tech, delay = 0 }) => {
                 onError={() => setImgError(true)}
               />
             ) : (
-              <Box
-                as="img"
-                src={tech.image}
-                alt={tech.name}
-                maxW="80%"
-                maxH="80%"
-                objectFit="contain"
-              />
+              <Box maxW="80%" maxH="80%" objectFit="contain" asChild>
+                <img src={tech.image} alt={tech.name} />
+              </Box>
             )}
           </Box>
           <Text

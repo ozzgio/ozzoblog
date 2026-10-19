@@ -1,135 +1,100 @@
-import { extendTheme, theme as baseTheme } from "@chakra-ui/react";
-import { mode } from "@chakra-ui/theme-tools";
+import { createSystem, defaultConfig, defineConfig } from "@chakra-ui/react";
 
-const theme = extendTheme({
-  config: {
-    // "system" (not "dark") so ColorModeScript's inline script reads
-    // prefers-color-scheme before first paint. With "dark" here the script
-    // pinned every visitor to dark and useSystemColorMode never got a
-    // chance, so the page-load intro overlay and the error pages rendered
-    // dark on a light OS.
-    initialColorMode: "system",
-    useSystemColorMode: true,
-  },
-  styles: {
-    global: (props) => ({
-      body: {
-        bg: mode("#f7f5f2", "#1a1a1e")(props),
-        color: mode("gray.800", "gray.100")(props),
-      },
-      "*::placeholder": {
-        color: mode("gray.400", "gray.600")(props),
-      },
-      "*, *::before, &::after": {
-        borderColor: mode("gray.200", "gray.700")(props),
-      },
-      "@media (prefers-reduced-motion: reduce)": {
-        "*, *::before, *::after": {
-          animationDuration: "0.01ms !important",
-          animationIterationCount: "1 !important",
-          scrollBehavior: "auto !important",
-          transitionDuration: "0.01ms !important",
-        },
-      },
-    }),
-  },
-  semanticTokens: {
-    colors: {
-      "accent.link": {
-        default: "orange.700",
-        _dark: "orange.300",
-      },
-      "status.error": {
-        default: "red.600",
-        _dark: "red.300",
+const config = defineConfig({
+  globalCss: {
+    body: { bg: "bg", color: "fg", lineHeight: "1.7" },
+    "*::placeholder": { color: "fg.muted" },
+    "::selection": { bg: "orange.200", color: "gray.950" },
+    "@media (prefers-reduced-motion: reduce)": {
+      "*, *::before, *::after": {
+        animationDuration: "0.01ms !important",
+        animationIterationCount: "1 !important",
+        scrollBehavior: "auto !important",
+        transitionDuration: "0.01ms !important",
       },
     },
   },
-  components: {
-    Heading: {
-      variants: {
-        "section-title": {
-          textDecoration: "underline",
-          fontSize: 22,
-          textUnderlineOffset: 8,
-          textDecorationColor: "#ff9933",
-          textDecorationThickness: 4,
-          marginTop: 4,
-          marginBottom: 5,
-          fontWeight: "bold",
+  theme: {
+    tokens: {
+      fonts: {
+        heading: { value: "var(--font-bricolage-grotesque), sans-serif" },
+      },
+      colors: { grassTeal: { value: "#ff9933" } },
+      sizes: { "container.md": { value: "48rem" } },
+    },
+    semanticTokens: {
+      colors: {
+        bg: {
+          DEFAULT: { value: { _light: "#f7f5f2", _dark: "#1a1a1e" } },
+          panel: { value: { _light: "#fffefd", _dark: "#222226" } },
+          subtle: { value: { _light: "#eeece8", _dark: "#2b2b30" } },
         },
-        "page-title": {
-          fontSize: { base: "2xl", md: "3xl", lg: "4xl" },
-          fontWeight: "bold",
-          mb: 4,
+        fg: {
+          DEFAULT: {
+            value: { _light: "{colors.gray.900}", _dark: "{colors.gray.100}" },
+          },
+          muted: {
+            value: { _light: "{colors.gray.600}", _dark: "{colors.gray.400}" },
+          },
+        },
+        border: { value: { _light: "#dcd9d3", _dark: "#414147" } },
+        accent: {
+          link: {
+            value: {
+              _light: "{colors.orange.700}",
+              _dark: "{colors.orange.300}",
+            },
+          },
+          subtle: { value: { _light: "{colors.orange.50}", _dark: "#38291f" } },
+        },
+        status: {
+          error: {
+            value: { _light: "{colors.red.700}", _dark: "{colors.red.300}" },
+          },
+        },
+        orange: {
+          solid: {
+            value: {
+              _light: "{colors.orange.700}",
+              _dark: "{colors.orange.300}",
+            },
+          },
+          contrast: { value: { _light: "white", _dark: "{colors.gray.950}" } },
+          fg: {
+            value: {
+              _light: "{colors.orange.700}",
+              _dark: "{colors.orange.300}",
+            },
+          },
         },
       },
     },
-    Link: {
-      baseStyle: (props) => ({
-        color: mode("#0052cc", "#d24dff")(props),
-        textUnderlineOffset: 3,
-        _hover: {
-          textDecoration: "underline",
-        },
-      }),
-    },
-    // Chakra's default light-mode solid "orange" is white-on-orange.500
-    // (3.39:1) and ghost text is orange.600 (4.2:1) -- both fail WCAG AA.
-    // Dark mode already uses its own orange.200-bg/gray.800-text combo for
-    // solid (11.5:1) -- leave that alone, only light mode needs shifting.
-    // Every other colorScheme keeps Chakra's own formula untouched.
-    Button: {
-      variants: {
-        solid: (props) => {
-          const base = baseTheme.components.Button.variants.solid(props);
-          if (props.colorScheme !== "orange" || props.colorMode === "dark") return base;
-          return {
-            ...base,
-            bg: "orange.700",
-            _hover: { ...base._hover, bg: "orange.800" },
-            _active: { ...base._active, bg: "orange.900" },
-          };
-        },
-        ghost: (props) => {
-          const base = baseTheme.components.Button.variants.ghost(props);
-          if (props.colorScheme !== "orange") return base;
-          return { ...base, color: mode("orange.700", "orange.200")(props) };
+    recipes: {
+      heading: {
+        base: { letterSpacing: "-0.025em", fontWeight: "700" },
+        variants: {
+          variant: {
+            "section-title": {
+              fontSize: "xl",
+              mt: 4,
+              mb: 5,
+              textDecoration: "underline",
+              textUnderlineOffset: "8px",
+              textDecorationColor: "orange.400",
+              textDecorationThickness: "3px",
+            },
+            "page-title": { fontSize: { base: "3xl", md: "4xl" }, mb: 4 },
+          },
         },
       },
-    },
-  },
-  fonts: {
-    heading: "var(--font-m-plus-rounded-1c), sans-serif",
-  },
-  colors: {
-    grassTeal: "#ff9933",
-    // Add our semantic colors here
-    cardBg: {
-      default: "#ffffff", // Light mode default (fallback)
-      _dark: "#1a202c", // Dark mode
-    },
-    cardBorder: {
-      default: "#e2e8f0", // Light mode border
-      _dark: "#4a5568", // Dark mode border
-    },
-    headingText: {
-      default: "#2d3748", // Light mode heading
-      _dark: "#ffffff", // Dark mode heading
-    },
-    bodyText: {
-      default: "#4a5568", // Light mode text -- #718096 was 3.68-4.01:1 against card/page bg, fails AA
-      _dark: "#a0aec0", // Dark mode text
-    },
-    tagBg: {
-      default: "#fff5f0",
-      _dark: "#744210",
-    },
-    tagText: {
-      default: "#a8460a",
-      _dark: "#f7fafc",
+      link: {
+        base: { color: "accent.link", textUnderlineOffset: "3px" },
+      },
+      button: {
+        base: { borderRadius: "lg", fontWeight: "600", whiteSpace: "normal" },
+      },
     },
   },
 });
 
-export default theme;
+export default createSystem(defaultConfig, config);

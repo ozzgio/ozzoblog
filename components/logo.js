@@ -2,17 +2,11 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { motion } from "framer-motion";
-import MoonZMark from "./icons/moon-z-mark";
+import { Box } from "@chakra-ui/react";
 import { useBrandIntro } from "./brand-intro-context";
 import { FLY_TRANSITION } from "./brand-intro";
 
-// The intro (components/brand-intro.js) owns forming "ozzo" into the mark
-// and flying it here. This just reserves the mark's slot in the nav and,
-// once the intro says it has landed, mounts the matching layoutId so
-// Framer Motion's shared-layout transition resolves into this exact spot.
-//
-// It also doubles as the route-change indicator: a brief pulse on the mark
-// itself while Next.js is navigating, instead of a separate loading spinner.
+// Share the intro landing position and pulse the wordmark during navigation.
 const Logo = () => {
   const { markLanded } = useBrandIntro();
   const router = useRouter();
@@ -32,12 +26,12 @@ const Logo = () => {
   }, [router]);
 
   return (
-    <Link href="/" scroll={false} aria-label="Ozzo — home">
+    <Link href="/" scroll={false} aria-label="Ozzo, home">
       <span
         style={{
           display: "inline-flex",
           alignItems: "center",
-          width: 30,
+          minWidth: 68,
           height: 30,
           margin: "8px 10px",
         }}
@@ -61,7 +55,21 @@ const Logo = () => {
               }
               style={{ display: "inline-flex" }}
             >
-              <MoonZMark size={30} />
+              <Box
+                as="span"
+                data-brand-wordmark=""
+                fontFamily="heading"
+                fontSize="28px"
+                fontWeight="800"
+                letterSpacing="-0.06em"
+                lineHeight="1"
+                color="fg"
+              >
+                ozzo
+                <Box as="span" color="accent.link">
+                  .
+                </Box>
+              </Box>
             </motion.span>
           </motion.span>
         )}

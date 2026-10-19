@@ -32,7 +32,7 @@ const PORTFOLIO_ARTICLES_URL =
   "https://raw.githubusercontent.com/ozzgio/portfolio-data/main/articles.json";
 
 // Pages that must carry full SEO metadata.
-const KEY_PAGES = ["/", "/articles", "/books", "/projects", "/contacts", "/experience"];
+const KEY_PAGES = ["/", "/about", "/articles", "/books", "/projects", "/contacts", "/experience"];
 
 // Tags required on every key page (regex patterns matched against raw HTML).
 const REQUIRED_TAGS = [

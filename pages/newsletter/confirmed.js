@@ -7,7 +7,7 @@ import MoonZPulse from "../../components/icons/moon-z-pulse";
 const NewsletterConfirmed = () => (
   <Layout
     title="You're in"
-    description="Your subscription to Ozzo's weekly field notes is confirmed."
+    description="You're subscribed to Ozzo's weekly newsletter on software, books, and his own projects."
     robots="noindex,nofollow"
     path="/newsletter/confirmed"
   >
@@ -19,9 +19,7 @@ const NewsletterConfirmed = () => (
             as="h1"
             fontSize={{ base: "2xl", md: "3xl" }}
             mb={4}
-            bgGradient="linear(to-r, orange.400, orange.600)"
-            _dark={{ bgGradient: "linear(to-r, orange.300, orange.500)" }}
-            bgClip="text"
+            color="fg"
           >
             You&apos;re confirmed
           </Heading>
@@ -33,32 +31,19 @@ const NewsletterConfirmed = () => (
             maxW="sm"
             mx="auto"
           >
-            Welcome. You&apos;ll get field notes on finding demand, shipping
-            useful software, earning attention, and building toward independent
-            work.
+            Thanks for reading. You&apos;ll get a weekly note on what I&apos;m
+            building, reading, and learning.
           </Text>
           <Stack
             direction={{ base: "column", sm: "row" }}
-            spacing={3}
+            gap={3}
             justify="center"
           >
-            <Button
-              as={NextLink}
-              href="/articles"
-              colorScheme="orange"
-              size="md"
-              minH="44px"
-            >
-              Read the articles
+            <Button colorPalette="orange" size="md" minH="44px" asChild>
+              <NextLink href="/articles">Read the articles</NextLink>
             </Button>
-            <Button
-              as={NextLink}
-              href="/"
-              variant="ghost"
-              size="md"
-              minH="44px"
-            >
-              Back to home
+            <Button variant="ghost" size="md" minH="44px" asChild>
+              <NextLink href="/">Back to home</NextLink>
             </Button>
           </Stack>
         </Box>
