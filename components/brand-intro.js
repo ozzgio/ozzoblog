@@ -3,11 +3,18 @@ import { useColorModeValue } from "./ui/color-mode";
 import { Box, Button, Text } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import { BrandIntroContext } from "./brand-intro-context";
-import MoonZMark from "./icons/moon-z-mark";
+import MoonZMark, { BRAND_Z_PATH } from "./icons/moon-z-mark";
 
 const EASE = [0.76, 0, 0.24, 1];
 const SEEN_KEY = "ozzo-intro-seen";
 export const FLY_TRANSITION = { duration: 0.9, ease: [0.22, 1, 0.36, 1] };
+const PHASES = {
+  word: ["merge", 1500],
+  merge: ["formed", 1100],
+  formed: ["mark", 350],
+  mark: ["flying", 1400],
+  flying: ["done", 1000],
+};
 
 const BrandIntro = ({ children, isHome }) => {
   const [phase, setPhase] = useState("pending");
@@ -17,7 +24,8 @@ const BrandIntro = ({ children, isHome }) => {
   const ink = useColorModeValue("#1c1917", "#f7f5f2");
   const muted = useColorModeValue("gray.600", "gray.400");
   const accent = useColorModeValue("#c05621", "#f6ad55");
-  const active = phase === "word" || phase === "mark";
+  const active = ["word", "merge", "formed", "mark"].includes(phase);
+  const merged = phase !== "word";
 
   useEffect(() => {
     const media = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -54,10 +62,7 @@ const BrandIntro = ({ children, isHome }) => {
 
   useEffect(() => {
     if (phase === "pending" || phase === "done") return;
-    const next =
-      phase === "word" ? "mark" : phase === "mark" ? "flying" : "done";
-    // Leave almost two seconds to read after the last letter settles.
-    const delay = phase === "word" ? 3000 : phase === "mark" ? 850 : 1000;
+    const [next, delay] = PHASES[phase];
     const timer = setTimeout(() => setPhase(next), delay);
     return () => clearTimeout(timer);
   }, [phase]);
@@ -136,128 +141,99 @@ const BrandIntro = ({ children, isHome }) => {
             aria-hidden="true"
           >
             <motion.svg
-              viewBox="0 0 760 420"
-              initial={{ opacity: 0, rotate: -18, scale: 0.8 }}
-              animate={
-                phase === "word"
-                  ? { opacity: 1, rotate: -8, scale: 1 }
-                  : { opacity: 0, rotate: 12, scale: 0.2 }
-              }
-              transition={{ duration: 0.9, ease: EASE }}
+              viewBox="0 0 480 240"
+              initial={false}
+              animate={{
+                opacity: phase === "mark" || phase === "flying" ? 0 : 1,
+              }}
+              transition={{ duration: 0.4 }}
               style={{
                 position: "absolute",
                 width: "100%",
                 overflow: "visible",
               }}
             >
-              <motion.ellipse
-                cx="380"
-                cy="210"
-                rx="355"
-                ry="115"
-                fill="none"
-                stroke={accent}
-                strokeWidth="1"
-                strokeOpacity="0.3"
-                initial={{ pathLength: 0 }}
-                animate={{ pathLength: 1 }}
-                transition={{ duration: 1.5, ease: EASE }}
-              />
-              <motion.ellipse
-                cx="380"
-                cy="210"
-                rx="355"
-                ry="115"
-                fill="none"
-                stroke={accent}
-                strokeWidth="3"
-                pathLength="1"
-                strokeDasharray="0.08 0.92"
-                initial={{ strokeDashoffset: 0.25 }}
-                animate={{ strokeDashoffset: -0.75 }}
-                transition={{ duration: 2.4, ease: [0.22, 1, 0.36, 1] }}
-              />
-            </motion.svg>
-
-            <Box position="absolute" textAlign="center" color={ink}>
-              <motion.div
-                initial={{ opacity: 0, y: 8 }}
-                animate={{
-                  opacity: phase === "word" ? 1 : 0,
-                  y: phase === "word" ? 0 : -8,
-                }}
-                transition={{
-                  duration: 0.4,
-                  delay: phase === "word" ? 0.15 : 0,
-                }}
-              >
-                <Text
-                  fontSize={{ base: "10px", md: "xs" }}
-                  letterSpacing="0.22em"
-                  color={muted}
-                  mb={3}
-                >
-                  OZZO.BLOG
-                </Text>
-              </motion.div>
-              <Box
-                display="flex"
-                justifyContent="center"
-                overflow="hidden"
-                pb="0.12em"
-                style={{
-                  fontFamily: "var(--font-bricolage-grotesque), sans-serif",
-                  fontSize: "clamp(96px, 23vw, 240px)",
-                  fontWeight: 800,
-                  lineHeight: 1,
-                  letterSpacing: "-0.075em",
-                }}
-              >
+              <g transform="translate(240 120)">
                 {["o", "z", "z", "o"].map((letter, i) => (
-                  <motion.span
+                  <motion.g
                     key={i}
-                    initial={{ y: "115%", rotate: 8 }}
+                    data-intro-letter={i}
+                    initial={{ opacity: 0, y: 35, x: (i - 1.5) * 96 }}
                     animate={{
-                      y: phase === "word" ? "0%" : "-120%",
-                      rotate: phase === "word" ? 0 : -8,
+                      x: merged ? 0 : (i - 1.5) * 96,
+                      y: 0,
+                      opacity: phase === "formed" && i >= 2 ? 0 : 1,
                     }}
                     transition={{
-                      duration: phase === "word" ? 0.9 : 0.45,
-                      delay: i * 0.07,
+                      duration: merged ? 0.9 : 0.65,
+                      delay: merged ? (letter === "o" ? 0.12 : 0) : i * 0.07,
                       ease: EASE,
-                    }}
-                    style={{
-                      display: "inline-block",
-                      color: i === 3 ? accent : ink,
-                      paddingRight: i === 3 ? "0.075em" : 0,
+                      opacity: { duration: 0.15 },
                     }}
                   >
-                    {letter}
-                  </motion.span>
+                    <motion.g
+                      initial={false}
+                      animate={{
+                        scale: merged ? 1.65 : letter === "o" ? 1 : 2.05,
+                      }}
+                      transition={{ duration: 0.9, ease: EASE }}
+                      style={{ transformOrigin: "0px 0px" }}
+                    >
+                      {letter === "o" ? (
+                        <motion.circle
+                          r="35.5"
+                          fill="none"
+                          strokeWidth="13"
+                          initial={false}
+                          animate={{
+                            stroke: i === 3 && !merged ? accent : ink,
+                          }}
+                          transition={{ duration: 0.9, ease: EASE }}
+                        />
+                      ) : (
+                        <path
+                          d={BRAND_Z_PATH}
+                          transform="translate(-50 -50)"
+                          fill={ink}
+                        />
+                      )}
+                    </motion.g>
+                  </motion.g>
                 ))}
-              </Box>
-              <motion.div
-                animate={{ opacity: phase === "word" ? 1 : 0 }}
-                transition={{ duration: 0.25 }}
-              >
-                <Text fontSize={{ base: "xs", md: "sm" }} color={muted} mt={2}>
-                  Software, books, and writing.
-                </Text>
-              </motion.div>
-            </Box>
+              </g>
+            </motion.svg>
+
+            <motion.div
+              animate={{ opacity: phase === "word" ? 1 : 0 }}
+              transition={{ duration: 0.25 }}
+              style={{
+                position: "absolute",
+                bottom: "8%",
+                textAlign: "center",
+              }}
+            >
+              <Text fontSize={{ base: "xs", md: "sm" }} color={muted}>
+                Software, books, and writing.
+              </Text>
+            </motion.div>
 
             {phase === "mark" && (
               <motion.div
                 layoutId="brand-mark"
                 transition={FLY_TRANSITION}
-                style={{ width: 120, height: 120, position: "relative" }}
+                style={{
+                  width: "34.375%",
+                  aspectRatio: "1",
+                  position: "relative",
+                }}
               >
                 <motion.div
-                  initial={{ opacity: 0, scale: 0.55, rotate: -35 }}
-                  animate={{ opacity: 1, scale: 1, rotate: 0 }}
-                  transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.4, ease: EASE }}
+                  style={{ width: "100%", height: "100%" }}
                 >
-                  <MoonZMark size={120} />
+                  <MoonZMark size="100%" loading />
                 </motion.div>
               </motion.div>
             )}

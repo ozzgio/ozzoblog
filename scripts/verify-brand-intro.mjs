@@ -1,7 +1,10 @@
 import assert from "node:assert/strict";
+import { mkdir } from "node:fs/promises";
 import { chromium } from "@playwright/test";
 
 const baseUrl = process.env.TARGET_URL || "http://localhost:3000";
+const artifactDir = process.env.INTRO_ARTIFACT_DIR || "/tmp/ozzo-intro";
+await mkdir(artifactDir, { recursive: true });
 const browser = await chromium.launch({
   headless: true,
   ...(process.env.BROWSER_EXECUTABLE_PATH && {
@@ -39,9 +42,7 @@ async function open(options = {}, path = "/") {
 }
 
 async function assertReleased(page) {
-  await page.clock.fastForward(4000);
-  await page.clock.fastForward(2000);
-  await page.clock.fastForward(2000);
+  for (let i = 0; i < 5; i++) await page.clock.fastForward(2000);
   await page.getByTestId("brand-intro").waitFor({ state: "detached" });
   assert.equal(await page.locator("[inert]").count(), 0);
   assert.notEqual(
@@ -52,6 +53,13 @@ async function assertReleased(page) {
     .getByRole("link", { name: "Ozzo, home" })
     .locator("[data-brand-wordmark]")
     .waitFor();
+}
+
+async function animateFor(page, duration) {
+  // Sample the endpoints without rendering every frame of the moon behind the overlay.
+  await page.clock.runFor(32);
+  await page.clock.fastForward(duration - 64);
+  await page.clock.runFor(32);
 }
 
 try {
@@ -74,16 +82,75 @@ try {
           () => document.documentElement.scrollWidth <= innerWidth,
         ),
       );
-      if (width === 320) await skip.click({ force: true });
-      else if (width === 390) await page.keyboard.press("Escape");
-      else {
-        await page.clock.fastForward(2500);
-        assert.equal(
-          await page.getByTestId("brand-intro").getAttribute("data-phase"),
-          "word",
-          "Keep the text visible long enough to read",
+      const intro = page.getByTestId("brand-intro");
+      await animateFor(page, 1100);
+      assert.equal(await intro.getAttribute("data-phase"), "word");
+      await page.screenshot({
+        path: `${artifactDir}/${width}-${colorScheme}-word.png`,
+      });
+      await page.clock.fastForward(450);
+      assert.equal(await intro.getAttribute("data-phase"), "merge");
+      await animateFor(page, 1150);
+      assert.equal(await intro.getAttribute("data-phase"), "formed");
+      const letters = await intro
+        .locator("[data-intro-letter]")
+        .evaluateAll((nodes) =>
+          nodes.map((node) => {
+            const shape = node.querySelector("circle, path");
+            const box = shape.getBoundingClientRect();
+            return {
+              x: box.x,
+              y: box.y,
+              width: box.width,
+              height: box.height,
+              opacity: getComputedStyle(node).opacity,
+            };
+          }),
         );
-      }
+      assert.ok(Math.abs(letters[0].x - letters[3].x) < 1, "Both Os merge");
+      assert.ok(Math.abs(letters[1].x - letters[2].x) < 1, "Both Zs merge");
+      assert.ok(
+        letters[0].width > letters[1].width * 1.5,
+        "The O encloses the Z",
+      );
+      await animateFor(page, 200);
+      assert.equal(
+        await intro
+          .locator('[data-intro-letter="2"]')
+          .evaluate((node) => getComputedStyle(node).opacity),
+        "0",
+      );
+      await page.screenshot({
+        path: `${artifactDir}/${width}-${colorScheme}-formed.png`,
+      });
+      await page.clock.fastForward(200);
+      assert.equal(await intro.getAttribute("data-phase"), "mark");
+      await animateFor(page, 450);
+      const orbit = intro.locator('[data-brand-orbit][data-loading="true"]');
+      const glyph = intro.locator('[data-brand-glyph="z"]');
+      const rotation = await orbit.evaluate(
+        (node) => getComputedStyle(node).transform,
+      );
+      const glyphBefore = await glyph.boundingBox();
+      await animateFor(page, 250);
+      assert.notEqual(
+        await orbit.evaluate((node) => getComputedStyle(node).transform),
+        rotation,
+        "The orange rim rotates",
+      );
+      assert.deepEqual(
+        await glyph.boundingBox(),
+        glyphBefore,
+        "The Z stays still",
+      );
+      assert.equal(
+        await page.locator("[inert]").count(),
+        1,
+        "Keep the page locked during loading",
+      );
+      await page.screenshot({
+        path: `${artifactDir}/${width}-${colorScheme}-loading.png`,
+      });
       await assertReleased(page);
       // Wait beyond the original sequence: skipping must cancel every phase timer.
       await page.clock.fastForward(6000);
@@ -95,10 +162,36 @@ try {
       assert.equal(await page.getByTestId("brand-intro").count(), 0);
       await context.close();
       console.log(
-        `PASS ${width}px ${colorScheme}: intro, dismissal, focus, repeat visit`,
+        `PASS ${width}px ${colorScheme}: fusion, enclosing O, rotating rim, focus, repeat visit`,
       );
     }
   }
+
+  for (const [phase, advances] of [
+    ["word", []],
+    ["merge", [1500]],
+    ["formed", [1500, 1100]],
+    ["mark", [1500, 1100, 350]],
+  ]) {
+    for (const method of ["button", "Escape"]) {
+      const { context, page } = await open();
+      for (const delay of advances) await page.clock.fastForward(delay);
+      assert.equal(
+        await page.getByTestId("brand-intro").getAttribute("data-phase"),
+        phase,
+      );
+      if (method === "button")
+        await page
+          .getByRole("button", { name: "Skip intro" })
+          .click({ force: true });
+      else await page.keyboard.press("Escape");
+      await assertReleased(page);
+      await page.clock.fastForward(6000);
+      assert.equal(await page.getByTestId("brand-intro").count(), 0);
+      await context.close();
+    }
+  }
+  console.log("PASS button and Escape dismissal during every intro phase");
 
   const reduced = await open({ reducedMotion: "reduce" });
   await assertReleased(reduced.page);
