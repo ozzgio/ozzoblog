@@ -70,7 +70,8 @@ const Layout = ({
           <script
             type="application/ld+json"
             dangerouslySetInnerHTML={{
-              __html: JSON.stringify(jsonLd),
+              // Escape "<" so editorial text like "</script>" cannot end the tag.
+              __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
             }}
           />
         )}

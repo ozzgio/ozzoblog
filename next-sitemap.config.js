@@ -22,12 +22,19 @@ module.exports = {
       return articles
         // Same rule as isInternalArticle: a slug plus a body gets its own page.
         .filter((a) => a?.slug && (a.content || a.body))
-        .map((a) => ({
-          loc: `/articles/${a.slug}`,
-          changefreq: "monthly",
-          priority: 0.8,
-          lastmod: a.date ? new Date(a.date).toISOString() : undefined,
-        }));
+        .map((a) => {
+          // An unparseable date drops only this entry's lastmod, not the list.
+          const date = a.date ? new Date(a.date) : null;
+          return {
+            loc: `/articles/${a.slug}`,
+            changefreq: "monthly",
+            priority: 0.8,
+            lastmod:
+              date && !Number.isNaN(date.getTime())
+                ? date.toISOString()
+                : undefined,
+          };
+        });
     } catch (err) {
       console.warn("sitemap: could not load articles:", err?.message || err);
       return [];
