@@ -76,6 +76,9 @@ const SIZES = {
     paragraphMb: 6,
     listSpacing: 3,
     headingMt: { h1: 8, h2: 10, h3: 8, h4: 6 },
+    // Chakra 3 "lg"/"md" heading presets are 18px/16px, smaller than the 17px
+    // body, so essay sections need explicit steps above it.
+    headingSize: { h1: "3xl", h2: "2xl", h3: "xl" },
   },
   compact: {
     fontSize: "15px",
@@ -85,6 +88,7 @@ const SIZES = {
     paragraphMb: 4,
     listSpacing: 2,
     headingMt: { h1: 6, h2: 6, h3: 5, h4: 4 },
+    headingSize: { h1: "lg", h2: "md", h3: "sm" },
   },
 };
 
@@ -163,13 +167,14 @@ export default function MarkdownProse({ children, size = "article" }) {
     paragraphMb,
     listSpacing,
     headingMt,
+    headingSize,
   } = SIZES[size] || SIZES.article;
 
   const components = {
     h1: ({ children }) => (
       <Heading
         as="h1"
-        size="lg"
+        size={headingSize.h1}
         color={headingColor}
         mt={headingMt.h1}
         mb={4}
@@ -191,7 +196,7 @@ export default function MarkdownProse({ children, size = "article" }) {
       >
         <Heading
           as="h2"
-          size="md"
+          size={headingSize.h2}
           color={headingColor}
           mt={headingMt.h2}
           mb={4}
@@ -205,7 +210,7 @@ export default function MarkdownProse({ children, size = "article" }) {
     h3: ({ children }) => (
       <Heading
         as="h3"
-        size="sm"
+        size={headingSize.h3}
         color={headingColor}
         mt={headingMt.h3}
         mb={3}

@@ -261,27 +261,34 @@ const ArticlesPage = ({ articles, error }) => {
                 p={{ base: 3, md: 4 }}
                 bg="bg.panel"
               >
-                <Stack direction={{ base: "column", md: "row" }} gap={4}>
+                <Stack
+                  direction="row"
+                  gap={{ base: 2, md: 4 }}
+                  flexWrap={{ base: "wrap", md: "nowrap" }}
+                >
                   <InputGroup
                     flex={1}
+                    minW={{ base: "0", md: "auto" }}
                     startElement={
                       <Icon as={IoSearchOutline} color="fg.muted" />
                     }
                   >
                     <Input
                       aria-label="Search articles"
-                      placeholder="Search titles, summaries, notes, or tags"
+                      placeholder="Search articles"
                       value={searchQuery}
                       onChange={(event) => setSearchQuery(event.target.value)}
                       minH="44px"
                     />
                   </InputGroup>
-                  <NativeSelect.Root maxW={{ base: "100%", md: "220px" }}>
+                  <NativeSelect.Root
+                    w={{ base: "128px", md: "220px" }}
+                    flexShrink={0}
+                  >
                     <NativeSelect.Field
                       aria-label="Sort articles"
                       value={sortOption}
                       onChange={(event) => setSortOption(event.target.value)}
-                      maxW={{ base: "100%", xl: "220px" }}
                       minH="44px"
                     >
                       <option value="newest">Newest First</option>
@@ -303,8 +310,18 @@ const ArticlesPage = ({ articles, error }) => {
                   )}
                 </Stack>
 
-                <Wrap mt={3} gap={1}>
-                  <WrapItem>
+                {/* One swipeable row on phones so the first article stays near
+                    the top; wraps from md up. */}
+                <Wrap
+                  mt={3}
+                  gap={1}
+                  flexWrap={{ base: "nowrap", md: "wrap" }}
+                  overflowX={{ base: "auto", md: "visible" }}
+                  mx={{ base: -3, md: 0 }}
+                  px={{ base: 3, md: 0 }}
+                  css={{ scrollbarWidth: "none" }}
+                >
+                  <WrapItem flexShrink={0}>
                     <Button
                       size="sm"
                       minH="44px"
@@ -317,7 +334,7 @@ const ArticlesPage = ({ articles, error }) => {
                     </Button>
                   </WrapItem>
                   {allTags.map(({ tag, count }) => (
-                    <WrapItem key={tag}>
+                    <WrapItem key={tag} flexShrink={0}>
                       <Button
                         size="sm"
                         minH="44px"
@@ -338,6 +355,10 @@ const ArticlesPage = ({ articles, error }) => {
                   color={mutedText}
                   fontSize="sm"
                   flexWrap="wrap"
+                  display={{
+                    base: hasActiveFilters ? "flex" : "none",
+                    md: "flex",
+                  }}
                 >
                   <HStack gap={1}>
                     <Icon asChild>
