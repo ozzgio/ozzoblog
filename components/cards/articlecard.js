@@ -2,12 +2,12 @@ import {
   Box,
   HStack,
   Icon,
-  Image,
   Heading,
   Tag,
   Text,
   VStack,
 } from "@chakra-ui/react";
+import NextImage from "next/image";
 import NextLink from "next/link";
 import { IoBookOutline, IoCalendarOutline } from "react-icons/io5";
 import {
@@ -134,13 +134,18 @@ const ArticleCard = ({
           bg="bg.subtle"
           borderRadius="md"
           overflow="hidden"
+          position="relative"
         >
-          <Image
+          {/* Source thumbnails are ~1700px PNGs (up to 2.4 MB); let Next serve
+              a resized copy for the 64–112px card instead of the original. */}
+          <NextImage
             src={thumbnail}
             alt={title}
-            w="100%"
-            h="100%"
-            objectFit="cover"
+            fill
+            sizes="(min-width: 30em) 112px, 64px"
+            style={{ objectFit: "cover" }}
+            // Hosts outside next.config remotePatterns would throw; show those as-is.
+            unoptimized={!/^https:\/\/(cdn\.jsdelivr\.net\/gh|raw\.githubusercontent\.com)\//.test(thumbnail)}
           />
         </Box>
       )}
