@@ -136,8 +136,8 @@ export default function ArticleDetailPage({ article, fetchError, slug }) {
             <VStack align="start" gap={4} w="100%">
               <Heading
                 as="h1"
-                size="lg"
-                lineHeight="1.25"
+                size={{ base: "3xl", md: "4xl" }}
+                lineHeight="1.2"
                 fontFamily={READING_FONT}
               >
                 {article.title}
