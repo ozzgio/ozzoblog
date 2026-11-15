@@ -1,3 +1,5 @@
+import { timingSafeEqual } from "node:crypto";
+
 // Disable body parsing so we can read the raw bytes for JSON parsing.
 export const config = {
   api: { bodyParser: false },
@@ -7,6 +9,14 @@ async function readRawBody(req) {
   const chunks = [];
   for await (const chunk of req) chunks.push(chunk);
   return Buffer.concat(chunks);
+}
+
+// Constant-time compare so response timing does not leak the secret.
+function secretMatches(given, expected) {
+  if (typeof given !== "string") return false;
+  const a = Buffer.from(given);
+  const b = Buffer.from(expected);
+  return a.length === b.length && timingSafeEqual(a, b);
 }
 
 export default async function handler(req, res) {
@@ -21,7 +31,7 @@ export default async function handler(req, res) {
   // Fail closed: missing env var = reject, not skip, to prevent an
   // unconfigured deployment from becoming an open email/job trigger.
   const secret = process.env.BUTTONDOWN_WEBHOOK_SECRET;
-  if (!secret || req.query.secret !== secret) {
+  if (!secret || !secretMatches(req.query.secret, secret)) {
     return res.status(401).json({ error: "Unauthorized" });
   }
 

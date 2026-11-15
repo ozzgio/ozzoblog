@@ -19,6 +19,7 @@ import NewsletterSubscribe from "../../components/NewsletterSubscribe";
 import ReadingProgress from "../../components/reading-progress";
 import { IoArrowBackOutline, IoCalendarOutline } from "react-icons/io5";
 import Layout from "../../components/layouts/layout";
+import { SITE_URL } from "../../libs/socialMetadata.mjs";
 import {
   fetchArticles,
   formatAbsoluteDate,
@@ -102,6 +103,16 @@ export default function ArticleDetailPage({ article, fetchError, slug }) {
       path={`/articles/${article.slug}`}
       image={article.og_image || article.thumbnail || undefined}
       ogType="article"
+      jsonLd={{
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        headline: article.title,
+        description: article.description || undefined,
+        datePublished: article.date || undefined,
+        image: article.og_image || article.thumbnail || undefined,
+        url: `${SITE_URL}/articles/${article.slug}`,
+        author: { "@type": "Person", name: "Ozzo", url: SITE_URL },
+      }}
     >
       <ReadingProgress targetRef={contentRef} color={progressColor} />
       {/* Measure tuned for long-form reading: ~70 characters per line at the
@@ -292,7 +303,9 @@ export async function getStaticPaths() {
     .filter(Boolean)
     .map((slug) => ({ params: { slug } }));
 
-  return { paths, fallback: false };
+  // "blocking" renders a slug published after the last build on its first
+  // request instead of returning 404 until the next deploy.
+  return { paths, fallback: "blocking" };
 }
 
 export async function getStaticProps({ params }) {

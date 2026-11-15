@@ -50,6 +50,12 @@ const Layout = ({
         <link rel="icon" href="/favicon.ico" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <link rel="manifest" href="/site.webmanifest" />
+        <link
+          rel="alternate"
+          type="application/rss+xml"
+          title="Ozzo's notebook"
+          href={`${SITE_URL}/rss.xml`}
+        />
         <meta property="og:title" content={shareTitle} />
         <meta property="og:description" content={description} />
         <meta property="og:type" content={ogType} />
