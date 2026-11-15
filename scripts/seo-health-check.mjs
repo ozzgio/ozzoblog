@@ -8,14 +8,11 @@
  *
  * Checks:
  *  1. RSS feed returns 200 and contains valid XML structure.
- *  2. Every URL in public/sitemap.xml returns 200.
+ *  2. /sitemap.xml lists the published articles and every URL returns 200.
  *  3. Key pages contain all required SEO tags.
  *  4. A current published article exposes article-specific social metadata.
  */
 
-import { readFileSync } from "fs";
-import { resolve, dirname } from "path";
-import { fileURLToPath } from "url";
 import { resolvePortfolioAssetUrl } from "../libs/portfolioAssets.mjs";
 import {
   DEFAULT_SOCIAL_IMAGE_URL,
@@ -23,8 +20,6 @@ import {
   resolveSocialImageUrl,
 } from "../libs/socialMetadata.mjs";
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const ROOT = resolve(__dirname, "..");
 const BASE_URL = process.env.BASE_URL || "http://localhost:3000";
 const TIMEOUT_MS = 15_000;
 const PORTFOLIO_ARTICLES_URL =
@@ -147,19 +142,23 @@ try {
 console.log("\n[2] Sitemap URLs");
 let sitemapUrls = [];
 try {
-  const sitemapPath = resolve(ROOT, "public/sitemap.xml");
-  const xml = readFileSync(sitemapPath, "utf8");
+  const res = await get("/sitemap.xml");
+  if (res.status !== 200) throw new Error(`HTTP ${res.status}`);
+  const xml = await res.text();
   // Extract all <loc> values
   sitemapUrls = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
-  console.log(`    Found ${sitemapUrls.length} URL(s) in public/sitemap.xml`);
+  console.log(`    Found ${sitemapUrls.length} URL(s) in /sitemap.xml`);
+  if (!sitemapUrls.some((u) => u.includes("/articles/"))) {
+    fail("/sitemap.xml lists no article pages");
+  }
 } catch (err) {
-  fail(`Cannot read public/sitemap.xml: ${err.message}`);
+  fail(`Cannot read /sitemap.xml: ${err.message}`);
 }
 
 const SITE_ORIGIN = new URL(SITE_URL).origin;
 
 for (const fullUrl of sitemapUrls) {
-  // Sitemap entries are expected to be same-origin (next-sitemap always
+  // Sitemap entries are expected to be same-origin (the route always
   // writes absolute ozzo.blog URLs) -- parse and check the origin
   // explicitly rather than trusting a regex strip, so a malformed or
   // unexpected <loc> can never turn into a request to another host.

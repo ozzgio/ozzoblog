@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "next build && next-sitemap",
+    "build": "next build",
     "start": "next start",
     "lint": "eslint .",
     "verify:native": "bash scripts/verify-native-fs.sh",
@@ -38,7 +38,6 @@
     "eslint": "^9.39.5",
     "eslint-config-next": "^16.4.6",
     "fast-glob": "file:tools/fast-glob-compat",
-    "next-sitemap": "^4.2.3",
     "prettier": "^3.9.6"
   },
   "overrides": {
