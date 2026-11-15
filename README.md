@@ -44,7 +44,7 @@ npm run verify:native # Verify native filesystem integration
 The SEO health workflow (`.github/workflows/seo-health.yml`) runs on every PR and `main` push:
 - Builds the site and starts `next start`
 - Verifies `/rss.xml` returns 200 with a valid RSS envelope
-- Verifies every URL in `public/sitemap.xml` returns 200
+- Verifies `/sitemap.xml` lists article pages and every URL in it returns 200
 - Checks key pages carry all required SEO tags: `title`, `meta description`, `canonical`, `og:*`, `twitter:card`
 
 ## Security and quality automation

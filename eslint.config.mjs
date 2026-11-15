@@ -5,7 +5,7 @@ import next from "eslint-config-next";
 const config = [
   ...next,
   {
-    ignores: [".next/**", "out/**", "node_modules/**", "next-sitemap.config.js"],
+    ignores: [".next/**", "out/**", "node_modules/**"],
   },
   {
     rules: {

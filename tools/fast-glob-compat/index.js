@@ -1,6 +1,6 @@
 // Replace the unpatched braces chain (GHSA-vfj7-8cjw-p6xm).
-// Only next-sitemap's callable async API and Next ESLint's globSync are used.
-// Remove when both upstream tools stop depending on vulnerable braces.
+// Only Next ESLint's globSync is used (the callable async API is kept for parity).
+// Remove when Next ESLint stops depending on vulnerable braces.
 const { glob, globSync } = require("tinyglobby");
 const { isAbsolute } = require("node:path");
 // tinyglobby defaults to relative results even for absolute input patterns.
