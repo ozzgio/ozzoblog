@@ -34,11 +34,11 @@
     "three": "^0.185.1"
   },
   "devDependencies": {
-    "@playwright/test": "^1.62.1",
+    "@playwright/test": "^1.65.0",
     "eslint": "^9.39.5",
     "eslint-config-next": "^16.4.6",
     "fast-glob": "file:tools/fast-glob-compat",
-    "prettier": "^3.9.6"
+    "prettier": "^3.10.1"
   },
   "overrides": {
     "nanoid": "^3.3.18",
