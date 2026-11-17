@@ -52,7 +52,7 @@ const QUESTIONS = [
   {
     name: "publishBy",
     label: "When do you want it out?",
-    placeholder: "Thursday 26 Nov",
+    placeholder: "e.g. next Thursday",
   },
 ];
 
